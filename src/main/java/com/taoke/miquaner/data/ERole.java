@@ -8,6 +8,12 @@ import java.util.List;
 @Table(name = "role")
 public class ERole {
 
+    public static final String SUPER_ROLE_NAME = "super role";
+
+    public boolean isSuperRole() {
+        return SUPER_ROLE_NAME.equals(this.name);
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -17,7 +23,7 @@ public class ERole {
     private String name;
 
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
-    private List<EAdmin> records = new ArrayList<>();
+    private List<EAdmin> admins = new ArrayList<>();
 
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     private List<EPrivilege> privileges = new ArrayList<>();
@@ -41,14 +47,6 @@ public class ERole {
         this.name = name;
     }
 
-    public List<EAdmin> getRecords() {
-        return records;
-    }
-
-    public void setRecords(List<EAdmin> records) {
-        this.records = records;
-    }
-
     public List<EPrivilege> getPrivileges() {
         return privileges;
     }
@@ -63,5 +61,13 @@ public class ERole {
 
     public void setMenus(List<EMenu> menus) {
         this.menus = menus;
+    }
+
+    public List<EAdmin> getAdmins() {
+        return admins;
+    }
+
+    public void setAdmins(List<EAdmin> admins) {
+        this.admins = admins;
     }
 }

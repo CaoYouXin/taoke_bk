@@ -3,8 +3,11 @@ package com.taoke.miquaner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.taobao.api.internal.toplink.embedded.websocket.util.StringUtil;
+import com.taoke.miquaner.data.EAdmin;
 import com.taoke.miquaner.data.EConfig;
+import com.taoke.miquaner.data.ERole;
 import com.taoke.miquaner.repo.ConfigRepo;
+import com.taoke.miquaner.repo.RoleRepo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -20,6 +23,7 @@ import org.springframework.web.util.UrlPathHelper;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @SpringBootApplication
 @ServletComponentScan
@@ -31,13 +35,26 @@ public class MiquanerApplication {
         ConfigurableApplicationContext context = SpringApplication.run(MiquanerApplication.class, args);
 
         ConfigRepo configRepo = context.getBean(ConfigRepo.class);
-        EConfig byKeyEquals = configRepo.findByKeyEquals(EConfig.SERVER_TOKEN);
-        if (null == byKeyEquals) {
-            byKeyEquals = new EConfig();
-            byKeyEquals.setKey(EConfig.SERVER_TOKEN);
+        EConfig config = configRepo.findByKeyEquals(EConfig.SERVER_TOKEN);
+        if (null == config) {
+            config = new EConfig();
+            config.setKey(EConfig.SERVER_TOKEN);
         }
-        byKeyEquals.setValue(StringUtil.toMD5HexString(DEFAULT_DATE_FORMAT.format(new Date())));
-        configRepo.save(byKeyEquals);
+        config.setValue(StringUtil.toMD5HexString(DEFAULT_DATE_FORMAT.format(new Date())));
+        configRepo.save(config);
+
+        RoleRepo roleRepo = context.getBean(RoleRepo.class);
+        ERole role = roleRepo.findByNameEquals(ERole.SUPER_ROLE_NAME);
+        if (null == role) {
+            role = new ERole();
+            role.setName(ERole.SUPER_ROLE_NAME);
+            roleRepo.save(role);
+        } else {
+            List<EAdmin> admins = role.getAdmins();
+            if (admins.size() > 1) {
+                context.stop();
+            }
+        }
     }
 
 	@Bean

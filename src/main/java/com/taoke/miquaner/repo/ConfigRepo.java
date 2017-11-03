@@ -7,4 +7,6 @@ public interface ConfigRepo extends JpaRepository<EConfig, Long> {
 
     EConfig findByKeyEquals(String key);
 
+    EConfig findByKeyEqualsAndAndValueEquals(String key, String value);
+
 }
