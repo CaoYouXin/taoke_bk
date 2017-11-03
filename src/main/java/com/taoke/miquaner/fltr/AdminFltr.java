@@ -1,13 +1,8 @@
 package com.taoke.miquaner.fltr;
 
-import org.springframework.core.annotation.Order;
-
 import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
 import java.io.IOException;
 
-@Order(1)
-@WebFilter(filterName = "admin filter", urlPatterns = "/admin/**")
 public class AdminFltr implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -16,8 +11,9 @@ public class AdminFltr implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        System.out.println("test: from admin filter");
+        System.out.println("test: before admin filter " + System.currentTimeMillis());
         filterChain.doFilter(servletRequest, servletResponse);
+        System.out.println("test: after admin filter " + System.currentTimeMillis());
     }
 
     @Override
