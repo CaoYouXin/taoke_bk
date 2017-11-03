@@ -1,6 +1,8 @@
 package com.taoke.miquaner.data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "privilege")
@@ -14,9 +16,11 @@ public class EPrivilege {
     @Column(name = "api", length = 2048, nullable = false)
     private String api;
 
-    @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id")
-    private ERole role;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "role_privilege",
+            joinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private List<ERole> roles = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -34,11 +38,11 @@ public class EPrivilege {
         this.api = api;
     }
 
-    public ERole getRole() {
-        return role;
+    public List<ERole> getRoles() {
+        return roles;
     }
 
-    public void setRole(ERole role) {
-        this.role = role;
+    public void setRoles(List<ERole> roles) {
+        this.roles = roles;
     }
 }

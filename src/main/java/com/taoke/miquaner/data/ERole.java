@@ -25,10 +25,10 @@ public class ERole {
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     private List<EAdmin> admins = new ArrayList<>();
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private List<EPrivilege> privileges = new ArrayList<>();
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private List<EMenu> menus = new ArrayList<>();
 
     public Long getId() {
