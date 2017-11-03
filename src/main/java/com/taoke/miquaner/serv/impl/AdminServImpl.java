@@ -59,5 +59,10 @@ public class AdminServImpl implements IAdminServ {
         }
     }
 
-    
+    @Override
+    public Object getRoles() {
+        return null;
+    }
+
+
 }

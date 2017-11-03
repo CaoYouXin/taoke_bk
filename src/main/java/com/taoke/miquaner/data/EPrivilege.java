@@ -14,9 +14,6 @@ public class EPrivilege {
     @Column(name = "api", length = 2048, nullable = false)
     private String api;
 
-    @Column(name = "isAdmin", nullable = false)
-    private Boolean isAdmin;
-
     @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private ERole role;
@@ -35,14 +32,6 @@ public class EPrivilege {
 
     public void setApi(String api) {
         this.api = api;
-    }
-
-    public Boolean getAdmin() {
-        return isAdmin;
-    }
-
-    public void setAdmin(Boolean admin) {
-        isAdmin = admin;
     }
 
     public ERole getRole() {

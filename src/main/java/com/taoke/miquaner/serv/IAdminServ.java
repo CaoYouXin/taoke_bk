@@ -6,4 +6,6 @@ public interface IAdminServ {
 
     Object setSuperUser(SuperUserSubmit superUserSubmit);
 
+    Object getRoles();
+
 }

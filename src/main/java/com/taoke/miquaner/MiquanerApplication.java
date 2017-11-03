@@ -8,12 +8,15 @@ import com.taoke.miquaner.data.EConfig;
 import com.taoke.miquaner.data.ERole;
 import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.RoleRepo;
+import com.taoke.miquaner.serv.IInitServ;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -34,27 +37,8 @@ public class MiquanerApplication {
 	public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(MiquanerApplication.class, args);
 
-        ConfigRepo configRepo = context.getBean(ConfigRepo.class);
-        EConfig config = configRepo.findByKeyEquals(EConfig.SERVER_TOKEN);
-        if (null == config) {
-            config = new EConfig();
-            config.setKey(EConfig.SERVER_TOKEN);
-        }
-        config.setValue(StringUtil.toMD5HexString(DEFAULT_DATE_FORMAT.format(new Date())));
-        configRepo.save(config);
-
-        RoleRepo roleRepo = context.getBean(RoleRepo.class);
-        ERole role = roleRepo.findByNameEquals(ERole.SUPER_ROLE_NAME);
-        if (null == role) {
-            role = new ERole();
-            role.setName(ERole.SUPER_ROLE_NAME);
-            roleRepo.save(role);
-        } else {
-            List<EAdmin> admins = role.getAdmins();
-            if (admins.size() > 1) {
-                context.stop();
-            }
-        }
+        IInitServ initServ = context.getBean(IInitServ.class);
+        initServ.init(context);
     }
 
 	@Bean
