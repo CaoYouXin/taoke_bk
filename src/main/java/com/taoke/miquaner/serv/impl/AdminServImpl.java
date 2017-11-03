@@ -8,8 +8,10 @@ import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.RoleRepo;
 import com.taoke.miquaner.serv.IAdminServ;
 import com.taoke.miquaner.util.ErrorR;
+import com.taoke.miquaner.util.JpaUtil;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.AdminUserSubmit;
+import com.taoke.miquaner.view.RoleSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +55,8 @@ public class AdminServImpl implements IAdminServ {
         EAdmin admin = new EAdmin();
         BeanUtils.copyProperties(superUserSubmit, admin);
         admin.setRole(superRole);
-        return persistentAdmin(admin);
+
+        return JpaUtil.persistent(this.adminRepo, admin);
     }
 
     @Override
@@ -72,20 +75,16 @@ public class AdminServImpl implements IAdminServ {
         EAdmin admin = new EAdmin();
         BeanUtils.copyProperties(adminUserSubmit, admin);
         admin.setRole(role);
-        return persistentAdmin(admin);
+
+        return JpaUtil.persistent(this.adminRepo, admin);
     }
 
-    private Object persistentAdmin(EAdmin admin) {
-        try {
-            EAdmin saved = this.adminRepo.save(admin);
-            if (null == saved.getId()) {
-                return Result.fail(new ErrorR(ErrorR.CAN_NOT_SAVE_OBJECT, ErrorR.CAN_NOT_SAVE_OBJECT_MSG));
-            }
-            return Result.success(saved);
-        } catch (Exception e) {
-            return Result.fail(new ErrorR(ErrorR.CAN_NOT_SAVE_OBJECT, ErrorR.CAN_NOT_SAVE_OBJECT_MSG));
-        }
-    }
+    @Override
+    public Object createRole(RoleSubmit roleSubmit) {
+        ERole role = new ERole();
+        BeanUtils.copyProperties(roleSubmit, role);
 
+        return JpaUtil.persistent(this.roleRepo, role);
+    }
 
 }

@@ -3,6 +3,7 @@ package com.taoke.miquaner.ctrl;
 import com.taoke.miquaner.serv.IAdminServ;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.AdminUserSubmit;
+import com.taoke.miquaner.view.RoleSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,11 @@ public class AdminCtrl {
     @RequestMapping(value = "/admin/user/create", method = RequestMethod.POST)
     public Object createAdmin(AdminUserSubmit adminUserSubmit) {
         return this.adminServ.createAdmin(adminUserSubmit);
+    }
+
+    @RequestMapping(value = "/admin/role/create", method = RequestMethod.POST)
+    public Object createRole(RoleSubmit roleSubmit) {
+        return this.adminServ.createRole(roleSubmit);
     }
 
 }
