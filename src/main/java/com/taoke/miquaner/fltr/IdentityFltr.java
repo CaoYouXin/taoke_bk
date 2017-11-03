@@ -1,9 +1,15 @@
 package com.taoke.miquaner.fltr;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import javax.servlet.*;
 import java.io.IOException;
 
 public class IdentityFltr implements Filter {
+
+    private static final Logger logger = LogManager.getLogger(IdentityFltr.class);
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
@@ -11,9 +17,9 @@ public class IdentityFltr implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        System.out.println("test: before identity filter " + System.currentTimeMillis());
+        logger.info("test: before identity filter");
         filterChain.doFilter(servletRequest, servletResponse);
-        System.out.println("test: after identity filter " + System.currentTimeMillis());
+        logger.info("test: after identity filter");
     }
 
     @Override
