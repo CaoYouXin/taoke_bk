@@ -41,4 +41,9 @@ public class AdminCtrl {
         return this.adminServ.createRole(roleSubmit);
     }
 
+    @RequestMapping("/admin/privilege/list")
+    public Object getPrivileges() {
+        return this.adminServ.getPrivileges();
+    }
+
 }

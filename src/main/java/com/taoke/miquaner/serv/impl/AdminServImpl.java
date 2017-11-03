@@ -5,6 +5,7 @@ import com.taoke.miquaner.data.EConfig;
 import com.taoke.miquaner.data.ERole;
 import com.taoke.miquaner.repo.AdminRepo;
 import com.taoke.miquaner.repo.ConfigRepo;
+import com.taoke.miquaner.repo.PrivilegeRepo;
 import com.taoke.miquaner.repo.RoleRepo;
 import com.taoke.miquaner.serv.IAdminServ;
 import com.taoke.miquaner.util.ErrorR;
@@ -35,6 +36,8 @@ public class AdminServImpl implements IAdminServ {
     private AdminRepo adminRepo;
     @Autowired
     private RoleRepo roleRepo;
+    @Autowired
+    private PrivilegeRepo privilegeRepo;
 
     @Override
     public Object setSuperUser(SuperUserSubmit superUserSubmit) {
@@ -62,7 +65,11 @@ public class AdminServImpl implements IAdminServ {
     @Override
     public Object getRoles() {
         List<ERole> all = this.roleRepo.findAll();
-        return Result.success(all.stream().filter(eRole -> !eRole.isSuperRole()).collect(Collectors.toList()));
+        return Result.success(all.stream().filter(eRole -> !eRole.isSuperRole()).peek(eRole -> {
+            eRole.setAdmins(null);
+            eRole.setMenus(null);
+            eRole.setPrivileges(null);
+        }).collect(Collectors.toList()));
     }
 
     @Override
@@ -85,6 +92,13 @@ public class AdminServImpl implements IAdminServ {
         BeanUtils.copyProperties(roleSubmit, role);
 
         return JpaUtil.persistent(this.roleRepo, role);
+    }
+
+    @Override
+    public Object getPrivileges() {
+        return Result.success(this.privilegeRepo.findAll().stream().peek(ePrivilege -> {
+            ePrivilege.setRoles(null);
+        }).collect(Collectors.toList()));
     }
 
 }

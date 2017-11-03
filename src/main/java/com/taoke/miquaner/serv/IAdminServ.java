@@ -14,4 +14,6 @@ public interface IAdminServ {
 
     Object createRole(RoleSubmit roleSubmit);
 
+    Object getPrivileges();
+
 }
