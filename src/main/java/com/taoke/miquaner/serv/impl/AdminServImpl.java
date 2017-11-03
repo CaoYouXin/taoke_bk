@@ -33,6 +33,7 @@ public class AdminServImpl implements IAdminServ {
     private static final String SUBMIT_NEED_ROLE = "未指定角色";
     private static final String ALREADY_BIND = "已经绑定过";
     private static final String BIND_SUCCESS = "绑定成功";
+    private static final String UNBIND_SUCCESS = "解绑成功";
 
     @Autowired
     private ConfigRepo configRepo;
@@ -118,6 +119,14 @@ public class AdminServImpl implements IAdminServ {
         privilege.getRoles().add(role);
         this.privilegeRepo.save(privilege);
         return Result.success(BIND_SUCCESS);
+    }
+
+    @Override
+    public Object unbindPrivilege(BindSubmit bindSubmit) {
+        EPrivilege privilege = this.privilegeRepo.findOne(bindSubmit.getId());
+        privilege.setRoles(privilege.getRoles().stream().filter(eRole -> !bindSubmit.getTo().equals(eRole.getId())).collect(Collectors.toList()));
+        this.privilegeRepo.save(privilege);
+        return Result.success(UNBIND_SUCCESS);
     }
 
 }

@@ -19,4 +19,6 @@ public interface IAdminServ {
 
     Object bindPrivilege(BindSubmit bindSubmit);
 
+    Object unbindPrivilege(BindSubmit bindSubmit);
+
 }
