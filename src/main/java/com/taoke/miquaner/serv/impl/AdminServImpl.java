@@ -9,10 +9,14 @@ import com.taoke.miquaner.repo.RoleRepo;
 import com.taoke.miquaner.serv.IAdminServ;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
+import com.taoke.miquaner.view.AdminUserSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -21,6 +25,7 @@ public class AdminServImpl implements IAdminServ {
     private static final String ST_NOT_MATCH = "你的Token有误";
     private static final String NO_SUPER_ROLE = "没有超管权限可以绑定，错误可能发生在启动服务时";
     private static final String ALREADY_HAS_SUPER_USER = "系统里已经存在一个超级管理员了，超级管理员只能存在一个";
+    private static final String SUBMIT_NEED_ROLE = "未指定角色";
 
     @Autowired
     private ConfigRepo configRepo;
@@ -48,6 +53,29 @@ public class AdminServImpl implements IAdminServ {
         EAdmin admin = new EAdmin();
         BeanUtils.copyProperties(superUserSubmit, admin);
         admin.setRole(superRole);
+        return persistentAdmin(admin);
+    }
+
+    @Override
+    public Object getRoles() {
+        List<ERole> all = this.roleRepo.findAll();
+        return Result.success(all.stream().filter(eRole -> !eRole.isSuperRole()).collect(Collectors.toList()));
+    }
+
+    @Override
+    public Object createAdmin(AdminUserSubmit adminUserSubmit) {
+        ERole role = this.roleRepo.findOne(adminUserSubmit.getRoleId());
+        if (null == role) {
+            return Result.fail(new ErrorR(ErrorR.SUBMIT_NEED_ROLE, SUBMIT_NEED_ROLE));
+        }
+
+        EAdmin admin = new EAdmin();
+        BeanUtils.copyProperties(adminUserSubmit, admin);
+        admin.setRole(role);
+        return persistentAdmin(admin);
+    }
+
+    private Object persistentAdmin(EAdmin admin) {
         try {
             EAdmin saved = this.adminRepo.save(admin);
             if (null == saved.getId()) {
@@ -57,11 +85,6 @@ public class AdminServImpl implements IAdminServ {
         } catch (Exception e) {
             return Result.fail(new ErrorR(ErrorR.CAN_NOT_SAVE_OBJECT, ErrorR.CAN_NOT_SAVE_OBJECT_MSG));
         }
-    }
-
-    @Override
-    public Object getRoles() {
-        return null;
     }
 
 

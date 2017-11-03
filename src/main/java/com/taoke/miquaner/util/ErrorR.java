@@ -8,6 +8,7 @@ public class ErrorR {
     public static final String NO_SUPER_ROLE = "NO_SUPER_ROLE";
     public static final String CAN_NOT_SAVE_OBJECT = "CAN_NOT_SAVE_OBJECT";
     public static final String ALREADY_HAS_SUPER_USER = "ALREADY_HAS_SUPER_USER";
+    public static final String SUBMIT_NEED_ROLE = "SUBMIT_NEED_ROLE";
 
     private String key;
     private String msg;
