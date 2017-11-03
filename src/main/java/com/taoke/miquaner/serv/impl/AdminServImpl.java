@@ -2,6 +2,7 @@ package com.taoke.miquaner.serv.impl;
 
 import com.taoke.miquaner.data.EAdmin;
 import com.taoke.miquaner.data.EConfig;
+import com.taoke.miquaner.data.EPrivilege;
 import com.taoke.miquaner.data.ERole;
 import com.taoke.miquaner.repo.AdminRepo;
 import com.taoke.miquaner.repo.ConfigRepo;
@@ -12,6 +13,7 @@ import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.JpaUtil;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.AdminUserSubmit;
+import com.taoke.miquaner.view.BindSubmit;
 import com.taoke.miquaner.view.RoleSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
 import org.springframework.beans.BeanUtils;
@@ -29,6 +31,8 @@ public class AdminServImpl implements IAdminServ {
     private static final String NO_SUPER_ROLE = "没有超管权限可以绑定，错误可能发生在启动服务时";
     private static final String ALREADY_HAS_SUPER_USER = "系统里已经存在一个超级管理员了，超级管理员只能存在一个";
     private static final String SUBMIT_NEED_ROLE = "未指定角色";
+    private static final String ALREADY_BIND = "已经绑定过";
+    private static final String BIND_SUCCESS = "绑定成功";
 
     @Autowired
     private ConfigRepo configRepo;
@@ -99,6 +103,21 @@ public class AdminServImpl implements IAdminServ {
         return Result.success(this.privilegeRepo.findAll().stream().peek(ePrivilege -> {
             ePrivilege.setRoles(null);
         }).collect(Collectors.toList()));
+    }
+
+    @Override
+    public Object bindPrivilege(BindSubmit bindSubmit) {
+        EPrivilege privilege = this.privilegeRepo.findOne(bindSubmit.getId());
+        boolean alreadyBind = privilege.getRoles().stream().anyMatch(eRole -> bindSubmit.getTo().equals(eRole.getId()));
+
+        if (alreadyBind) {
+            return Result.success(ALREADY_BIND);
+        }
+
+        ERole role = this.roleRepo.findOne(bindSubmit.getTo());
+        privilege.getRoles().add(role);
+        this.privilegeRepo.save(privilege);
+        return Result.success(BIND_SUCCESS);
     }
 
 }

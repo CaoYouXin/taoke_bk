@@ -3,12 +3,15 @@ package com.taoke.miquaner.ctrl;
 import com.taoke.miquaner.serv.IAdminServ;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.AdminUserSubmit;
+import com.taoke.miquaner.view.BindSubmit;
 import com.taoke.miquaner.view.RoleSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.persistence.Entity;
 
 @RestController
 public class AdminCtrl {
@@ -44,6 +47,11 @@ public class AdminCtrl {
     @RequestMapping("/admin/privilege/list")
     public Object getPrivileges() {
         return this.adminServ.getPrivileges();
+    }
+
+    @RequestMapping(value = "/admin/privilege/bind", method = RequestMethod.POST)
+    public Object bindPrivilege(BindSubmit bindSubmit) {
+        return this.adminServ.bindPrivilege(bindSubmit);
     }
 
 }

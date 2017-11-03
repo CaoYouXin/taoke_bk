@@ -1,6 +1,7 @@
 package com.taoke.miquaner.serv;
 
 import com.taoke.miquaner.view.AdminUserSubmit;
+import com.taoke.miquaner.view.BindSubmit;
 import com.taoke.miquaner.view.RoleSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
 
@@ -15,5 +16,7 @@ public interface IAdminServ {
     Object createRole(RoleSubmit roleSubmit);
 
     Object getPrivileges();
+
+    Object bindPrivilege(BindSubmit bindSubmit);
 
 }
