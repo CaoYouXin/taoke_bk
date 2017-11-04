@@ -1,26 +1,27 @@
 package com.taoke.miquaner.ctrl;
 
 import com.taoke.miquaner.data.EAdmin;
+import com.taoke.miquaner.data.EMenu;
 import com.taoke.miquaner.data.ERole;
 import com.taoke.miquaner.serv.IAdminServ;
-import com.taoke.miquaner.util.Auth;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.AdminUserSubmit;
 import com.taoke.miquaner.view.BindSubmit;
-import com.taoke.miquaner.view.RoleSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.persistence.Entity;
-
 @RestController
 public class AdminCtrl {
 
-    @Autowired
     private IAdminServ adminServ;
+
+    @Autowired
+    public AdminCtrl(IAdminServ adminServ) {
+        this.adminServ = adminServ;
+    }
 
     @RequestMapping("/admin/ping")
     public Object adminPing() {
@@ -43,8 +44,8 @@ public class AdminCtrl {
     }
 
     @RequestMapping(value = "/admin/role/create", method = RequestMethod.POST)
-    public Object createRole(RoleSubmit roleSubmit) {
-        return this.adminServ.createRole(roleSubmit);
+    public Object createRole(ERole role) {
+        return this.adminServ.createRole(role);
     }
 
     @RequestMapping("/admin/privilege/list")
@@ -75,6 +76,31 @@ public class AdminCtrl {
     @RequestMapping(value = "/admin/user/role/change", method = RequestMethod.POST)
     public Object changeAdminRole(EAdmin admin) {
         return this.adminServ.changeAdminRole(admin);
+    }
+
+    @RequestMapping("/admin/menu/list")
+    public Object getMenuList() {
+        return this.adminServ.getMenus();
+    }
+
+    @RequestMapping(value = "/admin/menu/create", method = RequestMethod.POST)
+    public Object createMenu(EMenu menu) {
+        return this.adminServ.createMenu(menu);
+    }
+
+    @RequestMapping(value = "/admin/menu/change", method = RequestMethod.POST)
+    public Object changeMenu(EMenu menu) {
+        return this.adminServ.changeMenu(menu);
+    }
+
+    @RequestMapping(value = "/admin/menu/bind", method = RequestMethod.POST)
+    public Object bindMenu(BindSubmit bindSubmit) {
+        return this.adminServ.bindMenu(bindSubmit);
+    }
+
+    @RequestMapping(value = "/admin/menu/unbind", method = RequestMethod.POST)
+    public Object unbindMenu(BindSubmit bindSubmit) {
+        return this.adminServ.unbindMenu(bindSubmit);
     }
 
 }

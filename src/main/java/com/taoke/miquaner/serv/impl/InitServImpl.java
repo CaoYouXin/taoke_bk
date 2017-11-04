@@ -28,12 +28,16 @@ import java.util.List;
 @Service
 public class InitServImpl implements IInitServ {
 
-    @Autowired
     private ConfigRepo configRepo;
-    @Autowired
     private RoleRepo roleRepo;
-    @Autowired
     private PrivilegeRepo privilegeRepo;
+
+    @Autowired
+    public InitServImpl(ConfigRepo configRepo, RoleRepo roleRepo, PrivilegeRepo privilegeRepo) {
+        this.configRepo = configRepo;
+        this.roleRepo = roleRepo;
+        this.privilegeRepo = privilegeRepo;
+    }
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)

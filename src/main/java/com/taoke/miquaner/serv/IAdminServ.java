@@ -1,10 +1,10 @@
 package com.taoke.miquaner.serv;
 
 import com.taoke.miquaner.data.EAdmin;
+import com.taoke.miquaner.data.EMenu;
 import com.taoke.miquaner.data.ERole;
 import com.taoke.miquaner.view.AdminUserSubmit;
 import com.taoke.miquaner.view.BindSubmit;
-import com.taoke.miquaner.view.RoleSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
 
 public interface IAdminServ {
@@ -19,7 +19,7 @@ public interface IAdminServ {
 
     Object changeAdminPwd(EAdmin admin);
 
-    Object createRole(RoleSubmit roleSubmit);
+    Object createRole(ERole role);
 
     Object changeRole(ERole role);
 
@@ -29,5 +29,14 @@ public interface IAdminServ {
 
     Object unbindPrivilege(BindSubmit bindSubmit);
 
+    Object getMenus();
+
+    Object createMenu(EMenu menu);
+
+    Object changeMenu(EMenu menu);
+
+    Object bindMenu(BindSubmit bindSubmit);
+
+    Object unbindMenu(BindSubmit bindSubmit);
 
 }

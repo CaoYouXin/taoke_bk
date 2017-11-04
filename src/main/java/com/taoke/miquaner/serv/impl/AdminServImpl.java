@@ -1,24 +1,15 @@
 package com.taoke.miquaner.serv.impl;
 
-import com.taoke.miquaner.data.EAdmin;
-import com.taoke.miquaner.data.EConfig;
-import com.taoke.miquaner.data.EPrivilege;
-import com.taoke.miquaner.data.ERole;
-import com.taoke.miquaner.repo.AdminRepo;
-import com.taoke.miquaner.repo.ConfigRepo;
-import com.taoke.miquaner.repo.PrivilegeRepo;
-import com.taoke.miquaner.repo.RoleRepo;
+import com.taoke.miquaner.data.*;
+import com.taoke.miquaner.repo.*;
 import com.taoke.miquaner.serv.IAdminServ;
 import com.taoke.miquaner.util.ErrorR;
-import com.taoke.miquaner.util.JpaUtil;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.AdminUserSubmit;
 import com.taoke.miquaner.view.BindSubmit;
-import com.taoke.miquaner.view.RoleSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,14 +28,20 @@ public class AdminServImpl implements IAdminServ {
     private static final String UNBIND_SUCCESS = "解绑成功";
     private static final String NO_ID_FOUND = "没有找到主键，错误可能发生在前端漏传主键字段";
 
-    @Autowired
     private ConfigRepo configRepo;
-    @Autowired
     private AdminRepo adminRepo;
-    @Autowired
     private RoleRepo roleRepo;
-    @Autowired
     private PrivilegeRepo privilegeRepo;
+    private MenuRepo menuRepo;
+
+    @Autowired
+    public AdminServImpl(ConfigRepo configRepo, AdminRepo adminRepo, RoleRepo roleRepo, PrivilegeRepo privilegeRepo, MenuRepo menuRepo) {
+        this.configRepo = configRepo;
+        this.adminRepo = adminRepo;
+        this.roleRepo = roleRepo;
+        this.privilegeRepo = privilegeRepo;
+        this.menuRepo = menuRepo;
+    }
 
     @Override
     public Object setSuperUser(SuperUserSubmit superUserSubmit) {
@@ -65,8 +62,10 @@ public class AdminServImpl implements IAdminServ {
         EAdmin admin = new EAdmin();
         BeanUtils.copyProperties(superUserSubmit, admin);
         admin.setRole(superRole);
-
-        return JpaUtil.persistent(this.adminRepo, admin);
+        this.adminRepo.save(admin);
+        admin.setGrantedAdmins(null);
+        admin.getParentAdmin().setGrantedAdmins(null);
+        return Result.success(admin);
     }
 
     @Override
@@ -89,8 +88,10 @@ public class AdminServImpl implements IAdminServ {
         EAdmin admin = new EAdmin();
         BeanUtils.copyProperties(adminUserSubmit, admin);
         admin.setRole(role);
-
-        return JpaUtil.persistent(this.adminRepo, admin);
+        this.adminRepo.save(admin);
+        admin.setGrantedAdmins(null);
+        admin.getParentAdmin().setGrantedAdmins(null);
+        return Result.success(admin);
     }
 
     @Override
@@ -110,15 +111,19 @@ public class AdminServImpl implements IAdminServ {
 
         EAdmin one = this.adminRepo.findOne(admin.getId());
         BeanUtils.copyProperties(admin, one);
-        return JpaUtil.persistent(this.adminRepo, one);
+        this.adminRepo.save(admin);
+        admin.setGrantedAdmins(null);
+        admin.getParentAdmin().setGrantedAdmins(null);
+        return Result.success(admin);
     }
 
     @Override
-    public Object createRole(RoleSubmit roleSubmit) {
-        ERole role = new ERole();
-        BeanUtils.copyProperties(roleSubmit, role);
-
-        return JpaUtil.persistent(this.roleRepo, role);
+    public Object createRole(ERole role) {
+        this.roleRepo.save(role);
+        role.setPrivileges(null);
+        role.setMenus(null);
+        role.setAdmins(null);
+        return Result.success(role);
     }
 
     @Override
@@ -129,14 +134,16 @@ public class AdminServImpl implements IAdminServ {
 
         ERole one = this.roleRepo.findOne(role.getId());
         BeanUtils.copyProperties(role, one);
-        return JpaUtil.persistent(this.roleRepo, one);
+        this.roleRepo.save(role);
+        role.setPrivileges(null);
+        role.setMenus(null);
+        role.setAdmins(null);
+        return Result.success(role);
     }
 
     @Override
     public Object getPrivileges() {
-        return Result.success(this.privilegeRepo.findAll().stream().peek(ePrivilege -> {
-            ePrivilege.setRoles(null);
-        }).collect(Collectors.toList()));
+        return Result.success(this.privilegeRepo.findAll().stream().peek(ePrivilege -> ePrivilege.setRoles(null)).collect(Collectors.toList()));
     }
 
     @Override
@@ -162,4 +169,51 @@ public class AdminServImpl implements IAdminServ {
         return Result.success(UNBIND_SUCCESS);
     }
 
+    @Override
+    public Object getMenus() {
+        return Result.success(this.menuRepo.findAll().stream().peek(menu -> menu.setRoles(null)).collect(Collectors.toList()));
+    }
+
+    @Override
+    public Object createMenu(EMenu menu) {
+        this.menuRepo.save(menu);
+        menu.setRoles(null);
+        return Result.success(menu);
+    }
+
+    @Override
+    public Object changeMenu(EMenu menu) {
+        if (null == menu.getId()) {
+            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, NO_ID_FOUND));
+        }
+
+        EMenu one = this.menuRepo.findOne(menu.getId());
+        BeanUtils.copyProperties(menu, one);
+        this.menuRepo.save(menu);
+        menu.setRoles(null);
+        return Result.success(menu);
+    }
+
+    @Override
+    public Object bindMenu(BindSubmit bindSubmit) {
+        EMenu menu = this.menuRepo.findOne(bindSubmit.getId());
+        boolean alreadyBind = menu.getRoles().stream().anyMatch(role -> bindSubmit.getTo().equals(role.getId()));
+
+        if (alreadyBind) {
+            return Result.success(ALREADY_BIND);
+        }
+
+        ERole role = this.roleRepo.findOne(bindSubmit.getTo());
+        menu.getRoles().add(role);
+        this.menuRepo.save(menu);
+        return Result.success(BIND_SUCCESS);
+    }
+
+    @Override
+    public Object unbindMenu(BindSubmit bindSubmit) {
+        EMenu menu = this.menuRepo.findOne(bindSubmit.getId());
+        menu.setRoles(menu.getRoles().stream().filter(eRole -> !bindSubmit.getTo().equals(eRole.getId())).collect(Collectors.toList()));
+        this.menuRepo.save(menu);
+        return Result.success(UNBIND_SUCCESS);
+    }
 }
