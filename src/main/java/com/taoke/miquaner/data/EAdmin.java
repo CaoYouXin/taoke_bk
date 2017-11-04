@@ -1,6 +1,8 @@
 package com.taoke.miquaner.data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "admin")
@@ -16,6 +18,13 @@ public class EAdmin {
 
     @Column(name = "pwd", length = 32, nullable = false)
     private String pwd;
+
+    @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "grant_by_id")
+    private EAdmin parentAdmin;
+
+    @OneToMany(mappedBy = "parentAdmin", fetch = FetchType.LAZY)
+    private List<EAdmin> grantedAdmins = new ArrayList<>();
 
     @ManyToOne(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
@@ -51,5 +60,21 @@ public class EAdmin {
 
     public void setRole(ERole role) {
         this.role = role;
+    }
+
+    public EAdmin getParentAdmin() {
+        return parentAdmin;
+    }
+
+    public void setParentAdmin(EAdmin parentAdmin) {
+        this.parentAdmin = parentAdmin;
+    }
+
+    public List<EAdmin> getGrantedAdmins() {
+        return grantedAdmins;
+    }
+
+    public void setGrantedAdmins(List<EAdmin> grantedAdmins) {
+        this.grantedAdmins = grantedAdmins;
     }
 }

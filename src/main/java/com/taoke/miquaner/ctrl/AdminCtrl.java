@@ -1,6 +1,7 @@
 package com.taoke.miquaner.ctrl;
 
 import com.taoke.miquaner.serv.IAdminServ;
+import com.taoke.miquaner.util.Auth;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.AdminUserSubmit;
 import com.taoke.miquaner.view.BindSubmit;
@@ -24,31 +25,37 @@ public class AdminCtrl {
         return Result.success("admin ping success");
     }
 
+    @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/super/set", method = RequestMethod.POST)
     public Object setSuperUser(SuperUserSubmit superUserSubmit) {
         return this.adminServ.setSuperUser(superUserSubmit);
     }
 
+    @Auth(isAdmin = true)
     @RequestMapping("/admin/role/list")
     public Object getRoleList() {
         return this.adminServ.getRoles();
     }
 
+    @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/user/create", method = RequestMethod.POST)
     public Object createAdmin(AdminUserSubmit adminUserSubmit) {
         return this.adminServ.createAdmin(adminUserSubmit);
     }
 
+    @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/role/create", method = RequestMethod.POST)
     public Object createRole(RoleSubmit roleSubmit) {
         return this.adminServ.createRole(roleSubmit);
     }
 
+    @Auth(isAdmin = true)
     @RequestMapping("/admin/privilege/list")
     public Object getPrivileges() {
         return this.adminServ.getPrivileges();
     }
 
+    @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/privilege/bind", method = RequestMethod.POST)
     public Object bindPrivilege(BindSubmit bindSubmit) {
         return this.adminServ.bindPrivilege(bindSubmit);
