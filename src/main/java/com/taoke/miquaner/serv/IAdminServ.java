@@ -35,6 +35,8 @@ public interface IAdminServ {
 
     Object changeMenu(EMenu menu);
 
+    Object deleteMenu(Long id);
+
     Object bindMenu(BindSubmit bindSubmit);
 
     Object unbindMenu(BindSubmit bindSubmit);

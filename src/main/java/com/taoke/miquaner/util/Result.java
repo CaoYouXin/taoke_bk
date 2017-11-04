@@ -2,8 +2,10 @@ package com.taoke.miquaner.util;
 
 public class Result {
 
-    public static final int SUCCESS = 2000;
-    public static final int GENERAL_FAIL = 5000;
+    private static final int SUCCESS = 2000;
+    private static final int GENERAL_FAIL = 5000;
+
+    public static final String SUCCESS_MSG = "操作成功";
 
     public static Result success(Object body) {
         return new Result(SUCCESS, body);
@@ -16,7 +18,7 @@ public class Result {
     private int code;
     private Object body;
 
-    public Result(int code, Object body) {
+    private Result(int code, Object body) {
         this.code = code;
         this.body = body;
     }

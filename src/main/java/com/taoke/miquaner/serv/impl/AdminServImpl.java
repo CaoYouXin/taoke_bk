@@ -195,6 +195,12 @@ public class AdminServImpl implements IAdminServ {
     }
 
     @Override
+    public Object deleteMenu(Long id) {
+        this.menuRepo.delete(id);
+        return Result.success(Result.SUCCESS_MSG);
+    }
+
+    @Override
     public Object bindMenu(BindSubmit bindSubmit) {
         EMenu menu = this.menuRepo.findOne(bindSubmit.getId());
         boolean alreadyBind = menu.getRoles().stream().anyMatch(role -> bindSubmit.getTo().equals(role.getId()));

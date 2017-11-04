@@ -9,6 +9,7 @@ import com.taoke.miquaner.view.AdminUserSubmit;
 import com.taoke.miquaner.view.BindSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -101,6 +102,11 @@ public class AdminCtrl {
     @RequestMapping(value = "/admin/menu/unbind", method = RequestMethod.POST)
     public Object unbindMenu(BindSubmit bindSubmit) {
         return this.adminServ.unbindMenu(bindSubmit);
+    }
+
+    @RequestMapping("/admin/menu/delete/{id}")
+    public Object deleteMenu(@PathVariable(name = "id") Long id) {
+        return this.adminServ.deleteMenu(id);
     }
 
 }

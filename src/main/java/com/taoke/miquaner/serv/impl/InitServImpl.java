@@ -6,7 +6,6 @@ import com.taoke.miquaner.data.EAdmin;
 import com.taoke.miquaner.data.EConfig;
 import com.taoke.miquaner.data.EPrivilege;
 import com.taoke.miquaner.data.ERole;
-import com.taoke.miquaner.fltr.AdminInterceptor;
 import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.PrivilegeRepo;
 import com.taoke.miquaner.repo.RoleRepo;
@@ -17,11 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.handler.MappedInterceptor;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
