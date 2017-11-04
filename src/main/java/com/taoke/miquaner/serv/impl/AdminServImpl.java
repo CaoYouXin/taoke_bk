@@ -18,6 +18,7 @@ import com.taoke.miquaner.view.RoleSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class AdminServImpl implements IAdminServ {
     private static final String ALREADY_BIND = "已经绑定过";
     private static final String BIND_SUCCESS = "绑定成功";
     private static final String UNBIND_SUCCESS = "解绑成功";
+    private static final String NO_ID_FOUND = "没有找到主键，错误可能发生在前端漏传主键字段";
 
     @Autowired
     private ConfigRepo configRepo;
@@ -92,11 +94,42 @@ public class AdminServImpl implements IAdminServ {
     }
 
     @Override
+    public Object changeAdminRole(EAdmin admin) {
+        return this.persistentNewAdmin(admin);
+    }
+
+    @Override
+    public Object changeAdminPwd(EAdmin admin) {
+        return this.persistentNewAdmin(admin);
+    }
+
+    private Object persistentNewAdmin(EAdmin admin) {
+        if (null == admin.getId()) {
+            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, NO_ID_FOUND));
+        }
+
+        EAdmin one = this.adminRepo.findOne(admin.getId());
+        BeanUtils.copyProperties(admin, one);
+        return JpaUtil.persistent(this.adminRepo, one);
+    }
+
+    @Override
     public Object createRole(RoleSubmit roleSubmit) {
         ERole role = new ERole();
         BeanUtils.copyProperties(roleSubmit, role);
 
         return JpaUtil.persistent(this.roleRepo, role);
+    }
+
+    @Override
+    public Object changeRole(ERole role) {
+        if (null == role.getId()) {
+            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, NO_ID_FOUND));
+        }
+
+        ERole one = this.roleRepo.findOne(role.getId());
+        BeanUtils.copyProperties(role, one);
+        return JpaUtil.persistent(this.roleRepo, one);
     }
 
     @Override
