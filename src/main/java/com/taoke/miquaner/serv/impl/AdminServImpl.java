@@ -16,9 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -294,5 +292,19 @@ public class AdminServImpl implements IAdminServ {
         one.setPwd(null);
 
         return Result.success(new AdminLoginView(one, token));
+    }
+
+    @Override
+    public Object listAdmins(EAdmin performer) {
+        List<EAdmin> ret = new ArrayList<>();
+        Queue<EAdmin> admins = new ArrayDeque<>(performer.getGrantedAdmins());
+
+        while (!admins.isEmpty()) {
+            EAdmin admin = admins.remove();
+            ret.add(admin);
+            admins.addAll(admin.getGrantedAdmins());
+        }
+
+        return Result.success(ret);
     }
 }

@@ -10,8 +10,13 @@
         </encoder>
         <file>${LOG_FILE}</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- daily rollover -->
             <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- keep 7 days' worth of history -->
+            <MaxHistory>7</MaxHistory>
+
+            <TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxFileSize>36MB</MaxFileSize>
+            </TimeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
     </appender>
 

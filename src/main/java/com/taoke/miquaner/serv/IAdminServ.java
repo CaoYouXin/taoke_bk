@@ -45,4 +45,6 @@ public interface IAdminServ {
 
     Object adminLogin(EAdmin admin);
 
+    Object listAdmins(EAdmin performer);
+
 }

@@ -52,8 +52,8 @@ public class MiquanerApplication {
 
             @Override
             public void addInterceptors(InterceptorRegistry registry) {
-                registry.addInterceptor(new AdminInterceptor());
                 registry.addInterceptor(new IdentityInterceptor());
+                registry.addInterceptor(new AdminInterceptor());
             }
         };
 	}

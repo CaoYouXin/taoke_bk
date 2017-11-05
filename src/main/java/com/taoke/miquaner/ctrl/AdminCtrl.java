@@ -48,7 +48,7 @@ public class AdminCtrl {
     @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/user/create", method = RequestMethod.POST)
     public Object createAdmin(AdminUserSubmit adminUserSubmit, HttpServletRequest request) {
-        return this.adminServ.createAdmin(adminUserSubmit);
+        return this.adminServ.createAdmin(adminUserSubmit, (EAdmin) request.getAttribute("admin"));
     }
 
     @Auth(isAdmin = true)
@@ -83,14 +83,14 @@ public class AdminCtrl {
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/user/pwd/change", method = RequestMethod.POST)
-    public Object changeAdminPwd(EAdmin admin) {
-        return this.adminServ.changeAdminPwd(admin);
+    public Object changeAdminPwd(EAdmin admin, HttpServletRequest request) {
+        return this.adminServ.changeAdminPwd(admin, (EAdmin) request.getAttribute("admin"));
     }
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/user/role/change", method = RequestMethod.POST)
-    public Object changeAdminRole(EAdmin admin) {
-        return this.adminServ.changeAdminRole(admin);
+    public Object changeAdminRole(EAdmin admin, HttpServletRequest request) {
+        return this.adminServ.changeAdminRole(admin, (EAdmin) request.getAttribute("admin"));
     }
 
     @Auth(isAdmin = true)
@@ -140,4 +140,9 @@ public class AdminCtrl {
         return this.adminServ.adminLogin(admin);
     }
 
+    @Auth(isAdmin = true)
+    @RequestMapping("/admin/user/list")
+    public Object listAdmins(HttpServletRequest request) {
+        return this.adminServ.listAdmins((EAdmin) request.getAttribute("admin"));
+    }
 }

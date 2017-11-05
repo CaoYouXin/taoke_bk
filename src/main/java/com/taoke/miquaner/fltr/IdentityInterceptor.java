@@ -23,33 +23,41 @@ public class IdentityInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (handler instanceof HandlerMethod) {
-            Auth auth = ((HandlerMethod) handler).getMethod().getAnnotation(Auth.class);
+        if (!(handler instanceof HandlerMethod)) {
+            logger.debug("handler is no HandlerMethod");
+            return true;
+        }
 
-            if (null == auth) {
-                return true;
-            }
+        Auth auth = ((HandlerMethod) handler).getMethod().getAnnotation(Auth.class);
 
-            String authHeader = request.getHeader("auth");
-            if (null == authHeader) {
+        if (null == auth) {
+            logger.debug("handler has no Auth annotation");
+            return true;
+        }
+
+        String authHeader = request.getHeader("auth");
+        if (null == authHeader) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            logger.debug("request has no auth header, returning 401");
+            return false;
+        }
+
+        EToken token = this.tokenRepo.findByTokenEqualsAndExpiredAfter(authHeader, new Date());
+
+        if (null == token) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            logger.debug("got no token by auth [" + authHeader + "], returning 401");
+            return false;
+        }
+
+        if (auth.isAdmin()) {
+            if (null != token.getAdmin()) {
+                request.setAttribute("admin", token.getAdmin());
+            } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                logger.debug("token by auth [" + authHeader + "] associated with no admin, returning 401");
                 return false;
             }
-
-            EToken token = this.tokenRepo.findByTokenEqualsAndExpiredAfter(authHeader, new Date());
-
-            if (null == token) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return false;
-            }
-
-            if (auth.isAdmin()) {
-                if (null != token.getAdmin()) {
-                    request.setAttribute("admin", token.getAdmin());
-                } else {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    return false;
-                }
 //            } else {
 //                if (null != token.getAdmin()) {
 //                    request.setAttribute("admin", token.getAdmin());
@@ -57,9 +65,6 @@ public class IdentityInterceptor implements HandlerInterceptor {
 //                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 //                    return false;
 //                }
-            }
-
-            return true;
         }
 
         return true;
