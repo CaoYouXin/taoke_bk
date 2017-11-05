@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface HomeBtnRepo extends JpaRepository<EHomeBtn, Long> {
 
-    List<EHomeBtn> findAllByLocationTypeEqualsOrderByOrderAsc(Integer locationType);
+    List<EHomeBtn> findAllByLocationTypeEqualsOrderByOrderDesc(Integer locationType);
 
     EHomeBtn findByIdEqualsAndLocationTypeEquals(Long id, Integer locationType);
 

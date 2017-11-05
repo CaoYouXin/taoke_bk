@@ -25,4 +25,6 @@ public interface IHomeServ {
 
     Object deleteCategory(Long id);
 
+    Object getBtnList();
+
 }

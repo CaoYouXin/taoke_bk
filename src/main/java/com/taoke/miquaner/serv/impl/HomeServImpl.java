@@ -24,7 +24,7 @@ public class HomeServImpl implements IHomeServ {
 
     @Override
     public Object getBanners() {
-        return Result.success(this.homeBtnRepo.findAllByLocationTypeEqualsOrderByOrderAsc(EHomeBtn.BANNER));
+        return Result.success(this.homeBtnRepo.findAllByLocationTypeEqualsOrderByOrderDesc(EHomeBtn.BANNER));
     }
 
     @Override
@@ -34,7 +34,7 @@ public class HomeServImpl implements IHomeServ {
 
     @Override
     public Object getTools() {
-        return Result.success(this.homeBtnRepo.findAllByLocationTypeEqualsOrderByOrderAsc(EHomeBtn.TOOL));
+        return Result.success(this.homeBtnRepo.findAllByLocationTypeEqualsOrderByOrderDesc(EHomeBtn.TOOL));
     }
 
     @Override
@@ -44,7 +44,7 @@ public class HomeServImpl implements IHomeServ {
 
     @Override
     public Object getGroups() {
-        return Result.success(this.homeBtnRepo.findAllByLocationTypeEqualsOrderByOrderAsc(EHomeBtn.GROUP));
+        return Result.success(this.homeBtnRepo.findAllByLocationTypeEqualsOrderByOrderDesc(EHomeBtn.GROUP));
     }
 
     @Override
@@ -88,6 +88,11 @@ public class HomeServImpl implements IHomeServ {
             return Result.fail(Result.FAIL_ON_SQL);
         }
         return Result.success(Result.SUCCESS_MSG);
+    }
+
+    @Override
+    public Object getBtnList() {
+        return Result.success(this.homeBtnRepo.findAll());
     }
 
     private Object postHomeBtn(EHomeBtn homeBtn, Integer locationType) {

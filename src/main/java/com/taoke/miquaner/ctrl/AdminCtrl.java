@@ -43,13 +43,13 @@ public class AdminCtrl {
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/user/create", method = RequestMethod.POST)
-    public Object createAdmin(AdminUserSubmit adminUserSubmit, HttpServletRequest request) {
+    public Object createAdmin(@RequestBody AdminUserSubmit adminUserSubmit, HttpServletRequest request) {
         return this.adminServ.createAdmin(adminUserSubmit, (EAdmin) request.getAttribute("admin"));
     }
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/role/create", method = RequestMethod.POST)
-    public Object createRole(ERole role) {
+    public Object createRole(@RequestBody ERole role) {
         return this.adminServ.createRole(role);
     }
 
@@ -61,31 +61,31 @@ public class AdminCtrl {
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/privilege/bind", method = RequestMethod.POST)
-    public Object bindPrivilege(BindSubmit bindSubmit) {
+    public Object bindPrivilege(@RequestBody BindSubmit bindSubmit) {
         return this.adminServ.bindPrivilege(bindSubmit);
     }
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/privilege/unbind")
-    public Object unbindPrivilege(BindSubmit bindSubmit) {
+    public Object unbindPrivilege(@RequestBody BindSubmit bindSubmit) {
         return this.adminServ.unbindPrivilege(bindSubmit);
     }
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/role/change", method = RequestMethod.POST)
-    public Object changeRole(ERole role) {
+    public Object changeRole(@RequestBody ERole role) {
         return this.adminServ.changeRole(role);
     }
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/user/pwd/change", method = RequestMethod.POST)
-    public Object changeAdminPwd(EAdmin admin, HttpServletRequest request) {
+    public Object changeAdminPwd(@RequestBody EAdmin admin, HttpServletRequest request) {
         return this.adminServ.changeAdminPwd(admin, (EAdmin) request.getAttribute("admin"));
     }
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/user/role/change", method = RequestMethod.POST)
-    public Object changeAdminRole(EAdmin admin, HttpServletRequest request) {
+    public Object changeAdminRole(@RequestBody EAdmin admin, HttpServletRequest request) {
         return this.adminServ.changeAdminRole(admin, (EAdmin) request.getAttribute("admin"));
     }
 
@@ -97,7 +97,7 @@ public class AdminCtrl {
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/menu/create", method = RequestMethod.POST)
-    public Object createMenu(EMenu menu) {
+    public Object createMenu(@RequestBody EMenu menu) {
         return this.adminServ.createMenu(menu);
     }
 
@@ -109,13 +109,13 @@ public class AdminCtrl {
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/menu/bind", method = RequestMethod.POST)
-    public Object bindMenu(BindSubmit bindSubmit) {
+    public Object bindMenu(@RequestBody BindSubmit bindSubmit) {
         return this.adminServ.bindMenu(bindSubmit);
     }
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/menu/unbind", method = RequestMethod.POST)
-    public Object unbindMenu(BindSubmit bindSubmit) {
+    public Object unbindMenu(@RequestBody BindSubmit bindSubmit) {
         return this.adminServ.unbindMenu(bindSubmit);
     }
 

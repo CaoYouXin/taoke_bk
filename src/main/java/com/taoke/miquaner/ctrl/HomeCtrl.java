@@ -5,6 +5,7 @@ import com.taoke.miquaner.data.EHomeBtn;
 import com.taoke.miquaner.serv.IHomeServ;
 import com.taoke.miquaner.util.Auth;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +27,7 @@ public class HomeCtrl {
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/home/banner/set", method = RequestMethod.POST)
-    public Object setBanner(EHomeBtn banner) {
+    public Object setBanner(@RequestBody EHomeBtn banner) {
         return this.homeServ.postBanner(banner);
     }
 
@@ -37,7 +38,7 @@ public class HomeCtrl {
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/home/tool/set", method = RequestMethod.POST)
-    public Object setTool(EHomeBtn tool) {
+    public Object setTool(@RequestBody EHomeBtn tool) {
         return this.homeServ.postBanner(tool);
     }
 
@@ -48,7 +49,7 @@ public class HomeCtrl {
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/home/group/set", method = RequestMethod.POST)
-    public Object setGroup(EHomeBtn group) {
+    public Object setGroup(@RequestBody EHomeBtn group) {
         return this.homeServ.postBanner(group);
     }
 
@@ -59,7 +60,13 @@ public class HomeCtrl {
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/home/cate/set", method = RequestMethod.POST)
-    public Object setCategory(ECate cate) {
+    public Object setCategory(@RequestBody ECate cate) {
         return this.homeServ.postCategory(cate);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping("/home/btn/list")
+    public Object getBtnList() {
+        return this.homeServ.getBtnList();
     }
 }
