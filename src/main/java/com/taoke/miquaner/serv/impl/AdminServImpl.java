@@ -1,10 +1,14 @@
 package com.taoke.miquaner.serv.impl;
 
+import com.taobao.api.internal.toplink.embedded.websocket.util.StringUtil;
+import com.taoke.miquaner.MiquanerApplication;
 import com.taoke.miquaner.data.*;
 import com.taoke.miquaner.repo.*;
 import com.taoke.miquaner.serv.IAdminServ;
+import com.taoke.miquaner.util.DateUtils;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
+import com.taoke.miquaner.view.AdminLoginView;
 import com.taoke.miquaner.view.AdminUserSubmit;
 import com.taoke.miquaner.view.BindSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
@@ -12,6 +16,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,20 +33,26 @@ public class AdminServImpl implements IAdminServ {
     private static final String BIND_SUCCESS = "绑定成功";
     private static final String UNBIND_SUCCESS = "解绑成功";
     private static final String NO_ID_FOUND = "没有找到主键，错误可能发生在前端漏传主键字段";
+    private static final String SUBMIT_NEED_NAME = "未指定用户名";
+    private static final String ADMIN_NOT_FOUND = "没有该管理员";
+    private static final String ADMIN_WRONG_PWD = "管理员密码错误，请联系您的上级管理员";
+    private static final String ADMIN_NOT_PERMITTED = "该管理员并非您的权限范围";
 
     private ConfigRepo configRepo;
     private AdminRepo adminRepo;
     private RoleRepo roleRepo;
     private PrivilegeRepo privilegeRepo;
     private MenuRepo menuRepo;
+    private TokenRepo tokenRepo;
 
     @Autowired
-    public AdminServImpl(ConfigRepo configRepo, AdminRepo adminRepo, RoleRepo roleRepo, PrivilegeRepo privilegeRepo, MenuRepo menuRepo) {
+    public AdminServImpl(ConfigRepo configRepo, AdminRepo adminRepo, RoleRepo roleRepo, PrivilegeRepo privilegeRepo, MenuRepo menuRepo, TokenRepo tokenRepo) {
         this.configRepo = configRepo;
         this.adminRepo = adminRepo;
         this.roleRepo = roleRepo;
         this.privilegeRepo = privilegeRepo;
         this.menuRepo = menuRepo;
+        this.tokenRepo = tokenRepo;
     }
 
     @Override
@@ -79,7 +91,7 @@ public class AdminServImpl implements IAdminServ {
     }
 
     @Override
-    public Object createAdmin(AdminUserSubmit adminUserSubmit) {
+    public Object createAdmin(AdminUserSubmit adminUserSubmit, EAdmin performer) {
         ERole role = this.roleRepo.findOne(adminUserSubmit.getRoleId());
         if (null == role) {
             return Result.fail(new ErrorR(ErrorR.SUBMIT_NEED_ROLE, SUBMIT_NEED_ROLE));
@@ -88,6 +100,7 @@ public class AdminServImpl implements IAdminServ {
         EAdmin admin = new EAdmin();
         BeanUtils.copyProperties(adminUserSubmit, admin);
         admin.setRole(role);
+        admin.setParentAdmin(performer);
         this.adminRepo.save(admin);
         admin.setGrantedAdmins(null);
         admin.getParentAdmin().setGrantedAdmins(null);
@@ -95,13 +108,40 @@ public class AdminServImpl implements IAdminServ {
     }
 
     @Override
-    public Object changeAdminRole(EAdmin admin) {
+    public Object changeAdminRole(EAdmin admin, EAdmin performer) {
+        if (!this.checkPermission(admin, performer)) {
+            return Result.fail(new ErrorR(ErrorR.ADMIN_NOT_PERMITTED, ADMIN_NOT_PERMITTED));
+        }
         return this.persistentNewAdmin(admin);
     }
 
     @Override
-    public Object changeAdminPwd(EAdmin admin) {
+    public Object changeAdminPwd(EAdmin admin, EAdmin performer) {
+        if (!this.checkPermission(admin, performer)) {
+            return Result.fail(new ErrorR(ErrorR.ADMIN_NOT_PERMITTED, ADMIN_NOT_PERMITTED));
+        }
         return this.persistentNewAdmin(admin);
+    }
+
+    private boolean checkPermission(EAdmin admin, EAdmin performer) {
+        EAdmin granter = admin.getParentAdmin();
+        while (null != granter) {
+            if (granter.getId().equals(performer.getId())) {
+                return true;
+            }
+            granter = granter.getParentAdmin();
+        }
+        return false;
+    }
+
+    @Override
+    public Object deleteAdmin(Long id) {
+        try {
+            this.adminRepo.delete(id);
+        } catch (Exception ignored) {
+            return Result.fail(Result.FAIL_ON_SQL);
+        }
+        return Result.success(Result.SUCCESS_MSG);
     }
 
     private Object persistentNewAdmin(EAdmin admin) {
@@ -196,7 +236,11 @@ public class AdminServImpl implements IAdminServ {
 
     @Override
     public Object deleteMenu(Long id) {
-        this.menuRepo.delete(id);
+        try {
+            this.menuRepo.delete(id);
+        } catch (Exception e) {
+            return Result.fail(Result.FAIL_ON_SQL);
+        }
         return Result.success(Result.SUCCESS_MSG);
     }
 
@@ -221,5 +265,34 @@ public class AdminServImpl implements IAdminServ {
         menu.setRoles(menu.getRoles().stream().filter(eRole -> !bindSubmit.getTo().equals(eRole.getId())).collect(Collectors.toList()));
         this.menuRepo.save(menu);
         return Result.success(UNBIND_SUCCESS);
+    }
+
+    @Override
+    public Object adminLogin(EAdmin admin) {
+        if (null == admin.getName()) {
+            return Result.fail(new ErrorR(ErrorR.SUBMIT_NEED_NAME, SUBMIT_NEED_NAME));
+        }
+
+        EAdmin one = this.adminRepo.findByNameEquals(admin.getName());
+        if (null == one) {
+            return Result.fail(new ErrorR(ErrorR.ADMIN_NOT_FOUND, ADMIN_NOT_FOUND));
+        }
+
+        if (!one.getPwd().equals(admin.getPwd())) {
+            return Result.fail(new ErrorR(ErrorR.ADMIN_WRONG_PWD, ADMIN_WRONG_PWD));
+        }
+
+        EToken token = this.tokenRepo.findByAdmin_Id(one.getId());
+        if (null == token) {
+            token = new EToken();
+            token.setAdmin(one);
+        }
+        Date now = new Date();
+        token.setToken(StringUtil.toMD5HexString(MiquanerApplication.DEFAULT_DATE_FORMAT.format(now)));
+        token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 3));
+        this.tokenRepo.save(token);
+        one.setPwd(null);
+
+        return Result.success(new AdminLoginView(one, token));
     }
 }

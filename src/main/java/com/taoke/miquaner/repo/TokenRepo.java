@@ -9,4 +9,6 @@ public interface TokenRepo extends JpaRepository<EToken, Long> {
 
     EToken findByTokenEqualsAndExpiredAfter(String token, Date now);
 
+    EToken findByAdmin_Id(Long adminId);
+
 }

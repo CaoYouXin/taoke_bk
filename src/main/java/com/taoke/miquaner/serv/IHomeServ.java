@@ -1,11 +1,28 @@
 package com.taoke.miquaner.serv;
 
-import com.taoke.miquaner.data.EBanner;
+import com.taoke.miquaner.data.ECate;
+import com.taoke.miquaner.data.EHomeBtn;
 
 public interface IHomeServ {
 
     Object getBanners();
 
-    Object postBanner(EBanner banner);
+    Object postBanner(EHomeBtn banner);
+
+    Object getTools();
+
+    Object postTool(EHomeBtn tool);
+
+    Object getGroups();
+
+    Object postGroup(EHomeBtn group);
+
+    Object deleteHomeBtn(Long id);
+
+    Object getCategories();
+
+    Object postCategory(ECate cate);
+
+    Object deleteCategory(Long id);
 
 }

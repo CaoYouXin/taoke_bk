@@ -1,6 +1,6 @@
 package com.taoke.miquaner.ctrl;
 
-import com.taoke.miquaner.data.EBanner;
+import com.taoke.miquaner.data.EHomeBtn;
 import com.taoke.miquaner.serv.IHomeServ;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +23,7 @@ public class HomeCtrl {
     }
 
     @RequestMapping(value = "/admin/banner/set", method = RequestMethod.POST)
-    public Object setBanner(EBanner banner) {
+    public Object setBanner(EHomeBtn banner) {
         return this.homeServ.postBanner(banner);
     }
 

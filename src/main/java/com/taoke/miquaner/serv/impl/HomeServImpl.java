@@ -1,7 +1,9 @@
 package com.taoke.miquaner.serv.impl;
 
-import com.taoke.miquaner.data.EBanner;
-import com.taoke.miquaner.repo.BannerRepo;
+import com.taoke.miquaner.data.ECate;
+import com.taoke.miquaner.data.EHomeBtn;
+import com.taoke.miquaner.repo.CateRepo;
+import com.taoke.miquaner.repo.HomeBtnRepo;
 import com.taoke.miquaner.serv.IHomeServ;
 import com.taoke.miquaner.util.Result;
 import org.springframework.beans.BeanUtils;
@@ -11,26 +13,93 @@ import org.springframework.stereotype.Service;
 @Service
 public class HomeServImpl implements IHomeServ {
 
-    private BannerRepo bannerRepo;
+    private HomeBtnRepo homeBtnRepo;
+    private CateRepo cateRepo;
 
     @Autowired
-    public HomeServImpl(BannerRepo bannerRepo) {
-        this.bannerRepo = bannerRepo;
+    public HomeServImpl(HomeBtnRepo homeBtnRepo, CateRepo cateRepo) {
+        this.homeBtnRepo = homeBtnRepo;
+        this.cateRepo = cateRepo;
     }
 
     @Override
     public Object getBanners() {
-        return Result.success(this.bannerRepo.findAll());
+        return Result.success(this.homeBtnRepo.findAllByLocationTypeEqualsOrderByOrderAsc(EHomeBtn.BANNER));
     }
 
     @Override
-    public Object postBanner(EBanner banner) {
-        if (null != banner.getId()) {
-            EBanner one = this.bannerRepo.findOne(banner.getId());
-            BeanUtils.copyProperties(banner, one);
-            banner = one;
+    public Object postBanner(EHomeBtn banner) {
+        return this.postHomeBtn(banner, EHomeBtn.BANNER);
+    }
+
+    @Override
+    public Object getTools() {
+        return Result.success(this.homeBtnRepo.findAllByLocationTypeEqualsOrderByOrderAsc(EHomeBtn.TOOL));
+    }
+
+    @Override
+    public Object postTool(EHomeBtn tool) {
+        return this.postHomeBtn(tool, EHomeBtn.TOOL);
+    }
+
+    @Override
+    public Object getGroups() {
+        return Result.success(this.homeBtnRepo.findAllByLocationTypeEqualsOrderByOrderAsc(EHomeBtn.GROUP));
+    }
+
+    @Override
+    public Object postGroup(EHomeBtn group) {
+        return this.postHomeBtn(group, EHomeBtn.GROUP);
+    }
+
+    @Override
+    public Object deleteHomeBtn(Long id) {
+        try {
+            this.homeBtnRepo.delete(id);
+        } catch (Exception ignored) {
+            return Result.fail(Result.FAIL_ON_SQL);
         }
-        this.bannerRepo.save(banner);
-        return Result.success(banner);
+        return Result.success(Result.SUCCESS_MSG);
+    }
+
+    @Override
+    public Object getCategories() {
+        return Result.success(this.cateRepo.findAll());
+    }
+
+    @Override
+    public Object postCategory(ECate cate) {
+        if (null != cate.getId()) {
+            ECate one = this.cateRepo.findOne(cate.getId());
+            if (null != one) {
+                BeanUtils.copyProperties(cate, one);
+                cate = one;
+            }
+        }
+        this.cateRepo.save(cate);
+        return Result.success(cate);
+    }
+
+    @Override
+    public Object deleteCategory(Long id) {
+        try {
+            this.cateRepo.delete(id);
+        } catch (Exception ignored) {
+            return Result.fail(Result.FAIL_ON_SQL);
+        }
+        return Result.success(Result.SUCCESS_MSG);
+    }
+
+    private Object postHomeBtn(EHomeBtn homeBtn, Integer locationType) {
+        homeBtn.setLocationType(locationType);
+        if (null != homeBtn.getId()) {
+            EHomeBtn one = this.homeBtnRepo.findByIdEqualsAndLocationTypeEquals(homeBtn.getId(), locationType);
+            if (null != one) {
+                BeanUtils.copyProperties(homeBtn, one);
+                homeBtn = one;
+            }
+        }
+        this.homeBtnRepo.save(homeBtn);
+        return Result.success(homeBtn);
     }
 }

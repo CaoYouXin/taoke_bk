@@ -6,6 +6,7 @@ public class Result {
     private static final int GENERAL_FAIL = 5000;
 
     public static final String SUCCESS_MSG = "操作成功";
+    public static final ErrorR FAIL_ON_SQL = new ErrorR(ErrorR.SQL_ERROR, "操作失败");
 
     public static Result success(Object body) {
         return new Result(SUCCESS, body);

@@ -13,11 +13,13 @@ public interface IAdminServ {
 
     Object getRoles();
 
-    Object createAdmin(AdminUserSubmit adminUserSubmit);
+    Object createAdmin(AdminUserSubmit adminUserSubmit, EAdmin performer);
 
-    Object changeAdminRole(EAdmin admin);
+    Object changeAdminRole(EAdmin admin, EAdmin performer);
 
-    Object changeAdminPwd(EAdmin admin);
+    Object changeAdminPwd(EAdmin admin, EAdmin performer);
+
+    Object deleteAdmin(Long id);
 
     Object createRole(ERole role);
 
@@ -40,5 +42,7 @@ public interface IAdminServ {
     Object bindMenu(BindSubmit bindSubmit);
 
     Object unbindMenu(BindSubmit bindSubmit);
+
+    Object adminLogin(EAdmin admin);
 
 }

@@ -3,12 +3,12 @@ package com.taoke.miquaner.data;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "banner")
-public class EBanner {
+@Table(name = "home_btn")
+public class EHomeBtn {
 
-    public static final Integer IN_APP_WEB_VIEW = 1;
-    public static final Integer IN_SYS_WEB_VIEW = 1 << 1;
-    public static final Integer RESERVED = 1 << 2;
+    public static final Integer BANNER = 1;
+    public static final Integer TOOL = 1 << 1;
+    public static final Integer GROUP = 1 << 2;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,11 +21,14 @@ public class EBanner {
     @Column(name = "img_url", nullable = false, length = 2048)
     private String imgUrl;
 
+    @Column(name = "location", nullable = false)
+    private Integer locationType;
+
     @Column(name = "idx", nullable = false)
     private Integer order;
 
     @Column(name = "type", nullable = false)
-    private Integer type;
+    private Integer openType;
 
     @Column(name = "ext", nullable = false, length = 102400)
     private String ext;
@@ -54,6 +57,14 @@ public class EBanner {
         this.imgUrl = imgUrl;
     }
 
+    public Integer getLocationType() {
+        return locationType;
+    }
+
+    public void setLocationType(Integer locationType) {
+        this.locationType = locationType;
+    }
+
     public Integer getOrder() {
         return order;
     }
@@ -62,12 +73,12 @@ public class EBanner {
         this.order = order;
     }
 
-    public Integer getType() {
-        return type;
+    public Integer getOpenType() {
+        return openType;
     }
 
-    public void setType(Integer type) {
-        this.type = type;
+    public void setOpenType(Integer openType) {
+        this.openType = openType;
     }
 
     public String getExt() {
