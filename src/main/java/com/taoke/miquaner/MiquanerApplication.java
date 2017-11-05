@@ -52,11 +52,21 @@ public class MiquanerApplication {
 
             @Override
             public void addInterceptors(InterceptorRegistry registry) {
-                registry.addInterceptor(new IdentityInterceptor());
-                registry.addInterceptor(new AdminInterceptor());
+                registry.addInterceptor(getIdentityInterceptor());
+                registry.addInterceptor(getAdminInterceptor());
             }
         };
 	}
+
+	@Bean
+    AdminInterceptor getAdminInterceptor() {
+	    return new AdminInterceptor();
+    }
+
+	@Bean
+    IdentityInterceptor getIdentityInterceptor() {
+	    return new IdentityInterceptor();
+    }
 
 	@Bean
 	public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {

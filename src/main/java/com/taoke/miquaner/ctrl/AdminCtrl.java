@@ -10,10 +10,7 @@ import com.taoke.miquaner.view.AdminUserSubmit;
 import com.taoke.miquaner.view.BindSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -106,7 +103,7 @@ public class AdminCtrl {
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/menu/change", method = RequestMethod.POST)
-    public Object changeMenu(EMenu menu) {
+    public Object changeMenu(@RequestBody EMenu menu) {
         return this.adminServ.changeMenu(menu);
     }
 

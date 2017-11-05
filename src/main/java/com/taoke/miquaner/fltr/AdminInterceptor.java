@@ -2,10 +2,12 @@ package com.taoke.miquaner.fltr;
 
 import com.taoke.miquaner.data.EAdmin;
 import com.taoke.miquaner.data.ERole;
+import com.taoke.miquaner.repo.AdminRepo;
 import com.taoke.miquaner.util.Auth;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -18,7 +20,11 @@ public class AdminInterceptor implements HandlerInterceptor {
 
     private static final Logger logger = LogManager.getLogger(AdminInterceptor.class);
 
+    @Autowired
+    private AdminRepo adminRepo;
+
     @Override
+    @Transactional
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (!(handler instanceof HandlerMethod)) {
             logger.debug("handler is no HandlerMethod");
@@ -45,6 +51,7 @@ public class AdminInterceptor implements HandlerInterceptor {
             return false;// actually impossible
         }
 
+        admin = this.adminRepo.findOne(admin.getId());// gain lazy init feature
         ERole role = admin.getRole();
         boolean permitted = role.isSuperRole() ||
                 role.getPrivileges().stream().anyMatch(ePrivilege -> ePrivilege.getApi().equals(requestMapping.value()[0]));
