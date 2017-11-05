@@ -64,7 +64,7 @@ public class HomeServImpl implements IHomeServ {
 
     @Override
     public Object getCategories() {
-        return Result.success(this.cateRepo.findAll());
+        return Result.success(this.cateRepo.findAllByOrderByOrderDesc());
     }
 
     @Override
