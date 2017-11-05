@@ -26,6 +26,11 @@
 
 	<dependencies>
         <dependency>
+            <groupId>com.taobao.api</groupId>
+            <artifactId>tbk-miquaner</artifactId>
+            <version>20171031</version>
+        </dependency>
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
