@@ -2,6 +2,7 @@ package com.taoke.miquaner.fltr;
 
 import com.taoke.miquaner.data.EAdmin;
 import com.taoke.miquaner.data.ERole;
+import com.taoke.miquaner.util.Auth;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,13 @@ public class AdminInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (!(handler instanceof HandlerMethod)) {
             logger.debug("handler is no HandlerMethod");
+            return true;
+        }
+
+        Auth auth = ((HandlerMethod) handler).getMethod().getAnnotation(Auth.class);
+
+        if (null == auth || !auth.isAdmin()) {
+            logger.debug("handler has no Auth annotation or it request no admin permission");
             return true;
         }
 

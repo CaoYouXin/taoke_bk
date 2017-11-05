@@ -33,7 +33,6 @@ public class AdminCtrl {
         return Result.success("admin ping success");
     }
 
-    @Auth(isAdmin = true)
     @RequestMapping(value = "/admin/super/set", method = RequestMethod.POST)
     public Object setSuperUser(SuperUserSubmit superUserSubmit) {
         return this.adminServ.setSuperUser(superUserSubmit);

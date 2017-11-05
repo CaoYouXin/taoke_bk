@@ -74,7 +74,6 @@ public class AdminServImpl implements IAdminServ {
         admin.setRole(superRole);
         this.adminRepo.save(admin);
         admin.setGrantedAdmins(null);
-        admin.getParentAdmin().setGrantedAdmins(null);
         return Result.success(admin);
     }
 
@@ -290,6 +289,13 @@ public class AdminServImpl implements IAdminServ {
         token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 3));
         this.tokenRepo.save(token);
         one.setPwd(null);
+        one.setGrantedAdmins(null);
+        one.getRole().setAdmins(null);
+        one.getRole().setPrivileges(null);
+
+        if (one.getRole().isSuperRole()) {
+            one.getRole().setMenus(this.menuRepo.findAll());
+        }
 
         return Result.success(new AdminLoginView(one, token));
     }
