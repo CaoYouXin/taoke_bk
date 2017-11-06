@@ -3,6 +3,8 @@ package com.taoke.miquaner.fltr;
 import com.taoke.miquaner.data.EToken;
 import com.taoke.miquaner.repo.TokenRepo;
 import com.taoke.miquaner.util.Auth;
+import com.taoke.miquaner.util.HttpUtils;
+import com.taoke.miquaner.util.Result;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,7 @@ public class IdentityInterceptor implements HandlerInterceptor {
 
         String authHeader = request.getHeader("auth");
         if (null == authHeader) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            HttpUtils.returnJSON(response, Result.unAuth());
             logger.debug("request has no auth header, returning 401");
             return false;
         }
@@ -45,7 +47,7 @@ public class IdentityInterceptor implements HandlerInterceptor {
         EToken token = this.tokenRepo.findByTokenEqualsAndExpiredAfter(authHeader, new Date());
 
         if (null == token) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            HttpUtils.returnJSON(response, Result.unAuth());
             logger.debug("got no token by auth [" + authHeader + "], returning 401");
             return false;
         }
@@ -54,7 +56,7 @@ public class IdentityInterceptor implements HandlerInterceptor {
             if (null != token.getAdmin()) {
                 request.setAttribute("admin", token.getAdmin());
             } else {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                HttpUtils.returnJSON(response, Result.unAuth());
                 logger.debug("token by auth [" + authHeader + "] associated with no admin, returning 401");
                 return false;
             }
@@ -62,7 +64,8 @@ public class IdentityInterceptor implements HandlerInterceptor {
 //                if (null != token.getAdmin()) {
 //                    request.setAttribute("admin", token.getAdmin());
 //                } else {
-//                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            HttpUtils.returnJSON(response, Result.unAuth());
+//            logger.debug("token by auth [" + authHeader + "] associated with no user, returning 401");
 //                    return false;
 //                }
         }

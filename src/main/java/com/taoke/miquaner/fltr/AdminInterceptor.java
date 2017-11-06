@@ -4,6 +4,8 @@ import com.taoke.miquaner.data.EAdmin;
 import com.taoke.miquaner.data.ERole;
 import com.taoke.miquaner.repo.AdminRepo;
 import com.taoke.miquaner.util.Auth;
+import com.taoke.miquaner.util.HttpUtils;
+import com.taoke.miquaner.util.Result;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +48,7 @@ public class AdminInterceptor implements HandlerInterceptor {
 
         EAdmin admin = (EAdmin) request.getAttribute("admin");
         if (null == admin) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            HttpUtils.returnJSON(response, Result.unAuthAdmin());
             logger.debug("request has no Admin set, returning 401");
             return false;// actually impossible
         }
@@ -56,7 +58,7 @@ public class AdminInterceptor implements HandlerInterceptor {
         boolean permitted = role.isSuperRole() ||
                 role.getPrivileges().stream().anyMatch(ePrivilege -> ePrivilege.getApi().equals(requestMapping.value()[0]));
         if (!permitted) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            HttpUtils.returnJSON(response, Result.unAuthAdmin());
             logger.debug("request is not permitted, returning 401");
         }
 

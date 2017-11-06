@@ -3,6 +3,8 @@ package com.taoke.miquaner.util;
 public class Result {
 
     private static final int SUCCESS = 2000;
+    private static final int UN_AUTH = 4010;
+    private static final int UN_AUTH_ADMIN = 4011;
     private static final int GENERAL_FAIL = 5000;
 
     public static final String SUCCESS_MSG = "操作成功";
@@ -14,6 +16,14 @@ public class Result {
 
     public static Result fail(Object body) {
         return new Result(GENERAL_FAIL, body);
+    }
+
+    public static Result unAuth() {
+        return new Result(UN_AUTH, null);
+    }
+
+    public static Result unAuthAdmin() {
+        return new Result(UN_AUTH_ADMIN, null);
     }
 
     private int code;
