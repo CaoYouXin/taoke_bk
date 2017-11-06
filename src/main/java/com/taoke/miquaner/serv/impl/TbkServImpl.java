@@ -50,7 +50,7 @@ public class TbkServImpl implements ITbkServ {
         }
 
         EConfig appKey = this.configRepo.findByKeyEquals(AliMaMaSubmit.APP_KEY);
-        if(null != appKey) {
+        if (null != appKey) {
             this.appKey = appKey.getValue();
         }
 
@@ -138,9 +138,9 @@ public class TbkServImpl implements ITbkServ {
     public Object getCouponByCid(String cid, Long pageNo, EUser user) {
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
         TbkDgItemCouponGetRequest req = new TbkDgItemCouponGetRequest();
-        req.setAdzoneId(Long.parseLong(user.getAliPid().substring(user.getAliPid().lastIndexOf('_'))));
+        req.setAdzoneId(Long.parseLong(user.getAliPid().substring(user.getAliPid().lastIndexOf('_') + 1)));
         req.setPlatform(2L);
-        req.setPageSize(10000L);
+        req.setPageSize(100L);
         req.setPageNo(pageNo);
         req.setCat(cid);
         TbkDgItemCouponGetResponse rsp = null;
@@ -150,7 +150,8 @@ public class TbkServImpl implements ITbkServ {
             logger.error("error when invoke ali api");
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
         }
-        return rsp.getBody();
+        logger.debug(rsp.getBody());
+        return Result.success(rsp.getResults());
     }
 
 
