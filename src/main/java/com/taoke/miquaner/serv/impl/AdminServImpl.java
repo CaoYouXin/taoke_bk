@@ -148,10 +148,10 @@ public class AdminServImpl implements IAdminServ {
 
         EAdmin one = this.adminRepo.findOne(admin.getId());
         BeanUtils.copyProperties(admin, one);
-        this.adminRepo.save(admin);
-        admin.setGrantedAdmins(null);
-        admin.getParentAdmin().setGrantedAdmins(null);
-        return Result.success(admin);
+        EAdmin saved = this.adminRepo.save(admin);
+        saved.setGrantedAdmins(null);
+        saved.getParentAdmin().setGrantedAdmins(null);
+        return Result.success(saved);
     }
 
     @Override
@@ -171,11 +171,11 @@ public class AdminServImpl implements IAdminServ {
 
         ERole one = this.roleRepo.findOne(role.getId());
         BeanUtils.copyProperties(role, one);
-        this.roleRepo.save(role);
-        role.setPrivileges(null);
-        role.setMenus(null);
-        role.setAdmins(null);
-        return Result.success(role);
+        ERole saved = this.roleRepo.save(role);
+        saved.setPrivileges(null);
+        saved.setMenus(null);
+        saved.setAdmins(null);
+        return Result.success(saved);
     }
 
     @Override
@@ -287,7 +287,7 @@ public class AdminServImpl implements IAdminServ {
         Date now = new Date();
         token.setToken(StringUtil.toMD5HexString(MiquanerApplication.DEFAULT_DATE_FORMAT.format(now)));
         token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 3));
-        this.tokenRepo.save(token);
+        EToken saved = this.tokenRepo.save(token);
         one.setPwd(null);
         one.setGrantedAdmins(null);
         one.getRole().setAdmins(null);
@@ -297,7 +297,7 @@ public class AdminServImpl implements IAdminServ {
             one.getRole().setMenus(this.menuRepo.findAll());
         }
 
-        return Result.success(new AdminLoginView(one, token));
+        return Result.success(new AdminLoginView(one, saved));
     }
 
     @Override

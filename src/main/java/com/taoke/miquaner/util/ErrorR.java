@@ -16,6 +16,10 @@ public class ErrorR {
     public static final String ADMIN_NOT_FOUND = "ADMIN_NOT_FOUND";
     public static final String ADMIN_WRONG_PWD = "ADMIN_WRONG_PWD";
     public static final String ADMIN_NOT_PERMITTED = "ADMIN_NOT_PERMITTED";
+    public static final String FAIL_ON_EXTRACT_OBJECT_CONFIG = "FAIL_ON_EXTRACT_OBJECT_CONFIG";
+    public static final String FAIL_ON_ALI_API = "FAIL_ON_ALI_API";
+    public static final String NO_USER_FOUND = "NO_USER_FOUND";
+    public static final String USER_WRONG_PWD = "USER_WRONG_PWD";
 
     private String key;
     private String msg;

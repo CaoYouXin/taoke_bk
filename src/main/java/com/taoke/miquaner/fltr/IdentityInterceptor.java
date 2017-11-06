@@ -1,10 +1,14 @@
 package com.taoke.miquaner.fltr;
 
+import com.taoke.miquaner.data.EConfig;
 import com.taoke.miquaner.data.EToken;
+import com.taoke.miquaner.data.EUser;
+import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.TokenRepo;
 import com.taoke.miquaner.util.Auth;
 import com.taoke.miquaner.util.HttpUtils;
 import com.taoke.miquaner.util.Result;
+import com.taoke.miquaner.view.AliMaMaSubmit;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,8 @@ public class IdentityInterceptor implements HandlerInterceptor {
 
     @Autowired
     private TokenRepo tokenRepo;
+    @Autowired
+    private ConfigRepo configRepo;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -60,14 +66,26 @@ public class IdentityInterceptor implements HandlerInterceptor {
                 logger.debug("token by auth [" + authHeader + "] associated with no admin, returning 401");
                 return false;
             }
-//            } else {
-//                if (null != token.getAdmin()) {
-//                    request.setAttribute("admin", token.getAdmin());
-//                } else {
-//            HttpUtils.returnJSON(response, Result.unAuth());
-//            logger.debug("token by auth [" + authHeader + "] associated with no user, returning 401");
-//                    return false;
-//                }
+        } else {
+            EUser user = token.getUser();
+            if (null != user) {
+                if (null == user.getAliPid() && null != user.getpUser()) {
+                    user.setAliPid(user.getpUser().getAliPid());
+                }
+
+                if (null == user.getAliPid()) {
+                    EConfig config = this.configRepo.findByKeyEquals(AliMaMaSubmit.PID_K);
+                    if (null != config) {
+                        user.setAliPid(config.getValue());
+                    }
+                }
+
+                request.setAttribute("user", user);
+            } else {
+                HttpUtils.returnJSON(response, Result.unAuth());
+                logger.debug("token by auth [" + authHeader + "] associated with no user, returning 401");
+                return false;
+            }
         }
 
         return true;

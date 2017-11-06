@@ -13,7 +13,7 @@ public class EAdmin {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name", length = 32, nullable = false)
+    @Column(name = "name", unique = true, length = 32, nullable = false)
     private String name;
 
     @Column(name = "pwd", length = 32, nullable = false)

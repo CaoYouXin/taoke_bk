@@ -12,16 +12,20 @@ public class EToken {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "token", nullable = false)
+    @Column(name = "token", unique = true, nullable = false)
     private String token;
 
     @Column(name = "expired", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date expired;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id")
     private EAdmin admin;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private EUser user;
 
     public Long getId() {
         return id;
@@ -53,5 +57,13 @@ public class EToken {
 
     public void setAdmin(EAdmin admin) {
         this.admin = admin;
+    }
+
+    public EUser getUser() {
+        return user;
+    }
+
+    public void setUser(EUser user) {
+        this.user = user;
     }
 }

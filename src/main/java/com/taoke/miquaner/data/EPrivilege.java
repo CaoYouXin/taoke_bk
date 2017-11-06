@@ -13,7 +13,7 @@ public class EPrivilege {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "api", length = 2048, nullable = false)
+    @Column(name = "api", unique = true, length = 2048, nullable = false)
     private String api;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
