@@ -1,13 +1,13 @@
 package com.taoke.miquaner.ctrl;
 
+import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.util.Auth;
 import com.taoke.miquaner.view.AliMaMaSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 public class TbkCtrl {
@@ -29,6 +29,12 @@ public class TbkCtrl {
     @RequestMapping(value = "/tbk/setting", method = RequestMethod.POST)
     public Object setAliMaMa(@RequestBody AliMaMaSubmit aliMaMaSubmit) {
         return this.tbkServ.setAliMaMa(aliMaMaSubmit);
+    }
+
+    @Auth
+    @RequestMapping(value = "/tbk/coupon/{cid}/{pNo}")
+    public Object getCoupons(@PathVariable(name = "cid") String cid, @PathVariable(name = "pNo") Long pageNo, HttpServletRequest request) {
+        return this.tbkServ.getCouponByCid(cid, pageNo, (EUser) request.getAttribute("user"));
     }
 
 }

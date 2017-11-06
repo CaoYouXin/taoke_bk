@@ -63,7 +63,6 @@ public class UserServImpl implements IUserServ {
     }
 
     @Override
-    @Transactional
     public Object register(UserRegisterSubmit userRegisterSubmit) {
         userRegisterSubmit.getUser().setName("觅" + ("" + Math.random()).substring(2, 10));
         EUser saved = this.userRepo.save(userRegisterSubmit.getUser());

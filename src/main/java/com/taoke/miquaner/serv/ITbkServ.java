@@ -1,5 +1,6 @@
 package com.taoke.miquaner.serv;
 
+import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.view.AliMaMaSubmit;
 
 public interface ITbkServ {
@@ -8,6 +9,6 @@ public interface ITbkServ {
 
     Object getAliMaMa();
 
-    Object getCouponByCid(String cid, Long pageNo, Long adZoneId);
+    Object getCouponByCid(String cid, Long pageNo, EUser user);
 
 }

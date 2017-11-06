@@ -7,6 +7,7 @@ import com.taobao.api.TaobaoClient;
 import com.taobao.api.request.TbkDgItemCouponGetRequest;
 import com.taobao.api.response.TbkDgItemCouponGetResponse;
 import com.taoke.miquaner.data.EConfig;
+import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.util.ErrorR;
@@ -134,10 +135,10 @@ public class TbkServImpl implements ITbkServ {
     }
 
     @Override
-    public Object getCouponByCid(String cid, Long pageNo, Long adZoneId) {
+    public Object getCouponByCid(String cid, Long pageNo, EUser user) {
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
         TbkDgItemCouponGetRequest req = new TbkDgItemCouponGetRequest();
-        req.setAdzoneId(adZoneId);
+        req.setAdzoneId(Long.parseLong(user.getAliPid().substring(user.getAliPid().lastIndexOf('_'))));
         req.setPlatform(2L);
         req.setPageSize(10000L);
         req.setPageNo(pageNo);

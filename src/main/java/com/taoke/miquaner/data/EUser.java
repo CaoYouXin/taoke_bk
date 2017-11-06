@@ -23,7 +23,7 @@ public class EUser {
     @Column(name = "phone", unique = true, length = 32, nullable = false)
     private String phone;
 
-    @Column(name = "pwd", length = 32, nullable = false)
+    @Column(name = "u_pwd", length = 32, nullable = false)
     private String pwd;
 
     @Column(name = "name", unique = true, length = 32, nullable = false)
@@ -141,5 +141,23 @@ public class EUser {
 
     public void setAliPid(String aliPid) {
         this.aliPid = aliPid;
+    }
+
+    @Override
+    public String toString() {
+        return "EUser{" +
+                "id=" + id +
+                ", pUser=" + pUser +
+                ", cUsers=" + cUsers +
+                ", phone='" + phone + '\'' +
+                ", pwd='" + pwd + '\'' +
+                ", name='" + name + '\'' +
+                ", realName='" + realName + '\'' +
+                ", aliPayId='" + aliPayId + '\'' +
+                ", qqId='" + qqId + '\'' +
+                ", weChatId='" + weChatId + '\'' +
+                ", announcement='" + announcement + '\'' +
+                ", aliPid='" + aliPid + '\'' +
+                '}';
     }
 }

@@ -8,7 +8,7 @@ public class AliMaMaSubmit {
     public static final String APP_KEY = "AppKey";
     public static final String SECRET = "Secret";
     public static final String GATE = "Gate";
-    public static final String PID_K = "PID";
+    public static final String PID_K = "Pid";
 
     private String account;
     private String mail;
@@ -16,7 +16,7 @@ public class AliMaMaSubmit {
     private String appKey;
     private String secret;
     private String gate;
-    private String PID;
+    private String pid;
 
     public String getAccount() {
         return account;
@@ -66,11 +66,11 @@ public class AliMaMaSubmit {
         this.gate = gate;
     }
 
-    public String getPID() {
-        return PID;
+    public String getPid() {
+        return pid;
     }
 
-    public void setPID(String PID) {
-        this.PID = PID;
+    public void setPid(String pid) {
+        this.pid = pid;
     }
 }

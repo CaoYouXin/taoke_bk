@@ -19,11 +19,11 @@ public class EToken {
     @Temporal(TemporalType.TIMESTAMP)
     private Date expired;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "admin_id")
     private EAdmin admin;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private EUser user;
 

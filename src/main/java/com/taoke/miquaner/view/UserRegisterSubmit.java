@@ -22,4 +22,5 @@ public class UserRegisterSubmit {
     public void setCode(String code) {
         this.code = code;
     }
+
 }
