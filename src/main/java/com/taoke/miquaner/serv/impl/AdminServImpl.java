@@ -72,9 +72,12 @@ public class AdminServImpl implements IAdminServ {
         EAdmin admin = new EAdmin();
         BeanUtils.copyProperties(superUserSubmit, admin);
         admin.setRole(superRole);
-        this.adminRepo.save(admin);
-        admin.setGrantedAdmins(null);
-        return Result.success(admin);
+        EAdmin saved = this.adminRepo.save(admin);
+        saved.setGrantedAdmins(null);
+        saved.setParentAdmin(null);
+        saved.getRole().setPrivileges(null);
+        saved.getRole().setAdmins(null);
+        return Result.success(saved);
     }
 
     @Override
@@ -98,10 +101,12 @@ public class AdminServImpl implements IAdminServ {
         BeanUtils.copyProperties(adminUserSubmit, admin);
         admin.setRole(role);
         admin.setParentAdmin(performer);
-        this.adminRepo.save(admin);
-        admin.setGrantedAdmins(null);
-        admin.getParentAdmin().setGrantedAdmins(null);
-        return Result.success(admin);
+        EAdmin saved = this.adminRepo.save(admin);
+        saved.setGrantedAdmins(null);
+        saved.getParentAdmin().setGrantedAdmins(null);
+        saved.getRole().setAdmins(null);
+        saved.getRole().setPrivileges(null);
+        return Result.success(saved);
     }
 
     @Override
@@ -151,16 +156,18 @@ public class AdminServImpl implements IAdminServ {
         EAdmin saved = this.adminRepo.save(admin);
         saved.setGrantedAdmins(null);
         saved.getParentAdmin().setGrantedAdmins(null);
+        saved.getRole().setPrivileges(null);
+        saved.getRole().setAdmins(null);
         return Result.success(saved);
     }
 
     @Override
     public Object createRole(ERole role) {
-        this.roleRepo.save(role);
-        role.setPrivileges(null);
-        role.setMenus(null);
-        role.setAdmins(null);
-        return Result.success(role);
+        ERole saved = this.roleRepo.save(role);
+        saved.setPrivileges(null);
+        saved.setMenus(null);
+        saved.setAdmins(null);
+        return Result.success(saved);
     }
 
     @Override
@@ -213,9 +220,9 @@ public class AdminServImpl implements IAdminServ {
 
     @Override
     public Object createMenu(EMenu menu) {
-        this.menuRepo.save(menu);
-        menu.setRoles(null);
-        return Result.success(menu);
+        EMenu saved = this.menuRepo.save(menu);
+        saved.setRoles(null);
+        return Result.success(saved);
     }
 
     @Override
@@ -226,9 +233,9 @@ public class AdminServImpl implements IAdminServ {
 
         EMenu one = this.menuRepo.findOne(menu.getId());
         BeanUtils.copyProperties(menu, one);
-        this.menuRepo.save(menu);
-        menu.setRoles(null);
-        return Result.success(menu);
+        EMenu saved = this.menuRepo.save(menu);
+        saved.setRoles(null);
+        return Result.success(saved);
     }
 
     @Override
