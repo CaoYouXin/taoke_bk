@@ -2,6 +2,7 @@ package com.taoke.miquaner.ctrl;
 
 import com.taoke.miquaner.MiquanerApplication;
 import com.taoke.miquaner.data.EUser;
+import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.serv.IUserServ;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.UserRegisterSubmit;
@@ -19,10 +20,12 @@ import java.io.Reader;
 public class UserCtrl {
 
     private IUserServ userServ;
+    private ITbkServ tbkServ;
 
     @Autowired
-    public UserCtrl(IUserServ userServ) {
+    public UserCtrl(IUserServ userServ, ITbkServ tbkServ) {
         this.userServ = userServ;
+        this.tbkServ = tbkServ;
     }
 
     @RequestMapping(value = "/tbk/user/login", method = RequestMethod.POST)
@@ -42,7 +45,7 @@ public class UserCtrl {
 
     @RequestMapping(value = "/tbk/phone/verify", method = RequestMethod.POST)
     public Object verify(String phone) {
-        return Result.success(null);
+        return this.tbkServ.sendVerifyCode(phone);
     }
 
 }

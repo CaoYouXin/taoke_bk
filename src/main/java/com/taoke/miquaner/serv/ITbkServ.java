@@ -14,4 +14,5 @@ public interface ITbkServ {
 
     Object getShareLink(ShareSubmit shareSubmit);
 
+    Object sendVerifyCode(String phone);
 }
