@@ -1,11 +1,16 @@
 package com.taoke.miquaner.serv.impl;
 
 import com.mysql.jdbc.StringUtils;
+import com.sun.org.apache.regexp.internal.RE;
 import com.taobao.api.ApiException;
 import com.taobao.api.DefaultTaobaoClient;
 import com.taobao.api.TaobaoClient;
 import com.taobao.api.request.TbkDgItemCouponGetRequest;
+import com.taobao.api.request.TbkSpreadGetRequest;
+import com.taobao.api.request.TbkTpwdCreateRequest;
 import com.taobao.api.response.TbkDgItemCouponGetResponse;
+import com.taobao.api.response.TbkSpreadGetResponse;
+import com.taobao.api.response.TbkTpwdCreateResponse;
 import com.taoke.miquaner.data.EConfig;
 import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.repo.ConfigRepo;
@@ -13,6 +18,8 @@ import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.AliMaMaSubmit;
+import com.taoke.miquaner.view.ShareSubmit;
+import com.taoke.miquaner.view.ShareView;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,6 +159,43 @@ public class TbkServImpl implements ITbkServ {
         }
         logger.debug(rsp.getBody());
         return Result.success(rsp.getResults());
+    }
+
+    @Override
+    public Object getShareLink(ShareSubmit shareSubmit) {
+        try {
+            return Result.success(new ShareView(
+                    this.getShortUrl(shareSubmit.getUrl()),
+                    this.getTaobaoPwd(shareSubmit)
+            ).toString());
+        } catch (ApiException e) {
+            logger.error("error when invoke ali api");
+            return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
+        }
+    }
+
+    private String getTaobaoPwd(ShareSubmit shareSubmit) throws ApiException {
+        TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
+        TbkTpwdCreateRequest req = new TbkTpwdCreateRequest();
+        req.setUserId("3434155161");
+        req.setText(shareSubmit.getTitle());
+        req.setUrl(shareSubmit.getUrl());
+        TbkTpwdCreateResponse rsp = client.execute(req);
+        logger.debug(rsp.getBody());
+        return rsp.getData().getModel();
+    }
+
+    private String getShortUrl(String url) throws ApiException {
+        TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
+        TbkSpreadGetRequest req = new TbkSpreadGetRequest();
+        List<TbkSpreadGetRequest.TbkSpreadRequest> list2 = new ArrayList<>();
+        TbkSpreadGetRequest.TbkSpreadRequest obj3 = new TbkSpreadGetRequest.TbkSpreadRequest();
+        list2.add(obj3);
+        obj3.setUrl(url);
+        req.setRequests(list2);
+        TbkSpreadGetResponse rsp = client.execute(req);
+        logger.debug(rsp.getBody());
+        return rsp.getResults().get(0).getContent();
     }
 
 

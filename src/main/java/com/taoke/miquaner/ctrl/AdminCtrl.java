@@ -24,7 +24,6 @@ public class AdminCtrl {
         this.adminServ = adminServ;
     }
 
-    @Auth(isAdmin = true)
     @RequestMapping("/admin/ping")
     public Object adminPing() {
         return Result.success("admin ping success");

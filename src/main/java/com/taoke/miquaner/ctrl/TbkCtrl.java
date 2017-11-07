@@ -4,6 +4,7 @@ import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.util.Auth;
 import com.taoke.miquaner.view.AliMaMaSubmit;
+import com.taoke.miquaner.view.ShareSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +36,12 @@ public class TbkCtrl {
     @RequestMapping(value = "/tbk/coupon/{cid}/{pNo}")
     public Object getCoupons(@PathVariable(name = "cid") String cid, @PathVariable(name = "pNo") Long pageNo, HttpServletRequest request) {
         return this.tbkServ.getCouponByCid(cid, pageNo, (EUser) request.getAttribute("user"));
+    }
+
+    @Auth
+    @RequestMapping(value = "/tbk/url/trans", method = RequestMethod.POST)
+    public Object getShareLink(@RequestBody ShareSubmit shareSubmit) {
+        return this.tbkServ.getShareLink(shareSubmit);
     }
 
 }
