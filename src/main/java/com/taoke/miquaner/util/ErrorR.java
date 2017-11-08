@@ -2,9 +2,9 @@ package com.taoke.miquaner.util;
 
 public class ErrorR {
 
-    static final String CAN_NOT_SAVE_OBJECT_MSG = "无法保存数据到数据库";
+    public static final String CAN_NOT_SAVE_OBJECT_MSG = "无法保存数据到数据库";
+    public static final String CAN_NOT_SAVE_OBJECT = "CAN_NOT_SAVE_OBJECT";
 
-    static final String CAN_NOT_SAVE_OBJECT = "CAN_NOT_SAVE_OBJECT";
     static final String SQL_ERROR = "SQL_ERROR";
 
     public static final String ST_NOT_MATCH = "ST_NOT_MATCH";

@@ -4,7 +4,6 @@ import com.taoke.miquaner.MiquanerApplication;
 import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.serv.IUserServ;
-import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.UserRegisterSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
