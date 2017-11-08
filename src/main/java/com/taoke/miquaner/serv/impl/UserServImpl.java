@@ -23,6 +23,7 @@ public class UserServImpl implements IUserServ {
 
     private static final String NO_USER_FOUND = "没有该用户";
     private static final String USER_WRONG_PWD = "用户密码错误";
+    private static final String ALREADY_REGISTERED_USER = "已经注册过，请直接登录";
 
     private UserRepo userRepo;
     private TokenRepo tokenRepo;
@@ -64,6 +65,11 @@ public class UserServImpl implements IUserServ {
 
     @Override
     public Object register(UserRegisterSubmit userRegisterSubmit) {
+        EUser byPhoneEquals = this.userRepo.findByPhoneEquals(userRegisterSubmit.getUser().getPhone());
+        if (null != byPhoneEquals) {
+            return Result.fail(new ErrorR(ErrorR.ALREADY_REGISTERED_USER, ALREADY_REGISTERED_USER));
+        }
+
         userRegisterSubmit.getUser().setName("觅" + ("" + Math.random()).substring(2, 10));
         EUser saved = this.userRepo.save(userRegisterSubmit.getUser());
 

@@ -20,6 +20,7 @@ public class ErrorR {
     public static final String FAIL_ON_ALI_API = "FAIL_ON_ALI_API";
     public static final String NO_USER_FOUND = "NO_USER_FOUND";
     public static final String USER_WRONG_PWD = "USER_WRONG_PWD";
+    public static final String ALREADY_REGISTERED_USER = "ALREADY_REGISTERED_USER";
 
     private String key;
     private String msg;
