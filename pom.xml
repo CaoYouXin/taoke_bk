@@ -26,6 +26,11 @@
 
 	<dependencies>
         <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.17</version>
+        </dependency>
+        <dependency>
             <groupId>com.taobao.api</groupId>
             <artifactId>tbk-miquaner</artifactId>
             <version>20171031</version>
