@@ -44,4 +44,16 @@ public class TbkCtrl {
         return this.tbkServ.getShareLink(shareSubmit);
     }
 
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/tbk/fav/list/{pageNo}")
+    public Object getFavoriteList(@PathVariable(name = "pageNo") Long pageNo) {
+        return this.tbkServ.getFavoriteList(pageNo);
+    }
+
+    @Auth
+    @RequestMapping("/tbk/fav/{favId}/list/{pageNo}")
+    public Object getFavoriteItems(@PathVariable(name = "favId") Long favoriteId, @PathVariable(name = "pageNo") Long pageNo, HttpServletRequest request) {
+        return this.tbkServ.getFavoriteItems(favoriteId, pageNo, (EUser) request.getAttribute("user"));
+    }
+
 }

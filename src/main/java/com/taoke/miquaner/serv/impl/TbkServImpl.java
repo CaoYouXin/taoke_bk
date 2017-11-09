@@ -5,12 +5,8 @@ import com.sun.org.apache.regexp.internal.RE;
 import com.taobao.api.ApiException;
 import com.taobao.api.DefaultTaobaoClient;
 import com.taobao.api.TaobaoClient;
-import com.taobao.api.request.TbkDgItemCouponGetRequest;
-import com.taobao.api.request.TbkSpreadGetRequest;
-import com.taobao.api.request.TbkTpwdCreateRequest;
-import com.taobao.api.response.TbkDgItemCouponGetResponse;
-import com.taobao.api.response.TbkSpreadGetResponse;
-import com.taobao.api.response.TbkTpwdCreateResponse;
+import com.taobao.api.request.*;
+import com.taobao.api.response.*;
 import com.taoke.miquaner.data.EConfig;
 import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.repo.ConfigRepo;
@@ -187,6 +183,46 @@ public class TbkServImpl implements ITbkServ {
 //        AlibabaAliqinFcSmsNumSendResponse rsp = client.execute(req);
 //        System.out.println(rsp.getBody());
         return Result.success(null);
+    }
+
+    @Override
+    public Object getFavoriteList(Long pageNo) {
+        TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
+        TbkUatmFavoritesGetRequest req = new TbkUatmFavoritesGetRequest();
+        req.setPageNo(pageNo);
+        req.setPageSize(20L);
+        req.setFields("favorites_title,favorites_id,type");
+        req.setType(-1L);
+        TbkUatmFavoritesGetResponse rsp = null;
+        try {
+            rsp = client.execute(req);
+        } catch (ApiException e) {
+            logger.error("error when invoke ali api");
+            return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
+        }
+        logger.debug(rsp.getBody());
+        return Result.success(rsp.getResults());
+    }
+
+    @Override
+    public Object getFavoriteItems(Long favoriteId, Long pageNo, EUser user) {
+        TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
+        TbkUatmFavoritesItemGetRequest req = new TbkUatmFavoritesItemGetRequest();
+        req.setPlatform(2L);
+        req.setPageSize(100L);
+        req.setAdzoneId(Long.parseLong(user.getAliPid().substring(user.getAliPid().lastIndexOf('_') + 1)));
+        req.setFavoritesId(favoriteId);
+        req.setPageNo(pageNo);
+        req.setFields("commission_rate,coupon_click_url,coupon_end_time,coupon_info,coupon_remain_count,coupon_start_time,coupon_total_count,category,click_url,num_iid,title,pict_url,small_images,reserve_price,zk_final_price,user_type,provcity,item_url,seller_id,volume,nick,shop_title,zk_final_price_wap,event_start_time,event_end_time,tk_rate,status,type");
+        TbkUatmFavoritesItemGetResponse rsp = null;
+        try {
+            rsp = client.execute(req);
+        } catch (ApiException e) {
+            logger.error("error when invoke ali api");
+            return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
+        }
+        logger.debug(rsp.getBody());
+        return Result.success(rsp.getResults());
     }
 
     private String getTaobaoPwd(ShareSubmit shareSubmit) throws ApiException {
