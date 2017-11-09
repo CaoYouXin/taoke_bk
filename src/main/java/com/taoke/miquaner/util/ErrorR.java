@@ -23,6 +23,7 @@ public class ErrorR {
     public static final String ALREADY_REGISTERED_USER = "ALREADY_REGISTERED_USER";
     public static final String NO_TITLE_FOUND = "NO_TITLE_FOUND";
     public static final String NO_COL_HANDLER_FOUND = "NO_COL_HANDLER_FOUND";
+    public static final String WRONG_SEARCH_TYPE = "WRONG_SEARCH_TYPE";
 
     private String key;
     private String msg;

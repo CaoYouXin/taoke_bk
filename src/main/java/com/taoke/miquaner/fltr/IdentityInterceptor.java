@@ -61,6 +61,7 @@ public class IdentityInterceptor implements HandlerInterceptor {
 
         if (auth.isAdmin()) {
             if (null != token.getAdmin()) {
+                logger.info(String.format("Admin Id = %d", token.getAdmin().getId()));
                 request.setAttribute("admin", token.getAdmin());
             } else {
                 HttpUtils.returnJSON(response, Result.unAuth());
@@ -81,6 +82,7 @@ public class IdentityInterceptor implements HandlerInterceptor {
                     }
                 }
 
+                logger.info(String.format("User Id = %d", user.getId()));
                 request.setAttribute("user", user);
             } else {
                 HttpUtils.returnJSON(response, Result.unAuth());

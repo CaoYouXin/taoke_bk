@@ -3,6 +3,7 @@ package com.taoke.miquaner.serv.impl;
 import com.mysql.jdbc.StringUtils;
 import com.taoke.miquaner.MiquanerApplication;
 import com.taoke.miquaner.data.ETbkOrder;
+import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.repo.TbkOrderRepo;
 import com.taoke.miquaner.serv.IOrderServ;
 import com.taoke.miquaner.util.ErrorR;
@@ -16,6 +17,8 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -24,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -35,6 +39,7 @@ public class OrderServImpl implements IOrderServ {
 
     private static final String NO_TITLE_FOUND = "没找到标题";
     private static final String NO_COL_HANDLER_FOUND = "表格格式有变，请升级服务程序后再上传这批订单";
+    private static final String WRONG_SEARCH_TYPE = "查询类型错误";
 
     private TbkOrderRepo tbkOrderRepo;
 
@@ -130,6 +135,77 @@ public class OrderServImpl implements IOrderServ {
         }
 
         return Result.success(null);
+    }
+
+    @Override
+    public Object list(EUser user, Integer type, Integer pageNo) {
+        String aliPid = user.getAliPid();
+        if (StringUtils.isNullOrEmpty(aliPid)) {
+            return Result.success(Collections.emptyList());
+        }
+
+        List<ETbkOrder> orders = null;
+        Long siteId = getSiteId(aliPid);
+        Long adZoneId = getAdZoneId(aliPid);
+        pageNo = Math.max(0, --pageNo);
+        logger.debug(String.format("siteId = %d, adZoneId = %d", siteId, adZoneId));
+        switch (type) {
+            case 1:
+                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdEquals(
+                        siteId, adZoneId,
+                        new PageRequest(pageNo, 10, new Sort(Sort.Direction.DESC, "createTime"))
+                );
+                break;
+            case 2:
+                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusNotContains(
+                        siteId, adZoneId, "失效",
+                        new PageRequest(pageNo, 10, new Sort(Sort.Direction.DESC, "createTime"))
+                );
+                break;
+            case 3:
+                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContains(
+                        siteId, adZoneId, "付款",
+                        new PageRequest(pageNo, 10, new Sort(Sort.Direction.DESC, "createTime"))
+                );
+                break;
+            case 4:
+                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContains(
+                        siteId, adZoneId, "收货",
+                        new PageRequest(pageNo, 10, new Sort(Sort.Direction.DESC, "createTime"))
+                );
+                break;
+            case 5:
+                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContains(
+                        siteId, adZoneId, "结算",
+                        new PageRequest(pageNo, 10, new Sort(Sort.Direction.DESC, "createTime"))
+                );
+                break;
+            case 6:
+                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContains(
+                        siteId, adZoneId, "失效",
+                        new PageRequest(pageNo, 10, new Sort(Sort.Direction.DESC, "createTime"))
+                );
+                break;
+            default:
+                return Result.fail(new ErrorR(ErrorR.WRONG_SEARCH_TYPE, WRONG_SEARCH_TYPE));
+        }
+
+        logger.debug(String.format("%d results found.", orders.size()));
+        return Result.success(orders);
+    }
+
+    private Long getSiteId(String pid) {
+        int start = pid.indexOf('_') + 1;
+        start = pid.indexOf('_', start) + 1;
+        int end = pid.indexOf('_', start);
+        return Long.parseLong(pid.substring(start, end));
+    }
+
+    private Long getAdZoneId(String pid) {
+        int start = pid.indexOf('_') + 1;
+        start = pid.indexOf('_', start) + 1;
+        start = pid.indexOf('_', start) + 1;
+        return Long.parseLong(pid.substring(start));
     }
 
     private void processCell(TbkOrderWrapper tbkOrderWrapper, HSSFCell cell, TbkOrderWrapper.TOW tow, Method method) throws IllegalAccessException, InvocationTargetException, ParseException {
