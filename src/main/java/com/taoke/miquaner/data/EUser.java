@@ -17,8 +17,17 @@ public class EUser {
     @JoinColumn(name = "pid")
     private EUser pUser;
 
-    @OneToMany(mappedBy = "pUser")
+    @OneToMany(mappedBy = "pUser", fetch = FetchType.LAZY)
     private List<EUser> cUsers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<EWithdraw> withdraws = new ArrayList<>();
+
+    @OneToMany(mappedBy = "senderUser", fetch = FetchType.LAZY)
+    private List<EMailBox> sendedMails = new ArrayList<>();
+
+    @OneToMany(mappedBy = "receiverUser", fetch = FetchType.LAZY)
+    private List<EMailBox> receivedMails = new ArrayList<>();
 
     @Column(name = "phone", unique = true, length = 32, nullable = false)
     private String phone;
@@ -163,5 +172,29 @@ public class EUser {
 
     public void setExt(String ext) {
         this.ext = ext;
+    }
+
+    public List<EWithdraw> getWithdraws() {
+        return withdraws;
+    }
+
+    public void setWithdraws(List<EWithdraw> withdraws) {
+        this.withdraws = withdraws;
+    }
+
+    public List<EMailBox> getSendedMails() {
+        return sendedMails;
+    }
+
+    public void setSendedMails(List<EMailBox> sendedMails) {
+        this.sendedMails = sendedMails;
+    }
+
+    public List<EMailBox> getReceivedMails() {
+        return receivedMails;
+    }
+
+    public void setReceivedMails(List<EMailBox> receivedMails) {
+        this.receivedMails = receivedMails;
     }
 }
