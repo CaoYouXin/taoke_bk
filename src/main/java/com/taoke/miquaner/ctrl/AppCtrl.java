@@ -4,12 +4,18 @@ import com.taoke.miquaner.data.EGuide;
 import com.taoke.miquaner.data.EHelp;
 import com.taoke.miquaner.serv.IAppServ;
 import com.taoke.miquaner.util.Auth;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class AppCtrl {
 
     private IAppServ appServ;
+
+    @Autowired
+    public AppCtrl(IAppServ appServ) {
+        this.appServ = appServ;
+    }
 
     @RequestMapping("/app/guide/list")
     public Object getGuideList() {
