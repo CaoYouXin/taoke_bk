@@ -17,4 +17,5 @@ public interface ITbkServ {
     Object getFavoriteList(Long pageNo);
 
     Object getFavoriteItems(Long favoriteId, Long pageNo, EUser user);
+
 }

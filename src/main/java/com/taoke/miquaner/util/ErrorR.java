@@ -30,6 +30,8 @@ public class ErrorR {
     public static final String NO_VERIFY_CODE = "NO_VERIFY_CODE";
     public static final String VERIFY_CODE_EXPIRED = "VERIFY_CODE_EXPIRED";
     public static final String WRONG_VERIFY_CODE = "WRONG_VERIFY_CODE";
+    public static final String AT_LEAST_TEN = "AT_LEAST_TEN";
+    public static final String NO_THAT_MUCH = "NO_THAT_MUCH";
 
     private String key;
     private String msg;

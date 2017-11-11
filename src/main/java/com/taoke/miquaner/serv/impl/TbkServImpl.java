@@ -16,6 +16,7 @@ import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.AliMaMaSubmit;
 import com.taoke.miquaner.view.ShareSubmit;
 import com.taoke.miquaner.view.ShareView;
+import com.taoke.miquaner.view.UserCommitView;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

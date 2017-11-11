@@ -28,9 +28,13 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServImpl implements IUserServ {
@@ -242,6 +246,13 @@ public class UserServImpl implements IUserServ {
         this.userRepo.save(one);
 
         return clearToken(id);
+    }
+
+    @Override
+    @Transactional
+    public List<EUser> getChildUsers(EUser user) {
+        EUser one = this.userRepo.findOne(user.getId());
+        return new ArrayList<>(one.getcUsers());
     }
 
     private Object clearToken(Long id) {

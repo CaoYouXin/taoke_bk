@@ -5,6 +5,8 @@ import com.taoke.miquaner.view.EnrollSubmit;
 import com.taoke.miquaner.view.UserRegisterSubmit;
 import com.taoke.miquaner.view.UserResetPwdSubmit;
 
+import java.util.List;
+
 public interface IUserServ {
 
     Object login(EUser user);
@@ -18,5 +20,7 @@ public interface IUserServ {
     Object enroll(EUser user, EnrollSubmit enrollSubmit);
 
     Object check(Long id, String aliPid);
+
+    List<EUser> getChildUsers(EUser user);
 
 }

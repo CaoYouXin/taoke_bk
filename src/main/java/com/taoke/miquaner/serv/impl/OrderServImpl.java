@@ -4,11 +4,15 @@ import com.mysql.jdbc.StringUtils;
 import com.taoke.miquaner.MiquanerApplication;
 import com.taoke.miquaner.data.ETbkOrder;
 import com.taoke.miquaner.data.EUser;
+import com.taoke.miquaner.data.EWithdraw;
+import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.TbkOrderRepo;
+import com.taoke.miquaner.repo.WithdrawRepo;
 import com.taoke.miquaner.serv.IOrderServ;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.TbkOrderWrapper;
+import com.taoke.miquaner.view.UserCommitView;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -20,16 +24,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,12 +43,18 @@ public class OrderServImpl implements IOrderServ {
     private static final String NO_TITLE_FOUND = "没找到标题";
     private static final String NO_COL_HANDLER_FOUND = "表格格式有变，请升级服务程序后再上传这批订单";
     private static final String WRONG_SEARCH_TYPE = "查询类型错误";
+    private static final String AT_LEAST_TEN = "不满足最小提现金额";
+    private static final String NO_THAT_MUCH = "可提现金额不足";
 
     private TbkOrderRepo tbkOrderRepo;
+    private WithdrawRepo withdrawRepo;
+    private ConfigRepo configRepo;
 
     @Autowired
-    public OrderServImpl(TbkOrderRepo tbkOrderRepo) {
+    public OrderServImpl(TbkOrderRepo tbkOrderRepo, WithdrawRepo withdrawRepo, ConfigRepo configRepo) {
         this.tbkOrderRepo = tbkOrderRepo;
+        this.withdrawRepo = withdrawRepo;
+        this.configRepo = configRepo;
     }
 
     @Override
@@ -192,6 +201,108 @@ public class OrderServImpl implements IOrderServ {
 
         logger.debug(String.format("%d results found.", orders.size()));
         return Result.success(orders);
+    }
+
+    @Override
+    public Object getChildUserCommit(List<EUser> children) {
+        return Result.success(children.stream().map(user -> {
+            if (StringUtils.isNullOrEmpty(user.getAliPid())) {
+                return new UserCommitView(user.getName(), "0.00");
+            }
+
+            return getUserCommitView(user, 0.2);
+        }).collect(Collectors.toList()));
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Object withdraw(EUser user, Double amount) {
+        if (amount < 10.0) {
+            return Result.fail(new ErrorR(ErrorR.AT_LEAST_TEN, AT_LEAST_TEN));
+        }
+
+        Result canDraw = (Result) this.canDraw(user);
+        if (Double.parseDouble((String) canDraw.getBody()) < amount) {
+            return Result.fail(new ErrorR(ErrorR.NO_THAT_MUCH, NO_THAT_MUCH));
+        }
+
+        EWithdraw withdraw = new EWithdraw();
+        withdraw.setCreateTime(new Date());
+        withdraw.setUser(user);
+        withdraw.setAmount(String.format(Locale.ENGLISH, "%.2f", amount));
+        this.withdrawRepo.save(withdraw);
+        return Result.success(null);
+    }
+
+    @Override
+    public Object canDraw(EUser user) {
+        if (StringUtils.isNullOrEmpty(user.getAliPid())) {
+            return Result.success("0.00");
+        }
+
+        UserCommitView userCommitView = getUserCommitView(user, 0.3);
+        Double hasDraw = this.withdrawRepo.findAllByUserEquals(user).stream()
+                .reduce(0.0, (pv, cO) -> pv + Double.parseDouble(cO.getAmount()), (v1, v2) -> v1 + v2);
+        return Result.success(String.format(Locale.ENGLISH, "%.2f",
+                Double.parseDouble(userCommitView.getCommit()) - hasDraw));
+    }
+
+    @Override
+    public Object lastMonthSettled(EUser user) {
+        if (StringUtils.isNullOrEmpty(user.getAliPid())) {
+            return Result.success("0.00");
+        }
+
+        Calendar now = Calendar.getInstance();
+        int month = now.get(Calendar.MONTH);
+        now.set(now.get(Calendar.YEAR), month, 0, 0, 0, 0);
+        Date end = now.getTime(), start;
+        if (month == Calendar.JANUARY) {
+            now.set(now.get(Calendar.YEAR) - 1, Calendar.DECEMBER, 0, 0, 0, 0);
+            start = now.getTime();
+        } else {
+            now.set(now.get(Calendar.YEAR), month - 1, 0, 0, 0, 0);
+            start = now.getTime();
+        }
+        Double settled = this.tbkOrderRepo.findAllBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContainsAndCreateTimeBetween(
+                getSiteId(user.getAliPid()), getAdZoneId(user.getAliPid()), "结算", start, end
+        ).stream().reduce(0.0, (pv, cO) -> pv + Double.parseDouble(cO.getEstimateIncome()) * 0.3, (v1, v2) -> v1 + v2);
+        return Result.success(String.format(Locale.ENGLISH, "%.2f", settled));
+    }
+
+    @Override
+    public Object thisMonthSettled(EUser user) {
+        if (StringUtils.isNullOrEmpty(user.getAliPid())) {
+            return Result.success("0.00");
+        }
+
+        Calendar now = Calendar.getInstance();
+        now.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), 0, 0, 0, 0);
+        Double settled = this.tbkOrderRepo.findAllBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContainsAndCreateTimeBetween(
+                getSiteId(user.getAliPid()), getAdZoneId(user.getAliPid()), "结算", now.getTime(), new Date()
+        ).stream().reduce(0.0, (pv, cO) -> pv + Double.parseDouble(cO.getEstimateIncome()) * 0.3, (v1, v2) -> v1 + v2);
+        return Result.success(String.format(Locale.ENGLISH, "%.2f", settled));
+    }
+
+    private UserCommitView getUserCommitView(EUser user, final Double percent) {
+        Double settled = this.tbkOrderRepo.findAllBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContainsAndCreateTimeBefore(
+                getSiteId(user.getAliPid()), getAdZoneId(user.getAliPid()), "结算", this.getNearestSettleEndTime()
+        ).stream().reduce(0.0, (pv, cv) -> pv + Double.parseDouble(cv.getEstimateIncome()) * percent, (v1, v2) -> v1 + v2);
+        return new UserCommitView(user.getName(), String.format(Locale.ENGLISH, "%.2f", settled));
+    }
+
+    private Date getNearestSettleEndTime() {
+        Calendar now = Calendar.getInstance();
+        int month = now.get(Calendar.MONTH);
+        if (now.get(Calendar.DAY_OF_MONTH) > 20) {
+            now.set(now.get(Calendar.YEAR), month, 0, 0, 0, 0);
+        } else {
+            if (month == Calendar.JANUARY) {
+                now.set(now.get(Calendar.YEAR) - 1, Calendar.DECEMBER, 0, 0, 0, 0);
+            }
+            now.set(now.get(Calendar.YEAR), month - 1, 0, 0, 0, 0);
+        }
+        return now.getTime();
     }
 
     private Long getSiteId(String pid) {
