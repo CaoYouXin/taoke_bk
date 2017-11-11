@@ -234,6 +234,7 @@ public class OrderServImpl implements IOrderServ {
         withdraw.setCreateTime(new Date());
         withdraw.setUser(user);
         withdraw.setAmount(String.format(Locale.ENGLISH, "%.2f", amount));
+        withdraw.setPayed(false);
         this.withdrawRepo.save(withdraw);
         return Result.success(null);
     }
@@ -286,6 +287,11 @@ public class OrderServImpl implements IOrderServ {
                 getSiteId(user.getAliPid()), getAdZoneId(user.getAliPid()), "结算", now.getTime(), new Date()
         ).stream().reduce(0.0, (pv, cO) -> pv + Double.parseDouble(cO.getEstimateIncome()) * 0.3, (v1, v2) -> v1 + v2);
         return Result.success(String.format(Locale.ENGLISH, "%.2f", settled));
+    }
+
+    @Override
+    public Object userWithdrawList() {
+        return Result.success(this.withdrawRepo.findAllByPayedEquals(false));
     }
 
     private UserCommitView getUserCommitView(EUser user, final Double percent) {

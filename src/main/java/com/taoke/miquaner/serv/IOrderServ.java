@@ -21,4 +21,6 @@ public interface IOrderServ {
 
     Object thisMonthSettled(EUser user);
 
+    Object userWithdrawList();
+
 }

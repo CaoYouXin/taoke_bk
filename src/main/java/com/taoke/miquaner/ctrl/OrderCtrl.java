@@ -71,4 +71,10 @@ public class OrderCtrl {
         return this.orderServ.withdraw((EUser) request.getAttribute("user"), amount);
     }
 
+    @Auth(isAdmin = true)
+    @RequestMapping("/tbk/withdraw/request/list")
+    public Object withdrawList() {
+        return this.orderServ.userWithdrawList();
+    }
+
 }

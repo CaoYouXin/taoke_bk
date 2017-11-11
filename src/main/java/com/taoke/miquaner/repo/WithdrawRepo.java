@@ -10,4 +10,6 @@ public interface WithdrawRepo extends JpaRepository<EWithdraw, Long> {
 
     List<EWithdraw> findAllByUserEquals(EUser user);
 
+    List<EWithdraw> findAllByPayedEquals(Boolean payed);
+
 }

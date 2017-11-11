@@ -23,6 +23,13 @@ public class EWithdraw {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
 
+    @Column(name = "payed", nullable = false)
+    private Boolean payed;
+
+    @Column(name = "pay_time", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date payTime;
+
     public Long getId() {
         return id;
     }
@@ -53,5 +60,21 @@ public class EWithdraw {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Boolean getPayed() {
+        return payed;
+    }
+
+    public void setPayed(Boolean payed) {
+        this.payed = payed;
+    }
+
+    public Date getPayTime() {
+        return payTime;
+    }
+
+    public void setPayTime(Date payTime) {
+        this.payTime = payTime;
     }
 }
