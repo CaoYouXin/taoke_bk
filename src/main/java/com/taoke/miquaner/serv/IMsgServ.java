@@ -12,4 +12,6 @@ public interface IMsgServ {
 
     Object sendFeedback(EUser user, String content);
 
+    Object readMessage(EUser user, Long mailBoxId);
+
 }

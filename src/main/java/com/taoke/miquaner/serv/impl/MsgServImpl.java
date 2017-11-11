@@ -7,16 +7,20 @@ import com.taoke.miquaner.repo.MailBoxRepo;
 import com.taoke.miquaner.repo.MessageRepo;
 import com.taoke.miquaner.repo.UserRepo;
 import com.taoke.miquaner.serv.IMsgServ;
+import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class MsgServImpl implements IMsgServ {
 
+    private static final String WRONG_MESSAGE_ID = "正在确认错误的消息";
     private MessageRepo messageRepo;
     private MailBoxRepo mailBoxRepo;
     private UserRepo userRepo;
@@ -87,5 +91,21 @@ public class MsgServImpl implements IMsgServ {
 
         return Result.success(null);
 
+    }
+
+    @Override
+    public Object readMessage(EUser user, Long mailBoxId) {
+        EMailBox one = this.mailBoxRepo.findOne(mailBoxId);
+        if (null == one) {
+            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
+        }
+
+        if (!one.getReceiverUser().getId().equals(user.getId())) {
+            return Result.fail(new ErrorR(ErrorR.WRONG_MESSAGE_ID, WRONG_MESSAGE_ID));
+        }
+
+        one.setChecked(true);
+        this.mailBoxRepo.save(one);
+        return Result.success(null);
     }
 }
