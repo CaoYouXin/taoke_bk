@@ -200,7 +200,11 @@ public class OrderServImpl implements IOrderServ {
         }
 
         logger.debug(String.format("%d results found.", orders.size()));
-        return Result.success(orders);
+        return Result.success(orders.stream().peek(eTbkOrder -> {
+            eTbkOrder.setCommissionRate(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(eTbkOrder.getCommissionRate()) * 0.3));
+            eTbkOrder.setEstimateEffect(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(eTbkOrder.getEstimateEffect()) * 0.3));
+            eTbkOrder.setEstimateIncome(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(eTbkOrder.getEstimateIncome()) * 0.3));
+        }).collect(Collectors.toList()));
     }
 
     @Override

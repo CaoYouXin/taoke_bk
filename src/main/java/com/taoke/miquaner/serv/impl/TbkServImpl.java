@@ -26,6 +26,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Service
 public class TbkServImpl implements ITbkServ {
@@ -155,7 +157,9 @@ public class TbkServImpl implements ITbkServ {
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
         }
         logger.debug(rsp.getBody());
-        return Result.success(rsp.getResults());
+        return Result.success(rsp.getResults().stream().peek(tbkCoupon -> {
+            tbkCoupon.setCommissionRate(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(tbkCoupon.getCommissionRate()) * 0.3));
+        }).collect(Collectors.toList()));
     }
 
     @Override
@@ -208,7 +212,9 @@ public class TbkServImpl implements ITbkServ {
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
         }
         logger.debug(rsp.getBody());
-        return Result.success(rsp.getResults());
+        return Result.success(rsp.getResults().stream().peek(uatmTbkItem -> {
+            uatmTbkItem.setCommissionRate(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(uatmTbkItem.getCommissionRate()) * 0.3));
+        }).collect(Collectors.toList()));
     }
 
     private String getTaobaoPwd(ShareSubmit shareSubmit) throws ApiException {
