@@ -139,7 +139,7 @@ public class UserServImpl implements IUserServ {
 
     @Override
     public Object resetPwd(UserResetPwdSubmit userResetPwdSubmit) {
-        Object x = checkSmsCode(userResetPwdSubmit.getPhone(), userResetPwdSubmit.getCode());
+        Object x = checkSmsCode(userResetPwdSubmit.getPhone(), userResetPwdSubmit.getSmsCode());
         if (x != null) return x;
 
         EUser byPhoneEquals = this.userRepo.findByPhoneEquals(userResetPwdSubmit.getPhone());
@@ -238,6 +238,7 @@ public class UserServImpl implements IUserServ {
         }
 
         one.setAliPid(aliPid);
+        one.setCode(StringUtil.toMD5HexString(aliPid).substring(0, 10));
         this.userRepo.save(one);
 
         return clearToken(id);
