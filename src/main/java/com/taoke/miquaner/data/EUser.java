@@ -47,6 +47,12 @@ public class EUser {
     @Column(name = "aliPid", length = 1024, unique = true)
     private String aliPid;
 
+    @Column(name = "code", unique = true, length = 10)
+    private String code;
+
+    @Column(name = "ext")
+    private String ext;
+
     public Long getId() {
         return id;
     }
@@ -143,21 +149,19 @@ public class EUser {
         this.aliPid = aliPid;
     }
 
-    @Override
-    public String toString() {
-        return "EUser{" +
-                "id=" + id +
-                ", pUser=" + pUser +
-                ", cUsers=" + cUsers +
-                ", phone='" + phone + '\'' +
-                ", pwd='" + pwd + '\'' +
-                ", name='" + name + '\'' +
-                ", realName='" + realName + '\'' +
-                ", aliPayId='" + aliPayId + '\'' +
-                ", qqId='" + qqId + '\'' +
-                ", weChatId='" + weChatId + '\'' +
-                ", announcement='" + announcement + '\'' +
-                ", aliPid='" + aliPid + '\'' +
-                '}';
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getExt() {
+        return ext;
+    }
+
+    public void setExt(String ext) {
+        this.ext = ext;
     }
 }

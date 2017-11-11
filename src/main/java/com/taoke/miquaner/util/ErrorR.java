@@ -3,7 +3,10 @@ package com.taoke.miquaner.util;
 public class ErrorR {
 
     public static final String CAN_NOT_SAVE_OBJECT_MSG = "无法保存数据到数据库";
+    public static final String NO_ID_FOUND_MSG = "没有找到主键，错误可能发生在前端漏传主键字段";
+
     public static final String CAN_NOT_SAVE_OBJECT = "CAN_NOT_SAVE_OBJECT";
+    public static final String NO_ID_FOUND = "NO_ID_FOUND";
 
     static final String SQL_ERROR = "SQL_ERROR";
 
@@ -11,7 +14,6 @@ public class ErrorR {
     public static final String NO_SUPER_ROLE = "NO_SUPER_ROLE";
     public static final String ALREADY_HAS_SUPER_USER = "ALREADY_HAS_SUPER_USER";
     public static final String SUBMIT_NEED_ROLE = "SUBMIT_NEED_ROLE";
-    public static final String NO_ID_FOUND = "NO_ID_FOUND";
     public static final String SUBMIT_NEED_NAME = "SUBMIT_NEED_NAME";
     public static final String ADMIN_NOT_FOUND = "ADMIN_NOT_FOUND";
     public static final String ADMIN_WRONG_PWD = "ADMIN_WRONG_PWD";
@@ -24,6 +26,10 @@ public class ErrorR {
     public static final String NO_TITLE_FOUND = "NO_TITLE_FOUND";
     public static final String NO_COL_HANDLER_FOUND = "NO_COL_HANDLER_FOUND";
     public static final String WRONG_SEARCH_TYPE = "WRONG_SEARCH_TYPE";
+    public static final String NO_CORRECT_PHONE = "NO_CORRECT_PHONE";
+    public static final String NO_VERIFY_CODE = "NO_VERIFY_CODE";
+    public static final String VERIFY_CODE_EXPIRED = "VERIFY_CODE_EXPIRED";
+    public static final String WRONG_VERIFY_CODE = "WRONG_VERIFY_CODE";
 
     private String key;
     private String msg;

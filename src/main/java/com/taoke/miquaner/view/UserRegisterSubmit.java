@@ -6,6 +6,7 @@ public class UserRegisterSubmit {
 
     private EUser user;
     private String code;
+    private String invitation;
 
     public EUser getUser() {
         return user;
@@ -23,4 +24,11 @@ public class UserRegisterSubmit {
         this.code = code;
     }
 
+    public String getInvitation() {
+        return invitation;
+    }
+
+    public void setInvitation(String invitation) {
+        this.invitation = invitation;
+    }
 }

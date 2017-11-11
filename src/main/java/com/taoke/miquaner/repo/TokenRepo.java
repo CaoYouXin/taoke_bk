@@ -11,4 +11,6 @@ public interface TokenRepo extends JpaRepository<EToken, Long> {
 
     EToken findByAdmin_Id(Long adminId);
 
+    EToken findByUser_Id(Long userId);
+
 }

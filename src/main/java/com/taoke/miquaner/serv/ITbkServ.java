@@ -14,8 +14,6 @@ public interface ITbkServ {
 
     Object getShareLink(ShareSubmit shareSubmit);
 
-    Object sendVerifyCode(String phone);
-
     Object getFavoriteList(Long pageNo);
 
     Object getFavoriteItems(Long favoriteId, Long pageNo, EUser user);

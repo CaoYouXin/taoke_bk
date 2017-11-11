@@ -36,6 +36,16 @@
             <version>20171031</version>
         </dependency>
         <dependency>
+            <groupId>com.aliyuncs</groupId>
+            <artifactId>tbk-miquaner</artifactId>
+            <version>3.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyuncs.dysmsapi</groupId>
+            <artifactId>tbk-miquaner</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>

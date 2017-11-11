@@ -6,10 +6,7 @@ import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.serv.IUserServ;
 import com.taoke.miquaner.view.UserRegisterSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,12 +16,10 @@ import java.io.Reader;
 public class UserCtrl {
 
     private IUserServ userServ;
-    private ITbkServ tbkServ;
 
     @Autowired
-    public UserCtrl(IUserServ userServ, ITbkServ tbkServ) {
+    public UserCtrl(IUserServ userServ) {
         this.userServ = userServ;
-        this.tbkServ = tbkServ;
     }
 
     @RequestMapping(value = "/tbk/user/login", method = RequestMethod.POST)
@@ -44,7 +39,7 @@ public class UserCtrl {
 
     @RequestMapping(value = "/tbk/phone/verify", method = RequestMethod.POST)
     public Object verify(String phone) {
-        return this.tbkServ.sendVerifyCode(phone);
+        return this.userServ.sendVerifyCode(phone);
     }
 
 }

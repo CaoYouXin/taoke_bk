@@ -30,7 +30,6 @@ public class AdminServImpl implements IAdminServ {
     private static final String ALREADY_BIND = "已经绑定过";
     private static final String BIND_SUCCESS = "绑定成功";
     private static final String UNBIND_SUCCESS = "解绑成功";
-    private static final String NO_ID_FOUND = "没有找到主键，错误可能发生在前端漏传主键字段";
     private static final String SUBMIT_NEED_NAME = "未指定用户名";
     private static final String ADMIN_NOT_FOUND = "没有该管理员";
     private static final String ADMIN_WRONG_PWD = "管理员密码错误，请联系您的上级管理员";
@@ -148,7 +147,7 @@ public class AdminServImpl implements IAdminServ {
 
     private Object persistentNewAdmin(EAdmin admin) {
         if (null == admin.getId()) {
-            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, NO_ID_FOUND));
+            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
         }
 
         EAdmin one = this.adminRepo.findOne(admin.getId());
@@ -173,7 +172,7 @@ public class AdminServImpl implements IAdminServ {
     @Override
     public Object changeRole(ERole role) {
         if (null == role.getId()) {
-            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, NO_ID_FOUND));
+            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
         }
 
         ERole one = this.roleRepo.findOne(role.getId());
@@ -228,7 +227,7 @@ public class AdminServImpl implements IAdminServ {
     @Override
     public Object changeMenu(EMenu menu) {
         if (null == menu.getId()) {
-            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, NO_ID_FOUND));
+            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
         }
 
         EMenu one = this.menuRepo.findOne(menu.getId());
