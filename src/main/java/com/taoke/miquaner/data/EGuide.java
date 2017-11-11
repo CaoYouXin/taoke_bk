@@ -1,0 +1,43 @@
+package com.taoke.miquaner.data;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name = "guide")
+public class EGuide {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @Column(name = "idx", nullable = false)
+    private Integer order;
+
+    @Column(name = "img_url", unique = true, nullable = false, length = 2048)
+    private String imgUrl;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Integer getOrder() {
+        return order;
+    }
+
+    public void setOrder(Integer order) {
+        this.order = order;
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+}

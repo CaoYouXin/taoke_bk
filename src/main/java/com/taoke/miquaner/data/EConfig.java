@@ -7,6 +7,7 @@ import javax.persistence.*;
 public class EConfig {
 
     public static final String SERVER_TOKEN = "server_token";
+    public static final String APP_SHARE_IMG = "app_share_img";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,7 +17,7 @@ public class EConfig {
     @Column(name = "name", unique = true, nullable = false)
     private String key;
 
-    @Column(name = "value", nullable = false)
+    @Column(name = "value", nullable = false, length = 2048)
     private String value;
 
     public Long getId() {
