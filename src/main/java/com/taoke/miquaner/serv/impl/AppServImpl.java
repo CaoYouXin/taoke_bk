@@ -10,7 +10,9 @@ import com.taoke.miquaner.serv.IAppServ;
 import com.taoke.miquaner.util.Result;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AppServImpl implements IAppServ {
 
     private GuideRepo guideRepo;

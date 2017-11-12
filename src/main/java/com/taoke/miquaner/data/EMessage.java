@@ -20,7 +20,7 @@ public class EMessage {
     private String content;
 
     @OneToMany(mappedBy = "message")
-    private List<EMessage> messages = new ArrayList<>();
+    private List<EMailBox> messages = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -46,11 +46,11 @@ public class EMessage {
         this.content = content;
     }
 
-    public List<EMessage> getMessages() {
+    public List<EMailBox> getMessages() {
         return messages;
     }
 
-    public void setMessages(List<EMessage> messages) {
+    public void setMessages(List<EMailBox> messages) {
         this.messages = messages;
     }
 }
