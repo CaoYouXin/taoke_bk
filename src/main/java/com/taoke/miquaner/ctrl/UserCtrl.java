@@ -62,4 +62,10 @@ public class UserCtrl {
         return this.userServ.check(id, pid);
     }
 
+    @Auth(isAdmin = true)
+    @RequestMapping("/admin/manage/user/list/{pageNo}")
+    public Object listAllUsers(@PathVariable(name = "pageNo") Integer pageNo) {
+        return this.userServ.listAllUsers(pageNo);
+    }
+
 }

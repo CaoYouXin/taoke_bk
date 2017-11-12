@@ -26,7 +26,10 @@ import com.taoke.miquaner.view.UserRegisterSubmit;
 import com.taoke.miquaner.view.UserResetPwdSubmit;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServImpl implements IUserServ {
@@ -253,6 +255,15 @@ public class UserServImpl implements IUserServ {
     public List<EUser> getChildUsers(EUser user) {
         EUser one = this.userRepo.findOne(user.getId());
         return new ArrayList<>(one.getcUsers());
+    }
+
+    @Override
+    public Object listAllUsers(Integer pageNo) {
+        return Result.success(this.userRepo.findAll(new PageRequest(pageNo - 1, 1, new Sort(Sort.Direction.ASC, "id"))).map(user -> {
+            EUser viewUser = new EUser();
+            BeanUtils.copyProperties(user, viewUser, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
+            return viewUser;
+        }));
     }
 
     private Object clearToken(Long id) {

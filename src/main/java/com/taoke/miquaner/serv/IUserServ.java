@@ -23,4 +23,6 @@ public interface IUserServ {
 
     List<EUser> getChildUsers(EUser user);
 
+    Object listAllUsers(Integer pageNo);
+
 }
