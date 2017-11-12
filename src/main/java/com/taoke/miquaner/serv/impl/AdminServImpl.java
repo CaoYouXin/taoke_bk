@@ -74,6 +74,7 @@ public class AdminServImpl implements IAdminServ {
         EAdmin saved = this.adminRepo.save(admin);
         saved.setGrantedAdmins(null);
         saved.setParentAdmin(null);
+        saved.setCreatedMessages(null);
         saved.getRole().setPrivileges(null);
         saved.getRole().setAdmins(null);
         return Result.success(saved);
@@ -103,6 +104,7 @@ public class AdminServImpl implements IAdminServ {
         EAdmin saved = this.adminRepo.save(admin);
         saved.setGrantedAdmins(null);
         saved.getParentAdmin().setGrantedAdmins(null);
+        saved.setCreatedMessages(null);
         saved.getRole().setAdmins(null);
         saved.getRole().setPrivileges(null);
         return Result.success(saved);
@@ -155,6 +157,7 @@ public class AdminServImpl implements IAdminServ {
         EAdmin saved = this.adminRepo.save(admin);
         saved.setGrantedAdmins(null);
         saved.getParentAdmin().setGrantedAdmins(null);
+        saved.setCreatedMessages(null);
         saved.getRole().setPrivileges(null);
         saved.getRole().setAdmins(null);
         return Result.success(saved);
@@ -296,6 +299,7 @@ public class AdminServImpl implements IAdminServ {
         EToken saved = this.tokenRepo.save(token);
         one.setPwd(null);
         one.setGrantedAdmins(null);
+        one.setCreatedMessages(null);
         one.getRole().setAdmins(null);
         one.getRole().setPrivileges(null);
 

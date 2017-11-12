@@ -24,10 +24,13 @@ public class EUser {
     private List<EWithdraw> withdraws = new ArrayList<>();
 
     @OneToMany(mappedBy = "senderUser", fetch = FetchType.LAZY)
-    private List<EMailBox> sendedMails = new ArrayList<>();
+    private List<EMailBox> sentMails = new ArrayList<>();
 
     @OneToMany(mappedBy = "receiverUser", fetch = FetchType.LAZY)
     private List<EMailBox> receivedMails = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<EMessage> createdMessages = new ArrayList<>();
 
     @Column(name = "phone", unique = true, length = 32, nullable = false)
     private String phone;
@@ -182,12 +185,12 @@ public class EUser {
         this.withdraws = withdraws;
     }
 
-    public List<EMailBox> getSendedMails() {
-        return sendedMails;
+    public List<EMailBox> getSentMails() {
+        return sentMails;
     }
 
-    public void setSendedMails(List<EMailBox> sendedMails) {
-        this.sendedMails = sendedMails;
+    public void setSentMails(List<EMailBox> sentMails) {
+        this.sentMails = sentMails;
     }
 
     public List<EMailBox> getReceivedMails() {
@@ -196,5 +199,13 @@ public class EUser {
 
     public void setReceivedMails(List<EMailBox> receivedMails) {
         this.receivedMails = receivedMails;
+    }
+
+    public List<EMessage> getCreatedMessages() {
+        return createdMessages;
+    }
+
+    public void setCreatedMessages(List<EMessage> createdMessages) {
+        this.createdMessages = createdMessages;
     }
 }

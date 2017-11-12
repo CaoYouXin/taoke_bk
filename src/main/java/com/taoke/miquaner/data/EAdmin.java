@@ -30,6 +30,9 @@ public class EAdmin {
     @JoinColumn(name = "role_id")
     private ERole role;
 
+    @OneToMany(mappedBy = "admin", fetch = FetchType.LAZY)
+    private List<EMessage> createdMessages = new ArrayList<>();
+
     public Long getId() {
         return id;
     }
@@ -76,5 +79,13 @@ public class EAdmin {
 
     public void setGrantedAdmins(List<EAdmin> grantedAdmins) {
         this.grantedAdmins = grantedAdmins;
+    }
+
+    public List<EMessage> getCreatedMessages() {
+        return createdMessages;
+    }
+
+    public void setCreatedMessages(List<EMessage> createdMessages) {
+        this.createdMessages = createdMessages;
     }
 }

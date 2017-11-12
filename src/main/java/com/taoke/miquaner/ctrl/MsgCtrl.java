@@ -1,5 +1,6 @@
 package com.taoke.miquaner.ctrl;
 
+import com.taoke.miquaner.data.EAdmin;
 import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.serv.IMsgServ;
 import com.taoke.miquaner.util.Auth;
@@ -45,8 +46,20 @@ public class MsgCtrl {
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/msg/send/2/all", method = RequestMethod.POST)
-    public Object send2All(@RequestBody MessageSubmit messageSubmit) {
-        return this.msgServ.send2All(messageSubmit.getTitle(), messageSubmit.getContent());
+    public Object send2All(@RequestBody MessageSubmit messageSubmit, HttpServletRequest request) {
+        return this.msgServ.send2All((EAdmin) request.getAttribute("admin"), messageSubmit.getTitle(), messageSubmit.getContent());
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/msg/feedback", method = RequestMethod.GET)
+    public Object readFeedback() {
+        return this.msgServ.readFeedback();
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/msg/send/2/all/read", method = RequestMethod.GET)
+    public Object getSend2All(HttpServletRequest request) {
+        return this.msgServ.getSend2All((EAdmin) request.getAttribute("admin"));
     }
 
 }

@@ -19,8 +19,16 @@ public class EMessage {
     @Column(name = "content", nullable = false, length = 10240)
     private String content;
 
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id")
+    private EAdmin admin;
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private EUser user;
+
     @OneToMany(mappedBy = "message")
-    private List<EMailBox> messages = new ArrayList<>();
+    private List<EMailBox> mailBoxes = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -46,11 +54,27 @@ public class EMessage {
         this.content = content;
     }
 
-    public List<EMailBox> getMessages() {
-        return messages;
+    public List<EMailBox> getMailBoxes() {
+        return mailBoxes;
     }
 
-    public void setMessages(List<EMailBox> messages) {
-        this.messages = messages;
+    public void setMailBoxes(List<EMailBox> mailBoxes) {
+        this.mailBoxes = mailBoxes;
+    }
+
+    public EAdmin getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(EAdmin admin) {
+        this.admin = admin;
+    }
+
+    public EUser getUser() {
+        return user;
+    }
+
+    public void setUser(EUser user) {
+        this.user = user;
     }
 }

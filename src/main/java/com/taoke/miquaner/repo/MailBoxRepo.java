@@ -13,4 +13,6 @@ public interface MailBoxRepo extends JpaRepository<EMailBox, Long> {
 
     Long countAllByReceiverUserEqualsAndCheckedEquals(EUser receiver, Boolean checked);
 
+    List<EMailBox> findAllByIsAdminToReceiveEquals(Boolean isAdmin2Receive);
+
 }
