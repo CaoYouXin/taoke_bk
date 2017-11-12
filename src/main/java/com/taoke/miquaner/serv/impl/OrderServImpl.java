@@ -291,7 +291,30 @@ public class OrderServImpl implements IOrderServ {
 
     @Override
     public Object userWithdrawList() {
-        return Result.success(this.withdrawRepo.findAllByPayedEquals(false));
+        return Result.success(this.withdrawRepo.findAllByPayedEquals(false).stream().peek(eWithdraw -> {
+            EUser user = eWithdraw.getUser();
+            EUser viewUser = new EUser();
+            BeanUtils.copyProperties(user, viewUser, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
+            eWithdraw.setUser(viewUser);
+        }).collect(Collectors.toList()));
+    }
+
+    @Override
+    public Object payUserWithdraw(Long withdrawId) {
+        EWithdraw one = this.withdrawRepo.findOne(withdrawId);
+        if (null == one) {
+            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
+        }
+
+        one.setPayed(true);
+        one.setPayTime(new Date());
+        this.withdrawRepo.save(one);
+
+        EUser user = one.getUser();
+        EUser viewUser = new EUser();
+        BeanUtils.copyProperties(user, viewUser, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
+        one.setUser(viewUser);
+        return Result.success(one);
     }
 
     private UserCommitView getUserCommitView(EUser user, final Double percent) {

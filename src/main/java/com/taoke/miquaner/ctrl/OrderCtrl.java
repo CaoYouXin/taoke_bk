@@ -77,4 +77,10 @@ public class OrderCtrl {
         return this.orderServ.userWithdrawList();
     }
 
+    @Auth(isAdmin = true)
+    @RequestMapping("/tbk/withdraw/response/{id}")
+    public Object payWithdraw(@PathVariable(name = "id") Long id) {
+        return this.orderServ.payUserWithdraw(id);
+    }
+
 }
