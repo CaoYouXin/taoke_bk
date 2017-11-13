@@ -106,12 +106,7 @@ public class UserServImpl implements IUserServ {
         token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 3));
         EToken eToken = this.tokenRepo.save(token);
 
-        EUser eUser = new EUser();
-        eUser.setName(one.getName());
-        eUser.setPhone(one.getPhone());
-        eToken.setUser(eUser);
-
-        return Result.success(eToken);
+        return tokenWithUser(eToken, one);
     }
 
     @Override
@@ -153,12 +148,7 @@ public class UserServImpl implements IUserServ {
         token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 3));
         EToken eToken = this.tokenRepo.save(token);
 
-        EUser eUser = new EUser();
-        eUser.setName(saved.getName());
-        eUser.setPhone(saved.getPhone());
-        eToken.setUser(eUser);
-
-        return Result.success(eToken);
+        return tokenWithUser(eToken, saved);
     }
 
     @Override
@@ -184,12 +174,17 @@ public class UserServImpl implements IUserServ {
         token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 3));
         EToken eToken = this.tokenRepo.save(token);
 
-        EUser eUser = new EUser();
-        eUser.setName(byPhoneEquals.getName());
-        eUser.setPhone(byPhoneEquals.getPhone());
-        eToken.setUser(eUser);
+        return tokenWithUser(eToken, byPhoneEquals);
+    }
 
-        return Result.success(eToken);
+    private Object tokenWithUser(EToken token, EUser user) {
+        EUser eUser = new EUser();
+        eUser.setName(user.getName());
+        eUser.setPhone(user.getPhone());
+        eUser.setAliPid(user.getAliPid());
+        token.setUser(eUser);
+
+        return Result.success(token);
     }
 
     private Object checkSmsCode(String phone, String code) {

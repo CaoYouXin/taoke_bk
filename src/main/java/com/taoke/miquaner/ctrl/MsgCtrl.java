@@ -40,8 +40,8 @@ public class MsgCtrl {
 
     @Auth
     @RequestMapping(value = "/msg/feedback", method = RequestMethod.POST)
-    public Object feedback(HttpServletRequest request, String content) {
-        return this.msgServ.sendFeedback((EUser) request.getAttribute("user"), content);
+    public Object feedback(HttpServletRequest request, @RequestBody String content) {
+        return this.msgServ.sendFeedback((EUser) request.getAttribute("user"), content.replaceAll("\"", ""));
     }
 
     @Auth(isAdmin = true)
