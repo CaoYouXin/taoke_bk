@@ -8,4 +8,6 @@ public interface UserRepo extends JpaRepository<EUser, Long> {
 
     EUser findByPhoneEquals(String phone);
 
+    EUser findByNameEquals(String name);
+
 }

@@ -41,7 +41,7 @@ public class UserCtrl {
     }
 
     @RequestMapping(value = "/tbk/phone/verify", method = RequestMethod.POST)
-    public Object verify(String phone) {
+    public Object verify(@RequestBody String phone) {
         return this.userServ.sendVerifyCode(phone);
     }
 

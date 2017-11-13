@@ -213,7 +213,7 @@ public class TbkServImpl implements ITbkServ {
         }
         logger.debug(rsp.getBody());
         return Result.success(rsp.getResults().stream().peek(uatmTbkItem -> {
-            uatmTbkItem.setCommissionRate(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(uatmTbkItem.getCommissionRate()) * 0.3));
+            uatmTbkItem.setTkRate(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(uatmTbkItem.getTkRate()) * 0.3));
         }).collect(Collectors.toList()));
     }
 

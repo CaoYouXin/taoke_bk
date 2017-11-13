@@ -8,6 +8,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
+import com.mysql.jdbc.StringUtils;
 import com.taobao.api.internal.toplink.embedded.websocket.util.StringUtil;
 import com.taoke.miquaner.MiquanerApplication;
 import com.taoke.miquaner.data.ESmsCode;
@@ -49,6 +50,7 @@ public class UserServImpl implements IUserServ {
     private static final String NO_VERIFY_CODE = "请先获取验证码";
     private static final String VERIFY_CODE_EXPIRED = "验证码已过期，请重新获取验证码";
     private static final String WRONG_VERIFY_CODE = "验证码错误，请输入正确的验证码";
+    private static final String NEED_NAME_UNIQUE = "该名字已被注册";
 
     private static IAcsClient acsClient;
 
@@ -94,7 +96,7 @@ public class UserServImpl implements IUserServ {
             return Result.fail(new ErrorR(ErrorR.USER_WRONG_PWD, USER_WRONG_PWD));
         }
 
-        EToken token = this.tokenRepo.findByAdmin_Id(one.getId());
+        EToken token = this.tokenRepo.findByUser_Id(one.getId());
         if (null == token) {
             token = new EToken();
             token.setUser(one);
@@ -122,10 +124,26 @@ public class UserServImpl implements IUserServ {
             return Result.fail(new ErrorR(ErrorR.ALREADY_REGISTERED_USER, ALREADY_REGISTERED_USER));
         }
 
-        userRegisterSubmit.getUser().setName("觅" + ("" + Math.random()).substring(2, 10));
+        boolean try2ok = false;
+        if (StringUtils.isNullOrEmpty(userRegisterSubmit.getUser().getName())) {
+            try2ok = true;
+            userRegisterSubmit.getUser().setName("觅" + ("" + Math.random()).substring(2, 10));
+        }
+        EUser byNameEquals = this.userRepo.findByNameEquals(userRegisterSubmit.getUser().getName());
+        while (try2ok) {
+            if (null == byNameEquals) {
+                break;
+            }
+            userRegisterSubmit.getUser().setName("觅" + ("" + Math.random()).substring(2, 10));
+            byNameEquals = this.userRepo.findByNameEquals(userRegisterSubmit.getUser().getName());
+        }
+        if (null != byNameEquals) {
+            return Result.fail(new ErrorR(ErrorR.NEED_NAME_UNIQUE, NEED_NAME_UNIQUE));
+        }
+
         EUser saved = this.userRepo.save(userRegisterSubmit.getUser());
 
-        EToken token = this.tokenRepo.findByAdmin_Id(saved.getId());
+        EToken token = this.tokenRepo.findByUser_Id(saved.getId());
         if (null == token) {
             token = new EToken();
             token.setUser(saved);
@@ -156,7 +174,22 @@ public class UserServImpl implements IUserServ {
         byPhoneEquals.setPwd(userResetPwdSubmit.getPwd());
         this.userRepo.save(byPhoneEquals);
 
-        return clearToken(byPhoneEquals.getId());
+        EToken token = this.tokenRepo.findByUser_Id(byPhoneEquals.getId());
+        if (null == token) {
+            token = new EToken();
+            token.setUser(byPhoneEquals);
+        }
+        Date now = new Date();
+        token.setToken(StringUtil.toMD5HexString(MiquanerApplication.DEFAULT_DATE_FORMAT.format(now)));
+        token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 3));
+        EToken eToken = this.tokenRepo.save(token);
+
+        EUser eUser = new EUser();
+        eUser.setName(byPhoneEquals.getName());
+        eUser.setPhone(byPhoneEquals.getPhone());
+        eToken.setUser(eUser);
+
+        return Result.success(eToken);
     }
 
     private Object checkSmsCode(String phone, String code) {
@@ -177,6 +210,7 @@ public class UserServImpl implements IUserServ {
 
     @Override
     public Object sendVerifyCode(String phone) {
+        phone = phone.replaceAll("\"", "");
         if (!(phone.startsWith("1") && phone.length() == 11)) {
             return Result.fail(new ErrorR(ErrorR.NO_CORRECT_PHONE, NO_CORRECT_PHONE));
         }
@@ -186,6 +220,7 @@ public class UserServImpl implements IUserServ {
             smsCode = new ESmsCode();
             smsCode.setPhone(phone);
         }
+        smsCode.setCode(("" + Math.random()).substring(2, 8));
         smsCode.setExpired(DateUtils.add(new Date(), Calendar.MINUTE, 30));
         smsCode = this.smsCodeRepo.save(smsCode);
 
