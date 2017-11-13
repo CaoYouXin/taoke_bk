@@ -3,9 +3,11 @@ package com.taoke.miquaner.serv.impl;
 import com.taoke.miquaner.data.EConfig;
 import com.taoke.miquaner.data.EGuide;
 import com.taoke.miquaner.data.EHelp;
+import com.taoke.miquaner.data.EShareImg;
 import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.GuideRepo;
 import com.taoke.miquaner.repo.HelpRepo;
+import com.taoke.miquaner.repo.ShareImgRepo;
 import com.taoke.miquaner.serv.IAppServ;
 import com.taoke.miquaner.util.Result;
 import org.springframework.beans.BeanUtils;
@@ -17,13 +19,13 @@ public class AppServImpl implements IAppServ {
 
     private GuideRepo guideRepo;
     private HelpRepo helpRepo;
-    private ConfigRepo configRepo;
+    private ShareImgRepo shareImgRepo;
 
     @Autowired
-    public AppServImpl(GuideRepo guideRepo, HelpRepo helpRepo, ConfigRepo configRepo) {
+    public AppServImpl(GuideRepo guideRepo, HelpRepo helpRepo, ShareImgRepo shareImgRepo) {
         this.guideRepo = guideRepo;
         this.helpRepo = helpRepo;
-        this.configRepo = configRepo;
+        this.shareImgRepo = shareImgRepo;
     }
 
     @Override
@@ -87,23 +89,33 @@ public class AppServImpl implements IAppServ {
     }
 
     @Override
-    public Object setShareImgUrl(String shortUrl) {
-        EConfig config = this.configRepo.findByKeyEquals(EConfig.APP_SHARE_IMG);
-        if (null == config) {
-            config = new EConfig();
-            config.setValue(shortUrl);
+    public Object listShareImgUrl() {
+        return Result.success(this.shareImgRepo.findAllByOrderByOrderDesc());
+    }
+
+    @Override
+    public Object setShareImgUrl(EShareImg shareImg) {
+        if (null != shareImg.getId()) {
+            EShareImg one = this.shareImgRepo.findOne(shareImg.getId());
+            if (null != one) {
+                BeanUtils.copyProperties(shareImg, one);
+                shareImg = one;
+            }
         }
 
-        EConfig saved = this.configRepo.save(config);
+        EShareImg saved = this.shareImgRepo.save(shareImg);
         return Result.success(saved);
     }
 
     @Override
-    public Object getShareImgUrl() {
-        EConfig config = this.configRepo.findByKeyEquals(EConfig.APP_SHARE_IMG);
-        if (null == config) {
-            return Result.success("");
+    public Object removeShareImgUrl(Long id) {
+        EShareImg one = this.shareImgRepo.findOne(id);
+        if (null == one) {
+            return Result.success(null);
         }
-        return Result.success(config.getValue());
+
+        this.shareImgRepo.delete(id);
+        return Result.success(null);
     }
+
 }

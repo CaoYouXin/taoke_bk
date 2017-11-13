@@ -2,6 +2,7 @@ package com.taoke.miquaner.ctrl;
 
 import com.taoke.miquaner.data.EGuide;
 import com.taoke.miquaner.data.EHelp;
+import com.taoke.miquaner.data.EShareImg;
 import com.taoke.miquaner.serv.IAppServ;
 import com.taoke.miquaner.util.Auth;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,15 +52,21 @@ public class AppCtrl {
         return this.appServ.removeHelp(id);
     }
 
-    @RequestMapping(value = "/app/share/img/url", method = RequestMethod.GET)
+    @RequestMapping(value = "/app/share/img/url/list", method = RequestMethod.GET)
     public Object getShareImgUrl() {
-        return this.appServ.getShareImgUrl();
+        return this.appServ.listShareImgUrl();
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping(value = "/app/share/img/url", method = RequestMethod.POST)
-    public Object setShareImgUrl(String imgUrl) {
-        return this.appServ.setShareImgUrl(imgUrl);
+    @RequestMapping(value = "/app/share/img/url/set", method = RequestMethod.POST)
+    public Object setShareImgUrl(@RequestBody EShareImg shareImg) {
+        return this.appServ.setShareImgUrl(shareImg);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/app/share/img/url/remove/{id}")
+    public Object setShareImgUrl(@PathVariable(name = "id") Long id) {
+        return this.appServ.removeShareImgUrl(id);
     }
 
 }

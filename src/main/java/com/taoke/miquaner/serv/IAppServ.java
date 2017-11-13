@@ -2,6 +2,7 @@ package com.taoke.miquaner.serv;
 
 import com.taoke.miquaner.data.EGuide;
 import com.taoke.miquaner.data.EHelp;
+import com.taoke.miquaner.data.EShareImg;
 
 public interface IAppServ {
 
@@ -17,8 +18,10 @@ public interface IAppServ {
 
     Object removeHelp(Long id);
 
-    Object setShareImgUrl(String shortUrl);
+    Object listShareImgUrl();
 
-    Object getShareImgUrl();
+    Object setShareImgUrl(EShareImg shareImg);
+
+    Object removeShareImgUrl(Long id);
 
 }

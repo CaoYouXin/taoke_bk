@@ -179,9 +179,11 @@ public class UserServImpl implements IUserServ {
 
     private Object tokenWithUser(EToken token, EUser user) {
         EUser eUser = new EUser();
+        eUser.setId(user.getId());
         eUser.setName(user.getName());
         eUser.setPhone(user.getPhone());
         eUser.setAliPid(user.getAliPid());
+        eUser.setCode(user.getCode());
         token.setUser(eUser);
 
         return Result.success(token);

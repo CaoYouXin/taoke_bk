@@ -7,7 +7,6 @@ import javax.persistence.*;
 public class EConfig {
 
     public static final String SERVER_TOKEN = "server_token";
-    public static final String APP_SHARE_IMG = "app_share_img";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
