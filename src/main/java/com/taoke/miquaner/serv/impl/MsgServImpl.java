@@ -61,6 +61,9 @@ public class MsgServImpl implements IMsgServ {
     }
 
     private static EUser mapUser(EUser user) {
+        if (null == user) {
+            return null;
+        }
         EUser ret = new EUser();
         ret.setName(user.getName());
         return ret;
