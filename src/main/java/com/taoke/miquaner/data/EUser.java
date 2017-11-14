@@ -62,7 +62,7 @@ public class EUser {
     @Column(name = "code", unique = true, length = 10)
     private String code;
 
-    @Column(name = "ext")
+    @Column(name = "ext", length = 1024)
     private String ext;
 
     public Long getId() {
