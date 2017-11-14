@@ -39,7 +39,7 @@ public class HomeCtrl {
     @Auth(isAdmin = true)
     @RequestMapping(value = "/home/tool/set", method = RequestMethod.POST)
     public Object setTool(@RequestBody EHomeBtn tool) {
-        return this.homeServ.postBanner(tool);
+        return this.homeServ.postTool(tool);
     }
 
     @RequestMapping("/home/group/list")
@@ -50,7 +50,7 @@ public class HomeCtrl {
     @Auth(isAdmin = true)
     @RequestMapping(value = "/home/group/set", method = RequestMethod.POST)
     public Object setGroup(@RequestBody EHomeBtn group) {
-        return this.homeServ.postBanner(group);
+        return this.homeServ.postGroup(group);
     }
 
     @RequestMapping("/home/cate/list")
