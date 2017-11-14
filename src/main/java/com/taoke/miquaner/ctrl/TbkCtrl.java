@@ -56,4 +56,15 @@ public class TbkCtrl {
         return this.tbkServ.getFavoriteItems(favoriteId, pageNo, (EUser) request.getAttribute("user"));
     }
 
+    @Auth
+    @RequestMapping("/tbk/search/{keyword}")
+    public Object search(@PathVariable(name = "keyword") String keyword, HttpServletRequest request) {
+        return this.tbkServ.search((EUser) request.getAttribute("user"), keyword);
+    }
+
+    @RequestMapping("/tbk/hints/{keyword}")
+    public Object hint(@PathVariable(name = "keyword") String keyword) {
+        return this.tbkServ.hints(keyword);
+    }
+
 }

@@ -8,15 +8,16 @@ import com.taobao.api.TaobaoClient;
 import com.taobao.api.request.*;
 import com.taobao.api.response.*;
 import com.taoke.miquaner.data.EConfig;
+import com.taoke.miquaner.data.ESearchKeyWord;
 import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.repo.ConfigRepo;
+import com.taoke.miquaner.repo.SearchKeyWordRepo;
 import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.AliMaMaSubmit;
 import com.taoke.miquaner.view.ShareSubmit;
 import com.taoke.miquaner.view.ShareView;
-import com.taoke.miquaner.view.UserCommitView;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,10 +40,12 @@ public class TbkServImpl implements ITbkServ {
     private String secret;
 
     private ConfigRepo configRepo;
+    private SearchKeyWordRepo searchKeyWordRepo;
 
     @Autowired
-    public TbkServImpl(ConfigRepo configRepo) {
+    public TbkServImpl(ConfigRepo configRepo, SearchKeyWordRepo searchKeyWordRepo) {
         this.configRepo = configRepo;
+        this.searchKeyWordRepo = searchKeyWordRepo;
 
         this.initParams();
     }
@@ -157,6 +158,11 @@ public class TbkServImpl implements ITbkServ {
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
         }
         logger.debug(rsp.getBody());
+        
+        if (null == rsp.getResults()) {
+            return Result.success(Collections.emptyList());
+        }
+
         return Result.success(rsp.getResults().stream().peek(tbkCoupon -> {
             tbkCoupon.setCommissionRate(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(tbkCoupon.getCommissionRate()) * 0.3));
         }).collect(Collectors.toList()));
@@ -191,6 +197,11 @@ public class TbkServImpl implements ITbkServ {
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
         }
         logger.debug(rsp.getBody());
+
+        if (null == rsp.getResults()) {
+            return Result.success(Collections.emptyList());
+        }
+
         return Result.success(rsp.getResults());
     }
 
@@ -212,9 +223,54 @@ public class TbkServImpl implements ITbkServ {
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
         }
         logger.debug(rsp.getBody());
+
+        if (null == rsp.getResults()) {
+            return Result.success(Collections.emptyList());
+        }
+
         return Result.success(rsp.getResults().stream().peek(uatmTbkItem -> {
             uatmTbkItem.setTkRate(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(uatmTbkItem.getTkRate()) * 0.3));
         }).collect(Collectors.toList()));
+    }
+
+    @Override
+    public Object search(EUser user, String keyword) {
+        TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
+        TbkDgItemCouponGetRequest req = new TbkDgItemCouponGetRequest();
+        req.setAdzoneId(Long.parseLong(user.getAliPid().substring(user.getAliPid().lastIndexOf('_') + 1)));
+        req.setPlatform(2L);
+        req.setPageSize(100L);
+        req.setPageNo(1L);
+        req.setQ(keyword);
+        TbkDgItemCouponGetResponse rsp = null;
+        try {
+            rsp = client.execute(req);
+        } catch (ApiException e) {
+            logger.error("error when invoke ali api");
+            return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
+        }
+        logger.debug(rsp.getBody());
+
+        ESearchKeyWord one = this.searchKeyWordRepo.findByKeywordEquals(keyword);
+        if (null == one) {
+            one = new ESearchKeyWord();
+            one.setKeyword(keyword);
+            this.searchKeyWordRepo.save(one);
+        }
+
+        if (null == rsp.getResults()) {
+            return Result.success(Collections.emptyList());
+        }
+
+        return Result.success(rsp.getResults().stream().peek(tbkCoupon -> {
+            tbkCoupon.setCommissionRate(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(tbkCoupon.getCommissionRate()) * 0.3));
+        }).collect(Collectors.toList()));
+    }
+
+    @Override
+    public Object hints(String keyword) {
+        return Result.success(this.searchKeyWordRepo.findAllByKeywordContains(keyword)
+                .stream().map(ESearchKeyWord::getKeyword).collect(Collectors.toList()));
     }
 
     private String getTaobaoPwd(ShareSubmit shareSubmit) throws ApiException {

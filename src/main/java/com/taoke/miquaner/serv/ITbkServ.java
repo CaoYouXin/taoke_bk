@@ -18,4 +18,8 @@ public interface ITbkServ {
 
     Object getFavoriteItems(Long favoriteId, Long pageNo, EUser user);
 
+    Object search(EUser user, String keyword);
+
+    Object hints(String keyword);
+
 }
