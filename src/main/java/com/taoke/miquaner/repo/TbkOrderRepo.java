@@ -11,14 +11,15 @@ public interface TbkOrderRepo extends JpaRepository<ETbkOrder, Long> {
 
     ETbkOrder findByOrderIdEquals(Long orderId);
 
-    List<ETbkOrder> findBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContains(Long siteId, Long adZoneId, String orderStatus, Pageable pageable);
+    List<ETbkOrder> findBySiteIdEqualsAndAdZoneIdInAndOrderStatusContains(Long siteId, List<Long> adZoneId, String orderStatus, Pageable pageable);
 
-    List<ETbkOrder> findBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusNotContains(Long siteId, Long adZoneId, String orderStatus, Pageable pageable);
+    List<ETbkOrder> findBySiteIdEqualsAndAdZoneIdInAndOrderStatusNotContains(Long siteId, List<Long> adZoneId, String orderStatus, Pageable pageable);
 
-    List<ETbkOrder> findBySiteIdEqualsAndAdZoneIdEquals(Long siteId, Long adZoneId, Pageable pageable);
+    List<ETbkOrder> findBySiteIdEqualsAndAdZoneIdIn(Long siteId, List<Long> adZoneId, Pageable pageable);
 
     List<ETbkOrder> findAllBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContainsAndCreateTimeBefore(Long siteId, Long adZoneId, String orderStatus, Date lastDate);
 
-    List<ETbkOrder> findAllBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContainsAndCreateTimeBetween(Long siteId, Long adZoneId, String orderStatus, Date start, Date end);
+    List<ETbkOrder> findAllBySiteIdEqualsAndAdZoneIdInAndOrderStatusContainsAndCreateTimeBetween(Long siteId, List<Long> adZoneId, String orderStatus, Date start, Date end);
 
 }
+

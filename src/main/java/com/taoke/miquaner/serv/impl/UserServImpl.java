@@ -11,9 +11,11 @@ import com.aliyuncs.profile.IClientProfile;
 import com.mysql.jdbc.StringUtils;
 import com.taobao.api.internal.toplink.embedded.websocket.util.StringUtil;
 import com.taoke.miquaner.MiquanerApplication;
+import com.taoke.miquaner.data.EConfig;
 import com.taoke.miquaner.data.ESmsCode;
 import com.taoke.miquaner.data.EToken;
 import com.taoke.miquaner.data.EUser;
+import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.SmsCodeRepo;
 import com.taoke.miquaner.repo.TokenRepo;
 import com.taoke.miquaner.repo.UserRepo;
@@ -22,6 +24,7 @@ import com.taoke.miquaner.util.BeanUtil;
 import com.taoke.miquaner.util.DateUtils;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
+import com.taoke.miquaner.view.AliMaMaSubmit;
 import com.taoke.miquaner.view.EnrollSubmit;
 import com.taoke.miquaner.view.UserRegisterSubmit;
 import com.taoke.miquaner.view.UserResetPwdSubmit;
@@ -51,6 +54,7 @@ public class UserServImpl implements IUserServ {
     private static final String VERIFY_CODE_EXPIRED = "验证码已过期，请重新获取验证码";
     private static final String WRONG_VERIFY_CODE = "验证码错误，请输入正确的验证码";
     private static final String NEED_NAME_UNIQUE = "该名字已被注册";
+    private static final String NO_INV_CODE_FOUND = "没有找到该邀请码";
 
     private static IAcsClient acsClient;
 
@@ -77,12 +81,14 @@ public class UserServImpl implements IUserServ {
     private UserRepo userRepo;
     private TokenRepo tokenRepo;
     private SmsCodeRepo smsCodeRepo;
+    private ConfigRepo configRepo;
 
     @Autowired
-    public UserServImpl(UserRepo userRepo, TokenRepo tokenRepo, SmsCodeRepo smsCodeRepo) {
+    public UserServImpl(UserRepo userRepo, TokenRepo tokenRepo, SmsCodeRepo smsCodeRepo, ConfigRepo configRepo) {
         this.userRepo = userRepo;
         this.tokenRepo = tokenRepo;
         this.smsCodeRepo = smsCodeRepo;
+        this.configRepo = configRepo;
     }
 
     @Override
@@ -119,6 +125,16 @@ public class UserServImpl implements IUserServ {
             return Result.fail(new ErrorR(ErrorR.ALREADY_REGISTERED_USER, ALREADY_REGISTERED_USER));
         }
 
+        EUser byCodeEquals = null;
+        if (null != userRegisterSubmit.getInvitation() && !this.setSuperDivider(userRegisterSubmit)) {
+            byCodeEquals = this.userRepo.findByCodeEquals(userRegisterSubmit.getInvitation());
+            if (null == byCodeEquals) {
+                return Result.fail(new ErrorR(ErrorR.NO_INV_CODE_FOUND, NO_INV_CODE_FOUND));
+            }
+            userRegisterSubmit.getUser().setpUser(byCodeEquals);
+            userRegisterSubmit.getUser().setExt("2");
+        }
+
         boolean try2ok = false;
         if (StringUtils.isNullOrEmpty(userRegisterSubmit.getUser().getName())) {
             try2ok = true;
@@ -149,6 +165,19 @@ public class UserServImpl implements IUserServ {
         EToken eToken = this.tokenRepo.save(token);
 
         return tokenWithUser(eToken, saved);
+    }
+
+    private boolean setSuperDivider(UserRegisterSubmit userRegisterSubmit) {
+        EConfig config = this.configRepo.findByKeyEquals(AliMaMaSubmit.PLATFORM_CODE);
+        if (null == config) {
+            return false;
+        }
+        if (config.getValue().equals(userRegisterSubmit.getInvitation())) {
+
+            userRegisterSubmit.getUser().setExt("platform_user");
+            return true;
+        }
+        return false;
     }
 
     @Override

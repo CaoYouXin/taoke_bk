@@ -9,6 +9,8 @@ public class AliMaMaSubmit {
     public static final String SECRET = "Secret";
     public static final String GATE = "Gate";
     public static final String PID_K = "Pid";
+    public static final String DIVIDE_BY_TENTHS = "DivideByTenths";
+    public static final String PLATFORM_CODE = "PlatformCode";
 
     private String account;
     private String mail;
@@ -17,6 +19,8 @@ public class AliMaMaSubmit {
     private String secret;
     private String gate;
     private String pid;
+    private String divideByTenths;
+    private String platformCode;
 
     public String getAccount() {
         return account;
@@ -72,5 +76,21 @@ public class AliMaMaSubmit {
 
     public void setPid(String pid) {
         this.pid = pid;
+    }
+
+    public String getDivideByTenths() {
+        return divideByTenths;
+    }
+
+    public void setDivideByTenths(String divideByTenths) {
+        this.divideByTenths = divideByTenths;
+    }
+
+    public String getPlatformCode() {
+        return platformCode;
+    }
+
+    public void setPlatformCode(String platformCode) {
+        this.platformCode = platformCode;
     }
 }

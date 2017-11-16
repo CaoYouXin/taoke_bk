@@ -10,4 +10,6 @@ public interface UserRepo extends JpaRepository<EUser, Long> {
 
     EUser findByNameEquals(String name);
 
+    EUser findByCodeEquals(String code);
+
 }

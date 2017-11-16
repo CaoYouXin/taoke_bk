@@ -10,13 +10,13 @@ public interface ITbkServ {
 
     Object getAliMaMa();
 
-    Object getCouponByCid(String cid, Long pageNo, EUser user);
+    Object getCouponByCid(String cid, Long pageNo, EUser user, boolean isSuper);
 
     Object getShareLink(ShareSubmit shareSubmit);
 
     Object getFavoriteList(Long pageNo);
 
-    Object getFavoriteItems(Long favoriteId, Long pageNo, EUser user);
+    Object getFavoriteItems(Long favoriteId, Long pageNo, EUser user, boolean isSuper);
 
     Object search(EUser user, String keyword);
 

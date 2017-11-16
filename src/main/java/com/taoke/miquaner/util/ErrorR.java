@@ -4,9 +4,11 @@ public class ErrorR {
 
     public static final String CAN_NOT_SAVE_OBJECT_MSG = "无法保存数据到数据库";
     public static final String NO_ID_FOUND_MSG = "没有找到主键，错误可能发生在前端漏传主键字段";
+    public static final String NOT_FOR_BUYER_MSG = "购买者不享有此功能";
 
     public static final String CAN_NOT_SAVE_OBJECT = "CAN_NOT_SAVE_OBJECT";
     public static final String NO_ID_FOUND = "NO_ID_FOUND";
+    public static final String NOT_FOR_BUYER = "NOT_FOR_BUYER";
 
     static final String SQL_ERROR = "SQL_ERROR";
 
@@ -34,6 +36,7 @@ public class ErrorR {
     public static final String NO_THAT_MUCH = "NO_THAT_MUCH";
     public static final String WRONG_MESSAGE_ID = "WRONG_MESSAGE_ID";
     public static final String NEED_NAME_UNIQUE = "NEED_NAME_UNIQUE";
+    public static final String NO_INV_CODE_FOUND = "NO_INV_CODE_FOUND";
 
     private String key;
     private String msg;

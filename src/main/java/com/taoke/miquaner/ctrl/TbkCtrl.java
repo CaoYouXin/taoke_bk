@@ -35,7 +35,8 @@ public class TbkCtrl {
     @Auth
     @RequestMapping(value = "/tbk/coupon/{cid}/{pNo}")
     public Object getCoupons(@PathVariable(name = "cid") String cid, @PathVariable(name = "pNo") Long pageNo, HttpServletRequest request) {
-        return this.tbkServ.getCouponByCid(cid, pageNo, (EUser) request.getAttribute("user"));
+        return this.tbkServ.getCouponByCid(cid, pageNo,
+                (EUser) request.getAttribute("user"), (Boolean) request.getAttribute("super"));
     }
 
     @Auth
@@ -53,7 +54,8 @@ public class TbkCtrl {
     @Auth
     @RequestMapping("/tbk/fav/{favId}/list/{pageNo}")
     public Object getFavoriteItems(@PathVariable(name = "favId") Long favoriteId, @PathVariable(name = "pageNo") Long pageNo, HttpServletRequest request) {
-        return this.tbkServ.getFavoriteItems(favoriteId, pageNo, (EUser) request.getAttribute("user"));
+        return this.tbkServ.getFavoriteItems(favoriteId, pageNo,
+                (EUser) request.getAttribute("user"), (Boolean) request.getAttribute("super"));
     }
 
     @Auth

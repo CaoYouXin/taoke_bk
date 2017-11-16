@@ -17,6 +17,7 @@ import org.springframework.web.util.UrlPathHelper;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 @SpringBootApplication
 public class MiquanerApplication {
@@ -25,6 +26,10 @@ public class MiquanerApplication {
 	public static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) {
+//        Calendar instance = Calendar.getInstance();
+//        instance.set(instance.get(Calendar.YEAR), instance.get(Calendar.MONTH), 1, 0, 0, 0);
+//        System.out.println(DEFAULT_DATE_FORMAT.format(instance.getTime()));
+
         ConfigurableApplicationContext context = SpringApplication.run(MiquanerApplication.class, args);
 
         IInitServ initServ = context.getBean(IInitServ.class);

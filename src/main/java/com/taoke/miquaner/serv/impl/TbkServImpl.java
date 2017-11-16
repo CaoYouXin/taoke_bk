@@ -1,7 +1,6 @@
 package com.taoke.miquaner.serv.impl;
 
 import com.mysql.jdbc.StringUtils;
-import com.sun.org.apache.regexp.internal.RE;
 import com.taobao.api.ApiException;
 import com.taobao.api.DefaultTaobaoClient;
 import com.taobao.api.TaobaoClient;
@@ -13,6 +12,7 @@ import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.SearchKeyWordRepo;
 import com.taoke.miquaner.serv.ITbkServ;
+import com.taoke.miquaner.util.DivideByTenthUtil;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.AliMaMaSubmit;
@@ -25,7 +25,10 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -142,7 +145,10 @@ public class TbkServImpl implements ITbkServ {
     }
 
     @Override
-    public Object getCouponByCid(String cid, Long pageNo, EUser user) {
+    public Object getCouponByCid(String cid, Long pageNo, EUser user, boolean isSuper) {
+        DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
+        final double userRate = isSuper ? (1.0 - tenth.platform) : tenth.second;
+
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
         TbkDgItemCouponGetRequest req = new TbkDgItemCouponGetRequest();
         req.setAdzoneId(Long.parseLong(user.getAliPid().substring(user.getAliPid().lastIndexOf('_') + 1)));
@@ -158,13 +164,14 @@ public class TbkServImpl implements ITbkServ {
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
         }
         logger.debug(rsp.getBody());
-        
+
         if (null == rsp.getResults()) {
             return Result.success(Collections.emptyList());
         }
 
         return Result.success(rsp.getResults().stream().peek(tbkCoupon -> {
-            tbkCoupon.setCommissionRate(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(tbkCoupon.getCommissionRate()) * 0.3));
+            tbkCoupon.setCommissionRate(String.format(Locale.ENGLISH, "%.2f",
+                    userRate * Double.parseDouble(tbkCoupon.getCommissionRate())));
         }).collect(Collectors.toList()));
     }
 
@@ -174,7 +181,7 @@ public class TbkServImpl implements ITbkServ {
             return Result.success(new ShareView(
                     this.getShortUrl(shareSubmit.getUrl()),
                     this.getTaobaoPwd(shareSubmit)
-            ).toString());
+            ));
         } catch (ApiException e) {
             logger.error("error when invoke ali api");
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
@@ -206,7 +213,10 @@ public class TbkServImpl implements ITbkServ {
     }
 
     @Override
-    public Object getFavoriteItems(Long favoriteId, Long pageNo, EUser user) {
+    public Object getFavoriteItems(Long favoriteId, Long pageNo, EUser user, boolean isSuper) {
+        DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
+        final double userRate = isSuper ? (1.0 - tenth.platform) : tenth.second;
+
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
         TbkUatmFavoritesItemGetRequest req = new TbkUatmFavoritesItemGetRequest();
         req.setPlatform(2L);
@@ -229,7 +239,8 @@ public class TbkServImpl implements ITbkServ {
         }
 
         return Result.success(rsp.getResults().stream().peek(uatmTbkItem -> {
-            uatmTbkItem.setTkRate(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(uatmTbkItem.getTkRate()) * 0.3));
+            uatmTbkItem.setTkRate(String.format(Locale.ENGLISH, "%.2f",
+                    userRate * Double.parseDouble(uatmTbkItem.getTkRate())));
         }).collect(Collectors.toList()));
     }
 

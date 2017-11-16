@@ -9,17 +9,17 @@ public interface IOrderServ {
 
     Object upload(String filePath) throws IOException;
 
-    Object list(EUser user, Integer type, Integer pageNo);
+    Object list(EUser user, Boolean isSuper, Integer type, Integer pageNo);
 
     Object getChildUserCommit(List<EUser> children);
 
-    Object withdraw(EUser user, Double amount);
+    Object withdraw(EUser user, Double amount, Boolean isSuper);
 
-    Object canDraw(EUser user);
+    Object canDraw(EUser user, Boolean isSuper);
 
-    Object lastMonthSettled(EUser user);
+    Object lastMonthSettled(EUser user, Boolean isSuper);
 
-    Object thisMonthSettled(EUser user);
+    Object thisMonthSettled(EUser user, Boolean isSuper);
 
     Object userWithdrawList();
 

@@ -7,8 +7,10 @@ import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.data.EWithdraw;
 import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.TbkOrderRepo;
+import com.taoke.miquaner.repo.UserRepo;
 import com.taoke.miquaner.repo.WithdrawRepo;
 import com.taoke.miquaner.serv.IOrderServ;
+import com.taoke.miquaner.util.DivideByTenthUtil;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.TbkOrderWrapper;
@@ -49,12 +51,14 @@ public class OrderServImpl implements IOrderServ {
     private TbkOrderRepo tbkOrderRepo;
     private WithdrawRepo withdrawRepo;
     private ConfigRepo configRepo;
+    private UserRepo userRepo;
 
     @Autowired
-    public OrderServImpl(TbkOrderRepo tbkOrderRepo, WithdrawRepo withdrawRepo, ConfigRepo configRepo) {
+    public OrderServImpl(TbkOrderRepo tbkOrderRepo, WithdrawRepo withdrawRepo, ConfigRepo configRepo, UserRepo userRepo) {
         this.tbkOrderRepo = tbkOrderRepo;
         this.withdrawRepo = withdrawRepo;
         this.configRepo = configRepo;
+        this.userRepo = userRepo;
     }
 
     @Override
@@ -147,85 +151,99 @@ public class OrderServImpl implements IOrderServ {
     }
 
     @Override
-    public Object list(EUser user, Integer type, Integer pageNo) {
-        String aliPid = user.getAliPid();
-        if (StringUtils.isNullOrEmpty(aliPid)) {
-            return Result.success(Collections.emptyList());
-        }
+    public Object list(EUser user, Boolean isSuper, Integer type, Integer pageNo) {
+        return Result.success(this.listOrders(user, isSuper, type, pageNo, 30));
+    }
+
+    private List<ETbkOrder> listOrders(EUser user, Boolean isSuper, Integer type, Integer pageNo, Integer pageSize) {
+        DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
+        double userRate = isSuper ? (1 - tenth.platform) : tenth.second;
+
+        user = this.userRepo.findOne(user.getId());
+        Long siteId = getSiteId(user.getAliPid());
+        Long adZoneId = getAdZoneId(user.getAliPid());
+
+        List<EUser> cUsers = user.getcUsers();
+        List<Long> adZoneIds = new ArrayList<>(cUsers.stream()
+                .filter(cUser -> !StringUtils.isNullOrEmpty(cUser.getAliPid()))
+                .map(cUser -> getAdZoneId(cUser.getAliPid())).collect(Collectors.toList()));
+        adZoneIds.add(adZoneId);
 
         List<ETbkOrder> orders = null;
-        Long siteId = getSiteId(aliPid);
-        Long adZoneId = getAdZoneId(aliPid);
         pageNo = Math.max(0, --pageNo);
-        logger.debug(String.format("siteId = %d, adZoneId = %d", siteId, adZoneId));
         switch (type) {
             case 1:
-                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdEquals(
-                        siteId, adZoneId,
-                        new PageRequest(pageNo, 10, new Sort(Sort.Direction.DESC, "createTime"))
+                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdIn(
+                        siteId, adZoneIds,
+                        new PageRequest(pageNo, pageSize, new Sort(Sort.Direction.DESC, "createTime"))
                 );
                 break;
             case 2:
-                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusNotContains(
-                        siteId, adZoneId, "失效",
-                        new PageRequest(pageNo, 10, new Sort(Sort.Direction.DESC, "createTime"))
+                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdInAndOrderStatusNotContains(
+                        siteId, adZoneIds, "失效",
+                        new PageRequest(pageNo, pageSize, new Sort(Sort.Direction.DESC, "createTime"))
                 );
                 break;
             case 3:
-                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContains(
-                        siteId, adZoneId, "付款",
-                        new PageRequest(pageNo, 10, new Sort(Sort.Direction.DESC, "createTime"))
+                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdInAndOrderStatusContains(
+                        siteId, adZoneIds, "付款",
+                        new PageRequest(pageNo, pageSize, new Sort(Sort.Direction.DESC, "createTime"))
                 );
                 break;
             case 4:
-                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContains(
-                        siteId, adZoneId, "收货",
-                        new PageRequest(pageNo, 10, new Sort(Sort.Direction.DESC, "createTime"))
+                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdInAndOrderStatusContains(
+                        siteId, adZoneIds, "收货",
+                        new PageRequest(pageNo, pageSize, new Sort(Sort.Direction.DESC, "createTime"))
                 );
                 break;
             case 5:
-                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContains(
-                        siteId, adZoneId, "结算",
-                        new PageRequest(pageNo, 10, new Sort(Sort.Direction.DESC, "createTime"))
+                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdInAndOrderStatusContains(
+                        siteId, adZoneIds, "结算",
+                        new PageRequest(pageNo, pageSize, new Sort(Sort.Direction.DESC, "createTime"))
                 );
                 break;
             case 6:
-                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContains(
-                        siteId, adZoneId, "失效",
-                        new PageRequest(pageNo, 10, new Sort(Sort.Direction.DESC, "createTime"))
+                orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdInAndOrderStatusContains(
+                        siteId, adZoneIds, "失效",
+                        new PageRequest(pageNo, pageSize, new Sort(Sort.Direction.DESC, "createTime"))
                 );
                 break;
             default:
-                return Result.fail(new ErrorR(ErrorR.WRONG_SEARCH_TYPE, WRONG_SEARCH_TYPE));
+                return new ArrayList<>();
         }
 
-        logger.debug(String.format("%d results found.", orders.size()));
-        return Result.success(orders.stream().peek(eTbkOrder -> {
+        return orders.stream().peek(eTbkOrder -> {
+            double rate = eTbkOrder.getAdZoneId().equals(adZoneId) ? userRate : tenth.first;
+
             eTbkOrder.setCommissionRate(null);
-            eTbkOrder.setEstimateEffect(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(eTbkOrder.getEstimateEffect()) * 0.3));
-            eTbkOrder.setEstimateIncome(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(eTbkOrder.getEstimateIncome()) * 0.3));
-        }).collect(Collectors.toList()));
+            eTbkOrder.setEstimateEffect(String.format(Locale.ENGLISH, "%.2f",
+                    rate * Double.parseDouble(eTbkOrder.getEstimateEffect())));
+            eTbkOrder.setEstimateIncome(String.format(Locale.ENGLISH, "%.2f",
+                    rate * Double.parseDouble(eTbkOrder.getEstimateIncome())));
+        }).collect(Collectors.toList());
     }
 
     @Override
     public Object getChildUserCommit(List<EUser> children) {
+        DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
+
         return Result.success(children.stream().map(user -> {
             if (StringUtils.isNullOrEmpty(user.getAliPid())) {
                 return new UserCommitView(user.getName(), "0.00");
             }
 
-            return getUserCommitView(user, 0.2);
+            return getUserCommitView(user, tenth.first);
         }).collect(Collectors.toList()));
     }
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public Object withdraw(EUser user, Double amount) {
+    public Object withdraw(EUser user, Double amount, Boolean isSuper) {
         if (amount < 10.0) {
             return Result.fail(new ErrorR(ErrorR.AT_LEAST_TEN, AT_LEAST_TEN));
         }
 
-        Result canDraw = (Result) this.canDraw(user);
+        Result canDraw = (Result) this.canDraw(user, isSuper);
         if (Double.parseDouble((String) canDraw.getBody()) < amount) {
             return Result.fail(new ErrorR(ErrorR.NO_THAT_MUCH, NO_THAT_MUCH));
         }
@@ -240,52 +258,104 @@ public class OrderServImpl implements IOrderServ {
     }
 
     @Override
-    public Object canDraw(EUser user) {
+    public Object canDraw(EUser user, Boolean isSuper) {
         if (StringUtils.isNullOrEmpty(user.getAliPid())) {
             return Result.success("0.00");
         }
 
-        UserCommitView userCommitView = getUserCommitView(user, 0.3);
+        DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
+        user = this.userRepo.findOne(user.getId());//regain lazy init feature
+        Double registerReward = 0.0;
+        try {
+            registerReward = Double.parseDouble(user.getExt());
+        } catch (Exception ignored) {
+        }
+
+        UserCommitView userCommitView = getUserCommitView(user, (isSuper ? (1 - tenth.platform) : tenth.second));
+        Double childCommit = user.getcUsers().stream().map(cUser -> {
+            if (StringUtils.isNullOrEmpty(cUser.getAliPid())) {
+                return new UserCommitView(cUser.getName(), "0.00");
+            }
+
+            return getUserCommitView(cUser, tenth.first);
+        }).reduce(0.0, (pv, cO) -> pv + Double.parseDouble(cO.getCommit()), (v1, v2) -> v1 + v2);
+
         Double hasDraw = this.withdrawRepo.findAllByUserEquals(user).stream()
                 .reduce(0.0, (pv, cO) -> pv + Double.parseDouble(cO.getAmount()), (v1, v2) -> v1 + v2);
+
         return Result.success(String.format(Locale.ENGLISH, "%.2f",
-                Double.parseDouble(userCommitView.getCommit()) - hasDraw));
+                Double.parseDouble(userCommitView.getCommit()) + childCommit + registerReward - hasDraw));
     }
 
     @Override
-    public Object lastMonthSettled(EUser user) {
+    public Object lastMonthSettled(EUser user, Boolean isSuper) {
         if (StringUtils.isNullOrEmpty(user.getAliPid())) {
             return Result.success("0.00");
         }
 
+        DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
+        double userRate = isSuper ? (1 - tenth.platform) : tenth.second;
+
+        user = this.userRepo.findOne(user.getId());
+        Long siteId = getSiteId(user.getAliPid());
+        Long adZoneId = getAdZoneId(user.getAliPid());
+
+        List<EUser> cUsers = user.getcUsers();
+        List<Long> adZoneIds = new ArrayList<>(cUsers.stream()
+                .filter(cUser -> !StringUtils.isNullOrEmpty(cUser.getAliPid()))
+                .map(cUser -> getAdZoneId(cUser.getAliPid())).collect(Collectors.toList()));
+        adZoneIds.add(adZoneId);
+
         Calendar now = Calendar.getInstance();
         int month = now.get(Calendar.MONTH);
-        now.set(now.get(Calendar.YEAR), month, 0, 0, 0, 0);
+        now.set(now.get(Calendar.YEAR), month, 1, 0, 0, 0);
         Date end = now.getTime(), start;
         if (month == Calendar.JANUARY) {
-            now.set(now.get(Calendar.YEAR) - 1, Calendar.DECEMBER, 0, 0, 0, 0);
+            now.set(now.get(Calendar.YEAR) - 1, Calendar.DECEMBER, 1, 0, 0, 0);
             start = now.getTime();
         } else {
-            now.set(now.get(Calendar.YEAR), month - 1, 0, 0, 0, 0);
+            now.set(now.get(Calendar.YEAR), month - 1, 1, 0, 0, 0);
             start = now.getTime();
         }
-        Double settled = this.tbkOrderRepo.findAllBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContainsAndCreateTimeBetween(
-                getSiteId(user.getAliPid()), getAdZoneId(user.getAliPid()), "结算", start, end
-        ).stream().reduce(0.0, (pv, cO) -> pv + Double.parseDouble(cO.getEstimateIncome()) * 0.3, (v1, v2) -> v1 + v2);
+
+        Double settled = this.tbkOrderRepo.findAllBySiteIdEqualsAndAdZoneIdInAndOrderStatusContainsAndCreateTimeBetween(
+                siteId, adZoneIds, "结算", start, end
+        ).stream().reduce(0.0, (pv, cO) -> {
+            double rate = cO.getAdZoneId().equals(adZoneId) ? userRate : tenth.first;
+            return pv + Double.parseDouble(cO.getEstimateIncome()) * rate;
+        }, (v1, v2) -> v1 + v2);
+
         return Result.success(String.format(Locale.ENGLISH, "%.2f", settled));
     }
 
     @Override
-    public Object thisMonthSettled(EUser user) {
+    public Object thisMonthSettled(EUser user, Boolean isSuper) {
         if (StringUtils.isNullOrEmpty(user.getAliPid())) {
             return Result.success("0.00");
         }
 
+        DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
+        double userRate = isSuper ? (1 - tenth.platform) : tenth.second;
+
+        user = this.userRepo.findOne(user.getId());
+        Long siteId = getSiteId(user.getAliPid());
+        Long adZoneId = getAdZoneId(user.getAliPid());
+
+        List<EUser> cUsers = user.getcUsers();
+        List<Long> adZoneIds = new ArrayList<>(cUsers.stream()
+                .filter(cUser -> !StringUtils.isNullOrEmpty(cUser.getAliPid()))
+                .map(cUser -> getAdZoneId(cUser.getAliPid())).collect(Collectors.toList()));
+        adZoneIds.add(adZoneId);
+
         Calendar now = Calendar.getInstance();
-        now.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), 0, 0, 0, 0);
-        Double settled = this.tbkOrderRepo.findAllBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContainsAndCreateTimeBetween(
-                getSiteId(user.getAliPid()), getAdZoneId(user.getAliPid()), "结算", now.getTime(), new Date()
-        ).stream().reduce(0.0, (pv, cO) -> pv + Double.parseDouble(cO.getEstimateIncome()) * 0.3, (v1, v2) -> v1 + v2);
+        now.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), 1, 0, 0, 0);
+
+        Double settled = this.tbkOrderRepo.findAllBySiteIdEqualsAndAdZoneIdInAndOrderStatusContainsAndCreateTimeBetween(
+                siteId, adZoneIds, "结算", now.getTime(), new Date()
+        ).stream().reduce(0.0, (pv, cO) -> {
+            double rate = cO.getAdZoneId().equals(adZoneId) ? userRate : tenth.first;
+            return pv + Double.parseDouble(cO.getEstimateIncome()) * rate;
+        }, (v1, v2) -> v1 + v2);
         return Result.success(String.format(Locale.ENGLISH, "%.2f", settled));
     }
 
@@ -327,13 +397,14 @@ public class OrderServImpl implements IOrderServ {
     private Date getNearestSettleEndTime() {
         Calendar now = Calendar.getInstance();
         int month = now.get(Calendar.MONTH);
-        if (now.get(Calendar.DAY_OF_MONTH) > 20) {
-            now.set(now.get(Calendar.YEAR), month, 0, 0, 0, 0);
+        if (now.get(Calendar.DAY_OF_MONTH) > 21) {
+            now.set(now.get(Calendar.YEAR), month, 1, 0, 0, 0);
         } else {
             if (month == Calendar.JANUARY) {
-                now.set(now.get(Calendar.YEAR) - 1, Calendar.DECEMBER, 0, 0, 0, 0);
+                now.set(now.get(Calendar.YEAR) - 1, Calendar.DECEMBER, 1, 0, 0, 0);
+            } else {
+                now.set(now.get(Calendar.YEAR), month - 1, 1, 0, 0, 0);
             }
-            now.set(now.get(Calendar.YEAR), month - 1, 0, 0, 0, 0);
         }
         return now.getTime();
     }

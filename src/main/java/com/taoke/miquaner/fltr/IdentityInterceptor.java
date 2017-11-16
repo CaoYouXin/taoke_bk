@@ -12,7 +12,6 @@ import com.taoke.miquaner.view.AliMaMaSubmit;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -71,6 +70,10 @@ public class IdentityInterceptor implements HandlerInterceptor {
         } else {
             EUser user = token.getUser();
             if (null != user) {
+                request.setAttribute("user", user);
+                request.setAttribute("buyer", null == user.getAliPid());
+                request.setAttribute("super", null == user.getpUser() && "platform_user".equals(user.getExt()));
+
                 if (null == user.getAliPid() && null != user.getpUser()) {
                     user.setAliPid(user.getpUser().getAliPid());
                 }
@@ -83,7 +86,6 @@ public class IdentityInterceptor implements HandlerInterceptor {
                 }
 
                 logger.info(String.format("User Id = %d", user.getId()));
-                request.setAttribute("user", user);
             } else {
                 HttpUtils.returnJSON(response, Result.unAuth());
                 logger.debug("token by auth [" + authHeader + "] associated with no user, returning 401");
