@@ -8,9 +8,7 @@ import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -32,10 +30,10 @@ public class OrderCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping("/tbk/order/upload")
-    public Object uploadOrder(String fileName) throws IOException {
+    @RequestMapping(value = "/tbk/order/upload", method = RequestMethod.POST)
+    public Object uploadOrder(@RequestBody String fileName) throws IOException {
         String directory = env.getProperty("taoke.paths.uploadedFiles");
-        return this.orderServ.upload(Paths.get(directory, fileName).toString());
+        return this.orderServ.upload(Paths.get(directory, fileName.replaceAll("\"", "")).toString());
     }
 
     @Auth

@@ -35,6 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -135,7 +136,7 @@ public class OrderServImpl implements IOrderServ {
                 }
 
                 ETbkOrder entity = tbkOrderWrapper.getEntity();
-                ETbkOrder one = this.tbkOrderRepo.findByOrderIdEquals(entity.getOrderId());
+                ETbkOrder one = this.tbkOrderRepo.findByOrderIdEqualsAndItemNumIidEquals(entity.getOrderId(), entity.getItemNumIid());
                 if (null == one) {
                     one = new ETbkOrder();
                 }
@@ -144,7 +145,23 @@ public class OrderServImpl implements IOrderServ {
                 toSave.add(one);
             }
 
-            this.tbkOrderRepo.save(toSave.stream().distinct().collect(Collectors.toList()));
+            ArrayList<ETbkOrder> collected = toSave.stream()
+                    .collect(Collectors.collectingAndThen(
+                            Collectors.toMap(ETbkOrder.staticHash, Function.identity(), (a, b) -> {
+                                a.setItemCount(a.getItemCount() + b.getItemCount());
+                                a.setEstimateEffect(String.format(Locale.ENGLISH, "%.2f",
+                                        Double.parseDouble(a.getEstimateEffect())
+                                                + Double.parseDouble(b.getEstimateEffect())));
+                                a.setEstimateIncome(String.format(Locale.ENGLISH, "%.2f",
+                                        Double.parseDouble(a.getEstimateIncome())
+                                                + Double.parseDouble(b.getEstimateIncome())));
+                                a.setPayedAmount(String.format(Locale.ENGLISH, "%.2f",
+                                        Double.parseDouble(a.getPayedAmount())
+                                                + Double.parseDouble(b.getPayedAmount())));
+                                return a;
+                            }),
+                            m -> new ArrayList<>(m.values())));
+            this.tbkOrderRepo.save(collected);
         }
 
         return Result.success(null);

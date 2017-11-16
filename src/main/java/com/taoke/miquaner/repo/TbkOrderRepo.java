@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface TbkOrderRepo extends JpaRepository<ETbkOrder, Long> {
 
-    ETbkOrder findByOrderIdEquals(Long orderId);
+    ETbkOrder findByOrderIdEqualsAndItemNumIidEquals(Long orderId, Long itemId);
 
     List<ETbkOrder> findBySiteIdEqualsAndAdZoneIdInAndOrderStatusContains(Long siteId, List<Long> adZoneId, String orderStatus, Pageable pageable);
 

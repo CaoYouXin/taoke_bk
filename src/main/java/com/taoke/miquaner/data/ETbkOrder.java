@@ -2,9 +2,12 @@ package com.taoke.miquaner.data;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.function.Function;
 
 @Entity
-@Table(name = "tbk_order")
+@Table(name = "tbk_order", indexes = {
+        @Index(name = "unique_order_item", unique = true, columnList = "order_id,item_numIid")
+})
 public class ETbkOrder {
 
     @Id
@@ -12,7 +15,7 @@ public class ETbkOrder {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "order_id", nullable = false, unique = true)
+    @Column(name = "order_id", nullable = false)
     private Long orderId;
 
     @Column(name = "create_time", nullable = false)
@@ -353,114 +356,7 @@ public class ETbkOrder {
         this.orderId = orderId;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public static Function<? super ETbkOrder, ?> staticHash =
+            (Function<ETbkOrder, Object>) eTbkOrder -> eTbkOrder.getOrderId() + "-" + eTbkOrder.getItemNumIid();
 
-        ETbkOrder eTbkOrder = (ETbkOrder) o;
-
-        if (!orderId.equals(eTbkOrder.orderId)) return false;
-        if (!createTime.equals(eTbkOrder.createTime)) return false;
-        if (!clickTime.equals(eTbkOrder.clickTime)) return false;
-        if (!itemTitle.equals(eTbkOrder.itemTitle)) return false;
-        if (!itemNumIid.equals(eTbkOrder.itemNumIid)) return false;
-        if (!wangwangName.equals(eTbkOrder.wangwangName)) return false;
-        if (!shopTitle.equals(eTbkOrder.shopTitle)) return false;
-        if (!itemCount.equals(eTbkOrder.itemCount)) return false;
-        if (!itemUnitPrice.equals(eTbkOrder.itemUnitPrice)) return false;
-        if (!orderStatus.equals(eTbkOrder.orderStatus)) return false;
-        if (!orderType.equals(eTbkOrder.orderType)) return false;
-        if (!incomeRate.equals(eTbkOrder.incomeRate)) return false;
-        if (!divideRate.equals(eTbkOrder.divideRate)) return false;
-        if (!payedAmount.equals(eTbkOrder.payedAmount)) return false;
-        if (!estimateEffect.equals(eTbkOrder.estimateEffect)) return false;
-        if (!settleAmount.equals(eTbkOrder.settleAmount)) return false;
-        if (!estimateIncome.equals(eTbkOrder.estimateIncome)) return false;
-        if (settleTime != null ? !settleTime.equals(eTbkOrder.settleTime) : eTbkOrder.settleTime != null) return false;
-        if (!commissionRate.equals(eTbkOrder.commissionRate)) return false;
-        if (!commissionAmount.equals(eTbkOrder.commissionAmount)) return false;
-        if (!subsidyRate.equals(eTbkOrder.subsidyRate)) return false;
-        if (!subsidyAmount.equals(eTbkOrder.subsidyAmount)) return false;
-        if (!subsidyType.equals(eTbkOrder.subsidyType)) return false;
-        if (!platform.equals(eTbkOrder.platform)) return false;
-        if (!service3rd.equals(eTbkOrder.service3rd)) return false;
-        if (!category.equals(eTbkOrder.category)) return false;
-        if (!siteId.equals(eTbkOrder.siteId)) return false;
-        if (!siteName.equals(eTbkOrder.siteName)) return false;
-        if (!adZoneId.equals(eTbkOrder.adZoneId)) return false;
-        return adZoneName.equals(eTbkOrder.adZoneName);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = orderId.hashCode();
-        result = 31 * result + createTime.hashCode();
-        result = 31 * result + clickTime.hashCode();
-        result = 31 * result + itemTitle.hashCode();
-        result = 31 * result + itemNumIid.hashCode();
-        result = 31 * result + wangwangName.hashCode();
-        result = 31 * result + shopTitle.hashCode();
-        result = 31 * result + itemCount.hashCode();
-        result = 31 * result + itemUnitPrice.hashCode();
-        result = 31 * result + orderStatus.hashCode();
-        result = 31 * result + orderType.hashCode();
-        result = 31 * result + incomeRate.hashCode();
-        result = 31 * result + divideRate.hashCode();
-        result = 31 * result + payedAmount.hashCode();
-        result = 31 * result + estimateEffect.hashCode();
-        result = 31 * result + settleAmount.hashCode();
-        result = 31 * result + estimateIncome.hashCode();
-        result = 31 * result + (settleTime != null ? settleTime.hashCode() : 0);
-        result = 31 * result + commissionRate.hashCode();
-        result = 31 * result + commissionAmount.hashCode();
-        result = 31 * result + subsidyRate.hashCode();
-        result = 31 * result + subsidyAmount.hashCode();
-        result = 31 * result + subsidyType.hashCode();
-        result = 31 * result + platform.hashCode();
-        result = 31 * result + service3rd.hashCode();
-        result = 31 * result + category.hashCode();
-        result = 31 * result + siteId.hashCode();
-        result = 31 * result + siteName.hashCode();
-        result = 31 * result + adZoneId.hashCode();
-        result = 31 * result + adZoneName.hashCode();
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "ETbkOrder{" +
-                "id=" + id +
-                ", orderId=" + orderId +
-                ", createTime=" + createTime +
-                ", clickTime=" + clickTime +
-                ", itemTitle='" + itemTitle + '\'' +
-                ", itemNumIid=" + itemNumIid +
-                ", wangwangName='" + wangwangName + '\'' +
-                ", shopTitle='" + shopTitle + '\'' +
-                ", itemCount=" + itemCount +
-                ", itemUnitPrice='" + itemUnitPrice + '\'' +
-                ", orderStatus='" + orderStatus + '\'' +
-                ", orderType='" + orderType + '\'' +
-                ", incomeRate='" + incomeRate + '\'' +
-                ", divideRate='" + divideRate + '\'' +
-                ", payedAmount='" + payedAmount + '\'' +
-                ", estimateEffect='" + estimateEffect + '\'' +
-                ", settleAmount='" + settleAmount + '\'' +
-                ", estimateIncome='" + estimateIncome + '\'' +
-                ", settleTime=" + settleTime +
-                ", commissionRate='" + commissionRate + '\'' +
-                ", commissionAmount='" + commissionAmount + '\'' +
-                ", subsidyRate='" + subsidyRate + '\'' +
-                ", subsidyAmount='" + subsidyAmount + '\'' +
-                ", subsidyType='" + subsidyType + '\'' +
-                ", platform='" + platform + '\'' +
-                ", service3rd='" + service3rd + '\'' +
-                ", category='" + category + '\'' +
-                ", siteId=" + siteId +
-                ", siteName='" + siteName + '\'' +
-                ", adZoneId=" + adZoneId +
-                ", adZoneName='" + adZoneName + '\'' +
-                '}';
-    }
 }
