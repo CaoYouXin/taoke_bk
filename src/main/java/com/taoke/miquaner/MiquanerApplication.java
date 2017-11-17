@@ -44,7 +44,7 @@ public class MiquanerApplication {
 				registry.addMapping("/**")
 						.allowedOrigins("*")
 						.allowedHeaders("auth", "content-type")
-						.exposedHeaders("auth");
+						.exposedHeaders("auth", "Content-Disposition");
 			}
 
 			@Override

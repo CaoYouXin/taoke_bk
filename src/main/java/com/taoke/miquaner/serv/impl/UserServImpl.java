@@ -30,6 +30,11 @@ import com.taoke.miquaner.view.UserRegisterSubmit;
 import com.taoke.miquaner.view.UserResetPwdSubmit;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -37,10 +42,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServImpl implements IUserServ {
@@ -77,6 +83,20 @@ public class UserServImpl implements IUserServ {
         }
         acsClient = new DefaultAcsClient(profile);
     }
+
+    private Function<EUser, List<String>> eUserRFunction = user -> Arrays.asList(
+            "" + user.getId(),
+            user.getName(),
+            user.getRealName(),
+            user.getPhone(),
+            user.getAliPayId(),
+            user.getQqId(),
+            user.getWeChatId(),
+            user.getAnnouncement(),
+            user.getAliPid(),
+            user.getCode(),
+            user.getExt()
+    );
 
     private UserRepo userRepo;
     private TokenRepo tokenRepo;
@@ -325,6 +345,75 @@ public class UserServImpl implements IUserServ {
             BeanUtils.copyProperties(user, viewUser, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
             return viewUser;
         }));
+    }
+
+    @Override
+    public boolean exportAll(String filePath) {
+        List<List<String>> data = this.userRepo.findAll().stream().map(this.eUserRFunction).collect(Collectors.toList());
+        data.add(0, this.getHeaders());
+        return writeFile(filePath, data, this.getColWidth());
+    }
+
+    private List<Integer> getColWidth() {
+        return Arrays.asList(9, 12, 9, 18, 20, 15, 20, 42, 36, 11, 10);
+    }
+
+    private List<String> getHeaders() {
+        return Arrays.asList("ID", "用户名", "姓名", "电话", "支付宝", "QQ", "微信", "申请理由", "PID", "邀请码", "其它");
+    }
+
+    private boolean writeFile(String filePath, List<List<String>> data, List<Integer> width) {
+        try (HSSFWorkbook wb = new HSSFWorkbook()) {
+            HSSFSheet s = wb.createSheet();
+            wb.setSheetName(0, "User");
+
+            HSSFCellStyle cs = wb.createCellStyle();
+            HSSFCellStyle cs2 = wb.createCellStyle();
+            HSSFFont f = wb.createFont();
+            HSSFFont f2 = wb.createFont();
+
+            f.setFontHeightInPoints((short) 12);
+            f.setColor(IndexedColors.BLACK.getIndex());
+            f.setBold(true);
+            f2.setFontHeightInPoints((short) 10);
+            f2.setColor(IndexedColors.GREY_80_PERCENT.getIndex());
+            f2.setBold(false);
+            cs.setFont(f);
+            cs2.setFont(f2);
+
+            int rowNum = 0, cellNum;
+            HSSFRow r = s.createRow(rowNum);
+            r.setHeight((short) 0x128);
+
+            HSSFCell c = null;
+            List<String> headers = data.get(0);
+            for (cellNum = 0; cellNum < headers.size(); cellNum++) {
+                c = r.createCell(cellNum);
+                c.setCellStyle(cs);
+                c.setCellValue(headers.get(cellNum));
+
+                s.setColumnWidth(cellNum, (int) (width.get(cellNum) * 16 / 0.05));
+            }
+
+            for (rowNum = 1; rowNum < data.size(); rowNum++) {
+                r = s.createRow(rowNum);
+                List<String> datum = data.get(rowNum);
+
+                for (cellNum = 0; cellNum < datum.size(); cellNum++) {
+                    c = r.createCell(cellNum);
+                    c.setCellStyle(cs2);
+                    c.setCellValue(datum.get(cellNum));
+                }
+            }
+            
+            try (FileOutputStream out = new FileOutputStream(filePath)) {
+                wb.write(out);
+                return true;
+            }
+        } catch (IOException e) {
+            logger.error(e);
+            return false;
+        }
     }
 
     private Object clearToken(Long id) {

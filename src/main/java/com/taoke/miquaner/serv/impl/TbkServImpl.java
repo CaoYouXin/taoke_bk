@@ -148,6 +148,7 @@ public class TbkServImpl implements ITbkServ {
     public Object getCouponByCid(String cid, Long pageNo, EUser user, boolean isSuper) {
         DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
         final double userRate = isSuper ? (1.0 - tenth.platform) : tenth.second;
+        logger.debug(userRate);
 
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
         TbkDgItemCouponGetRequest req = new TbkDgItemCouponGetRequest();

@@ -25,4 +25,6 @@ public interface IUserServ {
 
     Object listAllUsers(Integer pageNo);
 
+    boolean exportAll(String filePath);
+
 }
