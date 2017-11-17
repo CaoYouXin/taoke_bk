@@ -146,7 +146,7 @@ public class UserServImpl implements IUserServ {
         }
 
         EUser byCodeEquals = null;
-        if (null != userRegisterSubmit.getInvitation() && !this.setSuperDivider(userRegisterSubmit)) {
+        if (!StringUtils.isNullOrEmpty(userRegisterSubmit.getInvitation()) && !this.setSuperDivider(userRegisterSubmit)) {
             byCodeEquals = this.userRepo.findByCodeEquals(userRegisterSubmit.getInvitation());
             if (null == byCodeEquals) {
                 return Result.fail(new ErrorR(ErrorR.NO_INV_CODE_FOUND, NO_INV_CODE_FOUND));
@@ -340,7 +340,7 @@ public class UserServImpl implements IUserServ {
 
     @Override
     public Object listAllUsers(Integer pageNo) {
-        return Result.success(this.userRepo.findAll(new PageRequest(pageNo - 1, 1, new Sort(Sort.Direction.ASC, "id"))).map(user -> {
+        return Result.success(this.userRepo.findAll(new PageRequest(Math.max(0, pageNo - 1), 10, new Sort(Sort.Direction.ASC, "id"))).map(user -> {
             EUser viewUser = new EUser();
             BeanUtils.copyProperties(user, viewUser, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
             return viewUser;
@@ -405,7 +405,7 @@ public class UserServImpl implements IUserServ {
                     c.setCellValue(datum.get(cellNum));
                 }
             }
-            
+
             try (FileOutputStream out = new FileOutputStream(filePath)) {
                 wb.write(out);
                 return true;

@@ -11,7 +11,9 @@ import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.AliMaMaSubmit;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -30,6 +32,7 @@ public class IdentityInterceptor implements HandlerInterceptor {
     private ConfigRepo configRepo;
 
     @Override
+    @Transactional
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (!(handler instanceof HandlerMethod)) {
             logger.debug("handler is no HandlerMethod");
@@ -70,18 +73,20 @@ public class IdentityInterceptor implements HandlerInterceptor {
         } else {
             EUser user = token.getUser();
             if (null != user) {
-                request.setAttribute("user", user);
+                EUser view = new EUser();
+                BeanUtils.copyProperties(user, view, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
+                request.setAttribute("user", view);
                 request.setAttribute("buyer", null == user.getAliPid());
                 request.setAttribute("super", null == user.getpUser() && "platform_user".equals(user.getExt()));
 
                 if (null == user.getAliPid() && null != user.getpUser()) {
-                    user.setAliPid(user.getpUser().getAliPid());
+                    view.setAliPid(user.getpUser().getAliPid());
                 }
 
                 if (null == user.getAliPid()) {
                     EConfig config = this.configRepo.findByKeyEquals(AliMaMaSubmit.PID_K);
                     if (null != config) {
-                        user.setAliPid(config.getValue());
+                        view.setAliPid(config.getValue());
                     }
                 }
 
