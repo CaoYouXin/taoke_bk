@@ -148,8 +148,8 @@ public class TbkServImpl implements ITbkServ {
     public Object getCouponByCid(String cid, Long pageNo, EUser user, boolean isSuper) {
         DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
         final double userRate = isSuper ? (1.0 - tenth.platform) : tenth.second;
-        logger.debug(userRate);
 
+        this.initParams();
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
         TbkDgItemCouponGetRequest req = new TbkDgItemCouponGetRequest();
         req.setAdzoneId(Long.parseLong(user.getAliPid().substring(user.getAliPid().lastIndexOf('_') + 1)));
@@ -191,6 +191,7 @@ public class TbkServImpl implements ITbkServ {
 
     @Override
     public Object getFavoriteList(Long pageNo) {
+        this.initParams();
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
         TbkUatmFavoritesGetRequest req = new TbkUatmFavoritesGetRequest();
         req.setPageNo(pageNo);
@@ -218,6 +219,7 @@ public class TbkServImpl implements ITbkServ {
         DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
         final double userRate = isSuper ? (1.0 - tenth.platform) : tenth.second;
 
+        this.initParams();
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
         TbkUatmFavoritesItemGetRequest req = new TbkUatmFavoritesItemGetRequest();
         req.setPlatform(2L);
@@ -247,6 +249,7 @@ public class TbkServImpl implements ITbkServ {
 
     @Override
     public Object search(EUser user, String keyword) {
+        this.initParams();
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
         TbkDgItemCouponGetRequest req = new TbkDgItemCouponGetRequest();
         req.setAdzoneId(Long.parseLong(user.getAliPid().substring(user.getAliPid().lastIndexOf('_') + 1)));
@@ -286,6 +289,7 @@ public class TbkServImpl implements ITbkServ {
     }
 
     private String getTaobaoPwd(ShareSubmit shareSubmit) throws ApiException {
+        this.initParams();
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
         TbkTpwdCreateRequest req = new TbkTpwdCreateRequest();
         req.setUserId("3434155161");
@@ -297,6 +301,7 @@ public class TbkServImpl implements ITbkServ {
     }
 
     private String getShortUrl(String url) throws ApiException {
+        this.initParams();
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
         TbkSpreadGetRequest req = new TbkSpreadGetRequest();
         List<TbkSpreadGetRequest.TbkSpreadRequest> list2 = new ArrayList<>();
