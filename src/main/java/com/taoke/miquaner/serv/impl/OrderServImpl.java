@@ -281,14 +281,9 @@ public class OrderServImpl implements IOrderServ {
         }
 
         DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
-        user = this.userRepo.findOne(user.getId());//regain lazy init feature
-        Double registerReward = 0.0;
-        try {
-            registerReward = Double.parseDouble(user.getExt());
-        } catch (Exception ignored) {
-        }
+        double userRate = isSuper ? (1 - tenth.platform) : tenth.second;
 
-        UserCommitView userCommitView = getUserCommitView(user, (isSuper ? (1 - tenth.platform) : tenth.second));
+        UserCommitView userCommitView = getUserCommitView(user, userRate);
         Double childCommit = user.getcUsers().stream().map(cUser -> {
             if (StringUtils.isNullOrEmpty(cUser.getAliPid())) {
                 return new UserCommitView(cUser.getName(), "0.00");
@@ -301,7 +296,7 @@ public class OrderServImpl implements IOrderServ {
                 .reduce(0.0, (pv, cO) -> pv + Double.parseDouble(cO.getAmount()), (v1, v2) -> v1 + v2);
 
         return Result.success(String.format(Locale.ENGLISH, "%.2f",
-                Double.parseDouble(userCommitView.getCommit()) + childCommit + registerReward - hasDraw));
+                Double.parseDouble(userCommitView.getCommit()) + childCommit - hasDraw));
     }
 
     @Override

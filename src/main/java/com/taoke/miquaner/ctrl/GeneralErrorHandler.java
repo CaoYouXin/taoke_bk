@@ -1,6 +1,5 @@
 package com.taoke.miquaner.ctrl;
 
-import com.taoke.miquaner.fltr.AdminInterceptor;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
 import org.apache.log4j.LogManager;

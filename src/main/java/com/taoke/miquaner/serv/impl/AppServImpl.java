@@ -1,10 +1,8 @@
 package com.taoke.miquaner.serv.impl;
 
-import com.taoke.miquaner.data.EConfig;
 import com.taoke.miquaner.data.EGuide;
 import com.taoke.miquaner.data.EHelp;
 import com.taoke.miquaner.data.EShareImg;
-import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.GuideRepo;
 import com.taoke.miquaner.repo.HelpRepo;
 import com.taoke.miquaner.repo.ShareImgRepo;

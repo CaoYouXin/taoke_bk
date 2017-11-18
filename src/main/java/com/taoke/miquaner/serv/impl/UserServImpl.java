@@ -24,17 +24,11 @@ import com.taoke.miquaner.util.BeanUtil;
 import com.taoke.miquaner.util.DateUtils;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
-import com.taoke.miquaner.view.AliMaMaSubmit;
-import com.taoke.miquaner.view.EnrollSubmit;
-import com.taoke.miquaner.view.UserRegisterSubmit;
-import com.taoke.miquaner.view.UserResetPwdSubmit;
+import com.taoke.miquaner.view.*;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -61,6 +55,7 @@ public class UserServImpl implements IUserServ {
     private static final String WRONG_VERIFY_CODE = "验证码错误，请输入正确的验证码";
     private static final String NEED_NAME_UNIQUE = "该名字已被注册";
     private static final String NO_INV_CODE_FOUND = "没有找到该邀请码";
+    private static final String THIRD_CAN_NOT_ENROLL = "您没有申请成为合伙人的权限";
 
     private static IAcsClient acsClient;
 
@@ -152,7 +147,6 @@ public class UserServImpl implements IUserServ {
                 return Result.fail(new ErrorR(ErrorR.NO_INV_CODE_FOUND, NO_INV_CODE_FOUND));
             }
             userRegisterSubmit.getUser().setpUser(byCodeEquals);
-            userRegisterSubmit.getUser().setExt("2");
         }
 
         boolean try2ok = false;
@@ -227,15 +221,20 @@ public class UserServImpl implements IUserServ {
     }
 
     private Object tokenWithUser(EToken token, EUser user) {
+        TokenView tokenView = new TokenView();
+        BeanUtils.copyProperties(token, tokenView, "id", "admin", "user");
+
         EUser eUser = new EUser();
         eUser.setId(user.getId());
         eUser.setName(user.getName());
         eUser.setPhone(user.getPhone());
         eUser.setAliPid(user.getAliPid());
         eUser.setCode(user.getCode());
-        token.setUser(eUser);
+        tokenView.setUser(eUser);
 
-        return Result.success(token);
+        tokenView.setCandidate(null == eUser.getpUser() || null == eUser.getpUser().getpUser());
+
+        return Result.success(tokenView);
     }
 
     private Object checkSmsCode(String phone, String code) {
@@ -324,8 +323,12 @@ public class UserServImpl implements IUserServ {
             return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
         }
 
+        if (null != one.getpUser() && null != one.getpUser().getpUser()) {
+            return Result.fail(new ErrorR(ErrorR.THIRD_CAN_NOT_ENROLL, THIRD_CAN_NOT_ENROLL));
+        }
+
         one.setAliPid(aliPid);
-        one.setCode(StringUtil.toMD5HexString(aliPid).substring(0, 10));
+        one.setCode(("" + Math.random()).substring(2, 8));
         this.userRepo.save(one);
 
         return clearToken(id);

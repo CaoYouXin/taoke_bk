@@ -39,6 +39,7 @@ public class ErrorR {
     public static final String WRONG_MESSAGE_ID = "WRONG_MESSAGE_ID";
     public static final String NEED_NAME_UNIQUE = "NEED_NAME_UNIQUE";
     public static final String NO_INV_CODE_FOUND = "NO_INV_CODE_FOUND";
+    public static final String THIRD_CAN_NOT_ENROLL = "THIRD_CAN_NOT_ENROLL";
 
     private String key;
     private String msg;

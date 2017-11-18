@@ -4,25 +4,17 @@ import com.taoke.miquaner.MiquanerApplication;
 import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.serv.IUserServ;
 import com.taoke.miquaner.util.Auth;
-import com.taoke.miquaner.util.ErrorR;
-import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.EnrollSubmit;
 import com.taoke.miquaner.view.UserRegisterSubmit;
 import com.taoke.miquaner.view.UserResetPwdSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.file.Paths;
 
 @RestController
 public class UserCtrl {
