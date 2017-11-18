@@ -61,14 +61,20 @@ public class UserCtrl {
 
     @Auth(isAdmin = true)
     @RequestMapping(value = "/tbk/user/check/agent/{id}", method = RequestMethod.POST)
-    public Object check4Agent(@PathVariable(name = "id") Long id, String pid) {
-        return this.userServ.check(id, pid);
+    public Object check4Agent(@PathVariable(name = "id") Long id, @RequestBody String pid) {
+        return this.userServ.check(id, pid.replaceAll("\"", ""));
     }
 
     @Auth(isAdmin = true)
     @RequestMapping("/admin/manage/user/list/{pageNo}")
     public Object listAllUsers(@PathVariable(name = "pageNo") Integer pageNo) {
         return this.userServ.listAllUsers(pageNo);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/tbk/user/down/grade/{id}", method = RequestMethod.GET)
+    public Object downGrade(@PathVariable(name = "id") Long id) {
+        return this.userServ.downGrade(id);
     }
 
 }

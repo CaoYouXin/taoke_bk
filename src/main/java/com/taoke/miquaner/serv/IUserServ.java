@@ -21,6 +21,8 @@ public interface IUserServ {
 
     Object check(Long id, String aliPid);
 
+    Object downGrade(Long id);
+
     List<EUser> getChildUsers(EUser user);
 
     Object listAllUsers(Integer pageNo);

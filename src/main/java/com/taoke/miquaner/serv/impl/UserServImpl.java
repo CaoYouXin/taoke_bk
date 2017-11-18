@@ -31,6 +31,7 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -330,8 +331,28 @@ public class UserServImpl implements IUserServ {
         one.setAliPid(aliPid);
         one.setCode(("" + Math.random()).substring(2, 8));
         this.userRepo.save(one);
+        clearToken(id);
 
-        return clearToken(id);
+        EUser view = new EUser();
+        BeanUtils.copyProperties(one, view, "pwd", "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
+        return Result.success(view);
+    }
+
+    @Override
+    public Object downGrade(Long id) {
+        EUser one = this.userRepo.findOne(id);
+        if (null == one) {
+            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
+        }
+
+        one.setAliPid(null);
+        one.setCode(null);
+        this.userRepo.save(one);
+        clearToken(id);
+
+        EUser view = new EUser();
+        BeanUtils.copyProperties(one, view, "pwd", "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
+        return Result.success(view);
     }
 
     @Override
