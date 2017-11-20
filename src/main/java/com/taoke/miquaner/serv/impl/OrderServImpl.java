@@ -2,17 +2,17 @@ package com.taoke.miquaner.serv.impl;
 
 import com.mysql.jdbc.StringUtils;
 import com.taoke.miquaner.MiquanerApplication;
+import com.taoke.miquaner.data.ETbkItem;
 import com.taoke.miquaner.data.ETbkOrder;
 import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.data.EWithdraw;
-import com.taoke.miquaner.repo.ConfigRepo;
-import com.taoke.miquaner.repo.TbkOrderRepo;
-import com.taoke.miquaner.repo.UserRepo;
-import com.taoke.miquaner.repo.WithdrawRepo;
+import com.taoke.miquaner.repo.*;
 import com.taoke.miquaner.serv.IOrderServ;
+import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.util.DivideByTenthUtil;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
+import com.taoke.miquaner.view.TbkOrderView;
 import com.taoke.miquaner.view.TbkOrderWrapper;
 import com.taoke.miquaner.view.UserCommitView;
 import org.apache.log4j.LogManager;
@@ -53,9 +53,11 @@ public class OrderServImpl implements IOrderServ {
     private WithdrawRepo withdrawRepo;
     private ConfigRepo configRepo;
     private UserRepo userRepo;
+    private ITbkServ tbkServ;
 
     @Autowired
-    public OrderServImpl(TbkOrderRepo tbkOrderRepo, WithdrawRepo withdrawRepo, ConfigRepo configRepo, UserRepo userRepo) {
+    public OrderServImpl(ITbkServ tbkServ, TbkOrderRepo tbkOrderRepo, WithdrawRepo withdrawRepo, ConfigRepo configRepo, UserRepo userRepo) {
+        this.tbkServ = tbkServ;
         this.tbkOrderRepo = tbkOrderRepo;
         this.withdrawRepo = withdrawRepo;
         this.configRepo = configRepo;
@@ -169,10 +171,10 @@ public class OrderServImpl implements IOrderServ {
 
     @Override
     public Object list(EUser user, Boolean isSuper, Integer type, Integer pageNo) {
-        return Result.success(this.listOrders(user, isSuper, type, pageNo, 30));
+        return Result.success(this.listOrders(user, isSuper, type, pageNo, 40));
     }
 
-    private List<ETbkOrder> listOrders(EUser user, Boolean isSuper, Integer type, Integer pageNo, Integer pageSize) {
+    private List<TbkOrderView> listOrders(EUser user, Boolean isSuper, Integer type, Integer pageNo, Integer pageSize) {
         DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
         double userRate = isSuper ? (1 - tenth.platform) : tenth.second;
 
@@ -229,14 +231,40 @@ public class OrderServImpl implements IOrderServ {
                 return new ArrayList<>();
         }
 
-        return orders.stream().peek(eTbkOrder -> {
-            double rate = eTbkOrder.getAdZoneId().equals(adZoneId) ? userRate : tenth.first;
+        logger.debug(String.format("page %d found %d", pageNo, orders.size()));
+        Map<Long, ETbkItem> longETbkItemMap = this.tbkServ.loadSimpleItem(orders.stream().map(eTbkOrder -> eTbkOrder.getItemNumIid()).collect(Collectors.toList()));
+
+        return orders.stream().map(eTbkOrder -> {
+            boolean self = eTbkOrder.getAdZoneId().equals(adZoneId);
+            double rate = self ? userRate : tenth.first;
 
             eTbkOrder.setCommissionRate(null);
             eTbkOrder.setEstimateEffect(String.format(Locale.ENGLISH, "%.2f",
                     rate * Double.parseDouble(eTbkOrder.getEstimateEffect())));
             eTbkOrder.setEstimateIncome(String.format(Locale.ENGLISH, "%.2f",
                     rate * Double.parseDouble(eTbkOrder.getEstimateIncome())));
+
+            TbkOrderView view = new TbkOrderView();
+            BeanUtils.copyProperties(eTbkOrder, view);
+            view.setSelf(self);
+
+            if (!self) {
+                String teammateName = "";
+                for (EUser cUser : cUsers) {
+                    if (getAdZoneId(cUser.getAliPid()).equals(eTbkOrder.getAdZoneId())) {
+                        teammateName = cUser.getName();
+                        break;
+                    }
+                }
+                view.setTeammateName(teammateName);
+            }
+
+            ETbkItem eTbkItem = longETbkItemMap.get(eTbkOrder.getItemNumIid());
+            if (null != eTbkItem) {
+                view.setPicUrl(eTbkItem.getPicUrl());
+            }
+
+            return view;
         }).collect(Collectors.toList());
     }
 

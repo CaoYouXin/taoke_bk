@@ -8,9 +8,11 @@ import com.taobao.api.request.*;
 import com.taobao.api.response.*;
 import com.taoke.miquaner.data.EConfig;
 import com.taoke.miquaner.data.ESearchKeyWord;
+import com.taoke.miquaner.data.ETbkItem;
 import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.SearchKeyWordRepo;
+import com.taoke.miquaner.repo.TbkItemRepo;
 import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.util.DivideByTenthUtil;
 import com.taoke.miquaner.util.ErrorR;
@@ -25,11 +27,10 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class TbkServImpl implements ITbkServ {
@@ -44,11 +45,13 @@ public class TbkServImpl implements ITbkServ {
 
     private ConfigRepo configRepo;
     private SearchKeyWordRepo searchKeyWordRepo;
+    private TbkItemRepo tbkItemRepo;
 
     @Autowired
-    public TbkServImpl(ConfigRepo configRepo, SearchKeyWordRepo searchKeyWordRepo) {
+    public TbkServImpl(ConfigRepo configRepo, SearchKeyWordRepo searchKeyWordRepo, TbkItemRepo tbkItemRepo) {
         this.configRepo = configRepo;
         this.searchKeyWordRepo = searchKeyWordRepo;
+        this.tbkItemRepo = tbkItemRepo;
 
         this.initParams();
     }
@@ -286,6 +289,47 @@ public class TbkServImpl implements ITbkServ {
     public Object hints(String keyword) {
         return Result.success(this.searchKeyWordRepo.findAllByKeywordContains(keyword)
                 .stream().map(ESearchKeyWord::getKeyword).collect(Collectors.toList()));
+    }
+
+    @Override
+    public Map<Long, ETbkItem> loadSimpleItem(List<Long> id) {
+        Stream<ETbkItem> eTbkItemStream = id.stream().distinct().map(nid -> this.tbkItemRepo.findOne(nid));
+        Map<Long, ETbkItem> found = eTbkItemStream.filter(Objects::nonNull).collect(Collectors.toMap(ETbkItem::getId, Function.identity()));
+
+        List<Long> notFound = id.stream().distinct().filter(nid -> !found.keySet().contains(nid)).collect(Collectors.toList());
+        if (notFound.isEmpty()) {
+            return found;
+        }
+
+        StringBuilder num_iids = new StringBuilder();
+        notFound.forEach(nid -> num_iids.append(nid).append(','));
+        String numIids = num_iids.toString();
+
+        this.initParams();
+        TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
+        TbkItemInfoGetRequest req = new TbkItemInfoGetRequest();
+        req.setFields("num_iid,pict_url");
+        req.setPlatform(2L);
+        req.setNumIids(numIids.substring(0, numIids.length() - 1));
+        TbkItemInfoGetResponse rsp = null;
+        try {
+            rsp = client.execute(req);
+        } catch (ApiException e) {
+            logger.error("error when invoke ali api");
+            return found;
+        }
+        logger.debug(rsp.getBody());
+
+        List<ETbkItem> toSave = rsp.getResults().stream().map(nTbkItem -> {
+            ETbkItem value = new ETbkItem();
+            value.setId(nTbkItem.getNumIid());
+            value.setPicUrl(nTbkItem.getPictUrl());
+            found.put(nTbkItem.getNumIid(), value);
+
+            return value;
+        }).collect(Collectors.toList());
+        this.tbkItemRepo.save(toSave);
+        return found;
     }
 
     private String getTaobaoPwd(ShareSubmit shareSubmit) throws ApiException {

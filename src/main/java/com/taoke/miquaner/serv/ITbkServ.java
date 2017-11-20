@@ -1,8 +1,12 @@
 package com.taoke.miquaner.serv;
 
+import com.taoke.miquaner.data.ETbkItem;
 import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.view.AliMaMaSubmit;
 import com.taoke.miquaner.view.ShareSubmit;
+
+import java.util.List;
+import java.util.Map;
 
 public interface ITbkServ {
 
@@ -21,5 +25,7 @@ public interface ITbkServ {
     Object search(EUser user, String keyword);
 
     Object hints(String keyword);
+
+    Map<Long, ETbkItem> loadSimpleItem(List<Long> id);
 
 }
