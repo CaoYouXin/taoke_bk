@@ -235,6 +235,17 @@ public class UserServImpl implements IUserServ {
         eUser.setCode(user.getCode());
         tokenView.setUser(eUser);
 
+        if (StringUtils.isNullOrEmpty(eUser.getAliPid()) && null != eUser.getpUser()) {
+            eUser.setAliPid(eUser.getpUser().getAliPid());
+        }
+
+        if (StringUtils.isNullOrEmpty(eUser.getAliPid())) {
+            EConfig config = this.configRepo.findByKeyEquals(AliMaMaSubmit.PID_K);
+            if (null != config) {
+                eUser.setAliPid(config.getValue());
+            }
+        }
+
         return Result.success(tokenView);
     }
 
