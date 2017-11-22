@@ -41,6 +41,11 @@
             <version>2.0</version>
         </dependency>
         <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.13</version>
+        </dependency>
+        <dependency>
             <groupId>com.taobao.api</groupId>
             <artifactId>tbk-miquaner</artifactId>
             <version>20171031</version>

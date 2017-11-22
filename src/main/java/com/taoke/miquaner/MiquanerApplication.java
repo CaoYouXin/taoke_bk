@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.taoke.miquaner.fltr.AdminInterceptor;
 import com.taoke.miquaner.fltr.IdentityInterceptor;
 import com.taoke.miquaner.serv.IInitServ;
+import com.taoke.miquaner.util.DateUtils;
+import com.taoke.miquaner.view.JdTokenType;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -13,19 +15,29 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.util.UrlPathHelper;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 @SpringBootApplication
 public class MiquanerApplication {
 
-	public static final DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	public static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper();
+    public static final DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper();
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 //        Calendar instance = Calendar.getInstance();
 //        instance.set(instance.get(Calendar.YEAR), instance.get(Calendar.MONTH), 1, 0, 0, 0);
 //        System.out.println(DEFAULT_DATE_FORMAT.format(instance.getTime()));
+
+//        try {
+//            JdTokenType jdTokenType = DEFAULT_OBJECT_MAPPER.readValue("{ \"access_token\": \"f0fa32a8-73e4-4567-9d9f-ee1b1699ed24\", \"code\": 0, \"expires_in\": 86399, \"refresh_token\": \"1967783a-d0df-47aa-9522-f942a080bc12\", \"time\": \"1511329860375\", \"token_type\": \"bearer\", \"uid\": \"6019658493\", \"user_nick\": \"陈洋1121\" }", JdTokenType.class);
+//            System.out.println(DEFAULT_DATE_FORMAT.format(DateUtils.add(new Date(Long.parseLong(jdTokenType.getTime())), Calendar.SECOND, (int) (jdTokenType.getExpiresIn() - 1000))));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         ConfigurableApplicationContext context = SpringApplication.run(MiquanerApplication.class, args);
 
@@ -33,24 +45,24 @@ public class MiquanerApplication {
         initServ.init(context);
     }
 
-	@Bean
-	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurerAdapter() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**")
-						.allowedOrigins("*")
-						.allowedHeaders("auth", "content-type")
-						.exposedHeaders("auth", "Content-Disposition");
-			}
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurerAdapter() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("*")
+                        .allowedHeaders("auth", "content-type")
+                        .exposedHeaders("auth", "Content-Disposition");
+            }
 
-			@Override
-			public void configurePathMatch(PathMatchConfigurer configurer) {
-				UrlPathHelper urlPathHelper = new UrlPathHelper();
-				urlPathHelper.setUrlDecode(true);
-				configurer.setUrlPathHelper(urlPathHelper);
-				super.configurePathMatch(configurer);
-			}
+            @Override
+            public void configurePathMatch(PathMatchConfigurer configurer) {
+                UrlPathHelper urlPathHelper = new UrlPathHelper();
+                urlPathHelper.setUrlDecode(true);
+                configurer.setUrlPathHelper(urlPathHelper);
+                super.configurePathMatch(configurer);
+            }
 
             @Override
             public void addInterceptors(InterceptorRegistry registry) {
@@ -58,23 +70,23 @@ public class MiquanerApplication {
                 registry.addInterceptor(getAdminInterceptor());
             }
         };
-	}
+    }
 
-	@Bean
+    @Bean
     AdminInterceptor getAdminInterceptor() {
-	    return new AdminInterceptor();
+        return new AdminInterceptor();
     }
 
-	@Bean
+    @Bean
     IdentityInterceptor getIdentityInterceptor() {
-	    return new IdentityInterceptor();
+        return new IdentityInterceptor();
     }
 
-	@Bean
-	public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
+    @Bean
+    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
         DEFAULT_OBJECT_MAPPER.setDateFormat(DEFAULT_DATE_FORMAT);
         DEFAULT_OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-		return new MappingJackson2HttpMessageConverter(DEFAULT_OBJECT_MAPPER);
-	}
+        return new MappingJackson2HttpMessageConverter(DEFAULT_OBJECT_MAPPER);
+    }
 
 }
