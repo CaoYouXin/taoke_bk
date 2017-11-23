@@ -52,7 +52,13 @@ public class AppCtrl {
         return this.appServ.removeHelp(id);
     }
 
-    @RequestMapping(value = "/app/share/img/url/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/app/share/img/url/list/{type}", method = RequestMethod.GET)
+    public Object getShareImgUrl(@PathVariable(name = "type") Integer type) {
+        return this.appServ.listShareImgUrl(type);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/app/share/img/url/list/all", method = RequestMethod.GET)
     public Object getShareImgUrl() {
         return this.appServ.listShareImgUrl();
     }

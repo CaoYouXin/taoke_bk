@@ -92,6 +92,11 @@ public class AppServImpl implements IAppServ {
     }
 
     @Override
+    public Object listShareImgUrl(Integer type) {
+        return Result.success(this.shareImgRepo.findAllByTypeEqualsOrderByOrderDesc(type));
+    }
+
+    @Override
     public Object setShareImgUrl(EShareImg shareImg) {
         if (null != shareImg.getId()) {
             EShareImg one = this.shareImgRepo.findOne(shareImg.getId());

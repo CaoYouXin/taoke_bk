@@ -226,6 +226,7 @@ public class UserServImpl implements IUserServ {
         BeanUtils.copyProperties(token, tokenView, "id", "admin", "user");
 
         tokenView.setCandidate(null == user.getpUser() || null == user.getpUser().getpUser());
+        tokenView.setDirectUser(null == user.getpUser());
 
         EUser eUser = new EUser();
         eUser.setId(user.getId());

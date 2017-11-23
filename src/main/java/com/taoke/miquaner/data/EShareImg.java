@@ -17,6 +17,9 @@ public class EShareImg {
     @Column(name = "img_url", unique = true, nullable = false, length = 2048)
     private String imgUrl;
 
+    @Column(name = "type", nullable = false)
+    private Integer type;
+
     public Long getId() {
         return id;
     }
@@ -39,5 +42,13 @@ public class EShareImg {
 
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }

@@ -20,6 +20,8 @@ public interface IAppServ {
 
     Object listShareImgUrl();
 
+    Object listShareImgUrl(Integer type);
+
     Object setShareImgUrl(EShareImg shareImg);
 
     Object removeShareImgUrl(Long id);

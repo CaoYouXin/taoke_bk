@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface ShareImgRepo extends JpaRepository<EShareImg, Long> {
 
+    List<EShareImg> findAllByTypeEqualsOrderByOrderDesc(Integer type);
+
     List<EShareImg> findAllByOrderByOrderDesc();
 
 }
