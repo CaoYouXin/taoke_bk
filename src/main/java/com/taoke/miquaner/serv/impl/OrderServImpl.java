@@ -2,11 +2,9 @@ package com.taoke.miquaner.serv.impl;
 
 import com.mysql.jdbc.StringUtils;
 import com.taoke.miquaner.MiquanerApplication;
-import com.taoke.miquaner.data.ETbkItem;
-import com.taoke.miquaner.data.ETbkOrder;
-import com.taoke.miquaner.data.EUser;
-import com.taoke.miquaner.data.EWithdraw;
+import com.taoke.miquaner.data.*;
 import com.taoke.miquaner.repo.*;
+import com.taoke.miquaner.serv.IMsgServ;
 import com.taoke.miquaner.serv.IOrderServ;
 import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.util.DivideByTenthUtil;
@@ -53,11 +51,15 @@ public class OrderServImpl implements IOrderServ {
     private WithdrawRepo withdrawRepo;
     private ConfigRepo configRepo;
     private UserRepo userRepo;
+    private AdminRepo adminRepo;
     private ITbkServ tbkServ;
+    private IMsgServ msgServ;
 
     @Autowired
-    public OrderServImpl(ITbkServ tbkServ, TbkOrderRepo tbkOrderRepo, WithdrawRepo withdrawRepo, ConfigRepo configRepo, UserRepo userRepo) {
+    public OrderServImpl(ITbkServ tbkServ, IMsgServ msgServ, AdminRepo adminRepo, TbkOrderRepo tbkOrderRepo, WithdrawRepo withdrawRepo, ConfigRepo configRepo, UserRepo userRepo) {
         this.tbkServ = tbkServ;
+        this.msgServ = msgServ;
+        this.adminRepo = adminRepo;
         this.tbkOrderRepo = tbkOrderRepo;
         this.withdrawRepo = withdrawRepo;
         this.configRepo = configRepo;
@@ -299,6 +301,13 @@ public class OrderServImpl implements IOrderServ {
         withdraw.setAmount(String.format(Locale.ENGLISH, "%.2f", amount));
         withdraw.setPayed(false);
         this.withdrawRepo.save(withdraw);
+
+        List<EAdmin> admins = this.adminRepo.findAllByGrantedAdminsIsNull();
+        if (!admins.isEmpty()) {
+            EUser retouchedUser = this.userRepo.findOne(user.getId());
+            this.msgServ.send2One(admins.get(0), retouchedUser, "系统消息", String.format("您已发起一笔%s的提现请求！", withdraw.getAmount()));
+        }
+
         return Result.success(null);
     }
 

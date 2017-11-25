@@ -11,14 +11,9 @@ import com.aliyuncs.profile.IClientProfile;
 import com.mysql.jdbc.StringUtils;
 import com.taobao.api.internal.toplink.embedded.websocket.util.StringUtil;
 import com.taoke.miquaner.MiquanerApplication;
-import com.taoke.miquaner.data.EConfig;
-import com.taoke.miquaner.data.ESmsCode;
-import com.taoke.miquaner.data.EToken;
-import com.taoke.miquaner.data.EUser;
-import com.taoke.miquaner.repo.ConfigRepo;
-import com.taoke.miquaner.repo.SmsCodeRepo;
-import com.taoke.miquaner.repo.TokenRepo;
-import com.taoke.miquaner.repo.UserRepo;
+import com.taoke.miquaner.data.*;
+import com.taoke.miquaner.repo.*;
+import com.taoke.miquaner.serv.IMsgServ;
 import com.taoke.miquaner.serv.IUserServ;
 import com.taoke.miquaner.util.BeanUtil;
 import com.taoke.miquaner.util.DateUtils;
@@ -98,9 +93,13 @@ public class UserServImpl implements IUserServ {
     private TokenRepo tokenRepo;
     private SmsCodeRepo smsCodeRepo;
     private ConfigRepo configRepo;
+    private AdminRepo adminRepo;
+    private IMsgServ msgServ;
 
     @Autowired
-    public UserServImpl(UserRepo userRepo, TokenRepo tokenRepo, SmsCodeRepo smsCodeRepo, ConfigRepo configRepo) {
+    public UserServImpl(IMsgServ msgServ, AdminRepo adminRepo, UserRepo userRepo, TokenRepo tokenRepo, SmsCodeRepo smsCodeRepo, ConfigRepo configRepo) {
+        this.msgServ = msgServ;
+        this.adminRepo = adminRepo;
         this.userRepo = userRepo;
         this.tokenRepo = tokenRepo;
         this.smsCodeRepo = smsCodeRepo;
@@ -127,6 +126,11 @@ public class UserServImpl implements IUserServ {
         token.setToken(StringUtil.toMD5HexString(MiquanerApplication.DEFAULT_DATE_FORMAT.format(now)));
         token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 3));
         EToken eToken = this.tokenRepo.save(token);
+
+        List<EAdmin> admins = this.adminRepo.findAllByGrantedAdminsIsNull();
+        if (!admins.isEmpty()) {
+            this.msgServ.send2One(admins.get(0), one, "系统消息", "欢迎回来！");
+        }
 
         return tokenWithUser(eToken, one);
     }
@@ -179,6 +183,11 @@ public class UserServImpl implements IUserServ {
         token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 3));
         EToken eToken = this.tokenRepo.save(token);
 
+        List<EAdmin> admins = this.adminRepo.findAllByGrantedAdminsIsNull();
+        if (!admins.isEmpty()) {
+            this.msgServ.send2One(admins.get(0), saved, "系统消息", "欢迎使用觅券儿APP！");
+        }
+
         return tokenWithUser(eToken, saved);
     }
 
@@ -218,6 +227,11 @@ public class UserServImpl implements IUserServ {
         token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 3));
         EToken eToken = this.tokenRepo.save(token);
 
+        List<EAdmin> admins = this.adminRepo.findAllByGrantedAdminsIsNull();
+        if (!admins.isEmpty()) {
+            this.msgServ.send2One(admins.get(0), byPhoneEquals, "系统消息", "欢迎回来！");
+        }
+
         return tokenWithUser(eToken, byPhoneEquals);
     }
 
@@ -225,7 +239,7 @@ public class UserServImpl implements IUserServ {
         TokenView tokenView = new TokenView();
         BeanUtils.copyProperties(token, tokenView, "id", "admin", "user");
 
-        tokenView.setCandidate(null == user.getpUser() || null == user.getpUser().getpUser());
+        tokenView.setCandidate("platform_user".equals(user.getExt()) || (null != user.getpUser() && null == user.getpUser().getpUser()));
         tokenView.setDirectUser(null == user.getpUser());
 
         EUser eUser = new EUser();

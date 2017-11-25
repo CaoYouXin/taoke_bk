@@ -11,6 +11,10 @@ public interface IMsgServ {
 
     Object send2All(EAdmin admin, String title, String content);
 
+    Object send2One(EAdmin admin, EUser user, String title, String content);
+
+    Object send2One(EAdmin admin, Long userId, String title, String content);
+
     Object sendFeedback(EUser user, String content);
 
     Object readMessage(EUser user, Long mailBoxId);

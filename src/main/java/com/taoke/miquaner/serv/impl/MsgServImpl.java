@@ -110,6 +110,40 @@ public class MsgServImpl implements IMsgServ {
     }
 
     @Override
+    public Object send2One(EAdmin admin, EUser user, String title, String content) {
+        EAdmin reattachedAdmin = this.adminRepo.findOne(admin.getId());
+
+        EMessage message = new EMessage();
+        message.setTitle(title);
+        message.setContent(content);
+        message.setAdmin(reattachedAdmin);
+        EMessage savedMessage = this.messageRepo.save(message);
+
+        EMailBox mailBox = new EMailBox();
+        mailBox.setCreateTime(new Date());
+        mailBox.setReceiverUser(user);
+        mailBox.setAdminToReceive(false);
+        mailBox.setSendFromAdmin(true);
+        mailBox.setChecked(false);
+        mailBox.setMessage(savedMessage);
+        this.mailBoxRepo.save(mailBox);
+
+        EMessage ret = new EMessage();
+        BeanUtils.copyProperties(savedMessage, ret, "admin", "user", "mailBoxes");
+        return Result.success(ret);
+    }
+
+    @Override
+    public Object send2One(EAdmin admin, Long userId, String title, String content) {
+        EUser one = this.userRepo.findOne(userId);
+        if (null == one) {
+            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
+        }
+
+        return send2One(admin, one, title, content);
+    }
+
+    @Override
     @Transactional
     public Object sendFeedback(EUser user, String content) {
         EUser reattachedUser = this.userRepo.findOne(user.getId());
