@@ -79,18 +79,18 @@ public class IdentityInterceptor implements HandlerInterceptor {
                 request.setAttribute("buyer", null == user.getAliPid());
                 request.setAttribute("super", null == user.getpUser() && "platform_user".equals(user.getExt()));
 
-                if (null == user.getAliPid() && null != user.getpUser()) {
+                if (null == view.getAliPid() && null != user.getpUser()) {
                     view.setAliPid(user.getpUser().getAliPid());
                 }
 
-                if (null == user.getAliPid()) {
+                if (null == view.getAliPid()) {
                     EConfig config = this.configRepo.findByKeyEquals(AliMaMaSubmit.PID_K);
                     if (null != config) {
                         view.setAliPid(config.getValue());
                     }
                 }
 
-                logger.info(String.format("User Id = %d", user.getId()));
+                logger.info(String.format("User Id = %d, PID = %s", user.getId(), view.getAliPid()));
             } else {
                 HttpUtils.returnJSON(response, Result.unAuth());
                 logger.debug("token by auth [" + authHeader + "] associated with no user, returning 401");

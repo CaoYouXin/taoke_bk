@@ -250,14 +250,16 @@ public class UserServImpl implements IUserServ {
         eUser.setCode(user.getCode());
         tokenView.setUser(eUser);
 
-        if (StringUtils.isNullOrEmpty(eUser.getAliPid()) && null != eUser.getpUser()) {
-            eUser.setAliPid(eUser.getpUser().getAliPid());
+        if (StringUtils.isNullOrEmpty(eUser.getAliPid()) && null != user.getpUser()) {
+            eUser.setAliPid(user.getpUser().getAliPid());
+            logger.debug("set ali pid from pUser");
         }
 
         if (StringUtils.isNullOrEmpty(eUser.getAliPid())) {
             EConfig config = this.configRepo.findByKeyEquals(AliMaMaSubmit.PID_K);
             if (null != config) {
                 eUser.setAliPid(config.getValue());
+                logger.debug("set ali pid from platform");
             }
         }
 
@@ -340,6 +342,12 @@ public class UserServImpl implements IUserServ {
 
         BeanUtil.copyNotNullProps(enrollSubmit, one);
         this.userRepo.save(one);
+
+        List<EAdmin> admins = this.adminRepo.findAllByGrantedAdminsIsNull();
+        if (!admins.isEmpty()) {
+            this.msgServ.send2One(admins.get(0), one, "系统消息", "您刚刚申请了成为合伙人！");
+        }
+
         return Result.success(null);
     }
 
@@ -361,6 +369,12 @@ public class UserServImpl implements IUserServ {
 
         EUser view = new EUser();
         BeanUtils.copyProperties(one, view, "pwd", "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
+
+        List<EAdmin> admins = this.adminRepo.findAllByGrantedAdminsIsNull();
+        if (!admins.isEmpty()) {
+            this.msgServ.send2One(admins.get(0), one, "系统消息", "恭喜您！通过合伙人审核。");
+        }
+
         return Result.success(view);
     }
 
