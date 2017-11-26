@@ -4,6 +4,7 @@ import com.mysql.jdbc.StringUtils;
 import com.taobao.api.ApiException;
 import com.taobao.api.DefaultTaobaoClient;
 import com.taobao.api.TaobaoClient;
+import com.taobao.api.domain.UatmTbkItem;
 import com.taobao.api.request.*;
 import com.taobao.api.response.*;
 import com.taoke.miquaner.data.EConfig;
@@ -20,6 +21,7 @@ import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.AliMaMaSubmit;
 import com.taoke.miquaner.view.ShareSubmit;
 import com.taoke.miquaner.view.ShareView;
+import org.apache.catalina.connector.ClientAbortException;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -222,12 +224,24 @@ public class TbkServImpl implements ITbkServ {
         DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
         final double userRate = isSuper ? (1.0 - tenth.platform) : tenth.second;
 
+        final long adZoneId = Long.parseLong(user.getAliPid().substring(user.getAliPid().lastIndexOf('_') + 1));
+
+        List<UatmTbkItem> uatmTbkItems = this.getUatmTbkItems(userRate, favoriteId, 1L, adZoneId);
+        if (uatmTbkItems.size() == 100) {
+            uatmTbkItems.addAll(this.getUatmTbkItems(userRate, favoriteId, 2L, adZoneId));
+        }
+
+        return Result.success(uatmTbkItems);
+    }
+
+    private List<UatmTbkItem> getUatmTbkItems(final double userRate, final Long favoriteId, final Long pageNo, final long adZoneId) {
         this.initParams();
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
+
         TbkUatmFavoritesItemGetRequest req = new TbkUatmFavoritesItemGetRequest();
         req.setPlatform(2L);
         req.setPageSize(100L);
-        req.setAdzoneId(Long.parseLong(user.getAliPid().substring(user.getAliPid().lastIndexOf('_') + 1)));
+        req.setAdzoneId(adZoneId);
         req.setFavoritesId(favoriteId);
         req.setPageNo(pageNo);
         req.setFields("commission_rate,coupon_click_url,coupon_end_time,coupon_info,coupon_remain_count,coupon_start_time,coupon_total_count,category,click_url,num_iid,title,pict_url,small_images,reserve_price,zk_final_price,user_type,provcity,item_url,seller_id,volume,nick,shop_title,zk_final_price_wap,event_start_time,event_end_time,tk_rate,status,type");
@@ -236,18 +250,22 @@ public class TbkServImpl implements ITbkServ {
             rsp = client.execute(req);
         } catch (ApiException e) {
             logger.error("error when invoke ali api");
-            return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
+            return Collections.emptyList();
         }
         logger.debug(rsp.getBody());
 
         if (null == rsp.getResults()) {
-            return Result.success(Collections.emptyList());
+            return Collections.emptyList();
         }
 
-        return Result.success(rsp.getResults().stream().peek(uatmTbkItem -> {
+        if ("15".equals(rsp.getErrorCode()) && "isv.invalid-parameter:favorites_id".equals(rsp.getSubCode())) {
+            return Collections.emptyList();
+        }
+
+        return rsp.getResults().stream().peek(uatmTbkItem -> {
             uatmTbkItem.setTkRate(String.format(Locale.ENGLISH, "%.2f",
                     userRate * Double.parseDouble(uatmTbkItem.getTkRate())));
-        }).collect(Collectors.toList()));
+        }).collect(Collectors.toList());
     }
 
     @Override
