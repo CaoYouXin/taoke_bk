@@ -1,6 +1,7 @@
 package com.taoke.miquaner.serv.impl;
 
 import com.mysql.jdbc.StringUtils;
+import com.sun.org.apache.regexp.internal.RE;
 import com.taobao.api.ApiException;
 import com.taobao.api.DefaultTaobaoClient;
 import com.taobao.api.TaobaoClient;
@@ -21,7 +22,6 @@ import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.AliMaMaSubmit;
 import com.taoke.miquaner.view.ShareSubmit;
 import com.taoke.miquaner.view.ShareView;
-import org.apache.catalina.connector.ClientAbortException;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -348,6 +348,38 @@ public class TbkServImpl implements ITbkServ {
         }).collect(Collectors.toList());
         this.tbkItemRepo.save(toSave);
         return found;
+    }
+
+    @Override
+    public Object getJuItems(EUser user, String keyword) {
+        this.initParams();
+        TaobaoClient client = new DefaultTaobaoClient("https://eco.taobao.com/router/rest", "24677166", "c415a630e93808f2e56a985097c5ea20");
+        JuItemsSearchRequest req = new JuItemsSearchRequest();
+        JuItemsSearchRequest.TopItemQuery obj1 = new JuItemsSearchRequest.TopItemQuery();
+        obj1.setCurrentPage(1L);
+        obj1.setPageSize(100L);
+        obj1.setPid(user.getAliPid());
+        obj1.setStatus(2L);
+        obj1.setWord(keyword);
+        req.setParamTopItemQuery(obj1);
+        JuItemsSearchResponse rsp = null;
+        try {
+            rsp = client.execute(req);
+        } catch (ApiException e) {
+            logger.error("error when invoke ali api");
+            return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
+        }
+
+        logger.debug(rsp.getBody());
+        List<JuItemsSearchResponse.Items> modelList;
+        try {
+            modelList = rsp.getResult().getModelList();
+            Objects.requireNonNull(modelList);
+        } catch (Exception e) {
+            modelList = Collections.emptyList();
+        }
+
+        return Result.success(modelList);
     }
 
     private String getTaobaoPwd(ShareSubmit shareSubmit) throws ApiException {

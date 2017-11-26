@@ -28,4 +28,6 @@ public interface ITbkServ {
 
     Map<Long, ETbkItem> loadSimpleItem(List<Long> id);
 
+    Object getJuItems(EUser user, String keyword);
+
 }

@@ -69,4 +69,10 @@ public class TbkCtrl {
         return this.tbkServ.hints(keyword);
     }
 
+    @Auth
+    @RequestMapping("/tbk/ju/{keyword}")
+    public Object juSearch(@PathVariable(name = "keyword") String keyword, HttpServletRequest request) {
+        return this.tbkServ.getJuItems((EUser) request.getAttribute("user"), keyword);
+    }
+
 }
