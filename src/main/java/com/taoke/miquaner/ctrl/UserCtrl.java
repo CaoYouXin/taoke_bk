@@ -5,6 +5,7 @@ import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.serv.IUserServ;
 import com.taoke.miquaner.util.Auth;
 import com.taoke.miquaner.view.EnrollSubmit;
+import com.taoke.miquaner.view.PhoneVerifySubmit;
 import com.taoke.miquaner.view.UserRegisterSubmit;
 import com.taoke.miquaner.view.UserResetPwdSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +45,8 @@ public class UserCtrl {
     }
 
     @RequestMapping(value = "/tbk/phone/verify", method = RequestMethod.POST)
-    public Object verify(@RequestBody String phone) {
-        return this.userServ.sendVerifyCode(phone);
+    public Object verify(@RequestBody PhoneVerifySubmit phoneVerifySubmit) {
+        return this.userServ.sendVerifyCode(phoneVerifySubmit.getPhone());
     }
 
     @RequestMapping(value = "/tbk/user/reset/pwd", method = RequestMethod.POST)

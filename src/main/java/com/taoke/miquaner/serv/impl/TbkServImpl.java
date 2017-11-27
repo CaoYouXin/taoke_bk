@@ -166,7 +166,7 @@ public class TbkServImpl implements ITbkServ {
         try {
             rsp = client.execute(req);
         } catch (ApiException e) {
-            logger.error("error when invoke ali api");
+            logger.error("error when invoke ali api" + e.getMessage());
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
         }
         logger.debug(rsp.getBody());
@@ -189,7 +189,7 @@ public class TbkServImpl implements ITbkServ {
                     this.getTaobaoPwd(shareSubmit)
             ));
         } catch (ApiException e) {
-            logger.error("error when invoke ali api");
+            logger.error("error when invoke ali api" + e.getMessage());
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
         }
     }
@@ -207,7 +207,7 @@ public class TbkServImpl implements ITbkServ {
         try {
             rsp = client.execute(req);
         } catch (ApiException e) {
-            logger.error("error when invoke ali api");
+            logger.error("error when invoke ali api" + e.getMessage());
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
         }
         logger.debug(rsp.getBody());
@@ -249,7 +249,7 @@ public class TbkServImpl implements ITbkServ {
         try {
             rsp = client.execute(req);
         } catch (ApiException e) {
-            logger.error("error when invoke ali api");
+            logger.error("error when invoke ali api" + e.getMessage());
             return Collections.emptyList();
         }
         logger.debug(rsp.getBody());
@@ -282,7 +282,7 @@ public class TbkServImpl implements ITbkServ {
         try {
             rsp = client.execute(req);
         } catch (ApiException e) {
-            logger.error("error when invoke ali api");
+            logger.error("error when invoke ali api" + e.getMessage());
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
         }
         logger.debug(rsp.getBody());
@@ -333,7 +333,7 @@ public class TbkServImpl implements ITbkServ {
         try {
             rsp = client.execute(req);
         } catch (ApiException e) {
-            logger.error("error when invoke ali api");
+            logger.error("error when invoke ali api" + e.getMessage());
             return found;
         }
         logger.debug(rsp.getBody());
@@ -366,11 +366,11 @@ public class TbkServImpl implements ITbkServ {
         try {
             rsp = client.execute(req);
         } catch (ApiException e) {
-            logger.error("error when invoke ali api");
+            logger.error("error when invoke ali api" + e.getMessage());
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
         }
-
         logger.debug(rsp.getBody());
+
         List<JuItemsSearchResponse.Items> modelList;
         try {
             modelList = rsp.getResult().getModelList();
