@@ -5,10 +5,7 @@ import com.taoke.miquaner.data.EHomeBtn;
 import com.taoke.miquaner.serv.IHomeServ;
 import com.taoke.miquaner.util.Auth;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class HomeCtrl {
@@ -65,8 +62,21 @@ public class HomeCtrl {
     }
 
     @Auth(isAdmin = true)
+    @RequestMapping(value = "/home/cate/del/{id}", method = RequestMethod.GET)
+    public Object removeCategory(@PathVariable(name = "id") Long id) {
+        return this.homeServ.deleteCategory(id);
+    }
+
+    @Auth(isAdmin = true)
     @RequestMapping("/home/btn/list")
     public Object getBtnList() {
         return this.homeServ.getBtnList();
     }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/home/btn/del/{id}", method = RequestMethod.GET)
+    public Object removeHomeBtn(@PathVariable(name = "id") Long id) {
+        return this.homeServ.deleteHomeBtn(id);
+    }
+
 }
