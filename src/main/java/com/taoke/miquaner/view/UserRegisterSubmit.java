@@ -31,4 +31,5 @@ public class UserRegisterSubmit {
     public void setInvitation(String invitation) {
         this.invitation = invitation;
     }
+
 }
