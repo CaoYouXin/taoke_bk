@@ -27,6 +27,11 @@ public class AppServImpl implements IAppServ {
     }
 
     @Override
+    public Object listGuidesByType(Integer type) {
+        return Result.success(this.guideRepo.findAllByTypeEqualsOrderByOrderDesc(type));
+    }
+
+    @Override
     public Object listGuides() {
         return Result.success(this.guideRepo.findAllByOrderByOrderDesc());
     }

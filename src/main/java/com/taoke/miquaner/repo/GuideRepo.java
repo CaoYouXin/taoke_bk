@@ -9,4 +9,6 @@ public interface GuideRepo extends JpaRepository<EGuide, Long> {
 
     List<EGuide> findAllByOrderByOrderDesc();
 
+    List<EGuide> findAllByTypeEqualsOrderByOrderDesc(Integer type);
+
 }

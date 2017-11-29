@@ -6,6 +6,8 @@ import com.taoke.miquaner.data.EShareImg;
 
 public interface IAppServ {
 
+    Object listGuidesByType(Integer type);
+
     Object listGuides();
 
     Object setGuide(EGuide guide);

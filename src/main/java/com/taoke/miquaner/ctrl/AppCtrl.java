@@ -18,6 +18,12 @@ public class AppCtrl {
         this.appServ = appServ;
     }
 
+    @RequestMapping("/app/guide/list/{type}")
+    public Object getGuidesByType(@PathVariable(name = "type") Integer type) {
+        return this.getGuidesByType(type);
+    }
+
+    @Auth(isAdmin = true)
     @RequestMapping("/app/guide/list")
     public Object getGuideList() {
         return this.appServ.listGuides();
