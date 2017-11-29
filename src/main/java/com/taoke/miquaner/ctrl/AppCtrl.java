@@ -20,7 +20,7 @@ public class AppCtrl {
 
     @RequestMapping("/app/guide/list/{type}")
     public Object getGuidesByType(@PathVariable(name = "type") Integer type) {
-        return this.getGuidesByType(type);
+        return this.appServ.listGuidesByType(type);
     }
 
     @Auth(isAdmin = true)

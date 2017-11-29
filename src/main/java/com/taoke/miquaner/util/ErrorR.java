@@ -65,4 +65,12 @@ public class ErrorR {
     public void setMsg(String msg) {
         this.msg = msg;
     }
+
+    @Override
+    public String toString() {
+        return "ErrorR{" +
+                "key='" + key + '\'' +
+                ", msg='" + msg + '\'' +
+                '}';
+    }
 }

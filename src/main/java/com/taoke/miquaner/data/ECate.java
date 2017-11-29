@@ -51,4 +51,14 @@ public class ECate {
     public void setOrder(Integer order) {
         this.order = order;
     }
+
+    @Override
+    public String toString() {
+        return "ECate{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", cid='" + cid + '\'' +
+                ", order=" + order +
+                '}';
+    }
 }

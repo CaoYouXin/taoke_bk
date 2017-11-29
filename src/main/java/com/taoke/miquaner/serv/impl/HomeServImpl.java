@@ -76,8 +76,8 @@ public class HomeServImpl implements IHomeServ {
                 cate = one;
             }
         }
-        this.cateRepo.save(cate);
-        return Result.success(cate);
+        ECate saved = this.cateRepo.save(cate);
+        return Result.success(saved);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class HomeServImpl implements IHomeServ {
                 homeBtn = one;
             }
         }
-        this.homeBtnRepo.save(homeBtn);
-        return Result.success(homeBtn);
+        EHomeBtn saved = this.homeBtnRepo.save(homeBtn);
+        return Result.success(saved);
     }
 }
