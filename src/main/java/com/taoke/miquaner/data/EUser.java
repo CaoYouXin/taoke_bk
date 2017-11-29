@@ -208,4 +208,28 @@ public class EUser {
     public void setCreatedMessages(List<EMessage> createdMessages) {
         this.createdMessages = createdMessages;
     }
+
+    @Override
+    public String toString() {
+        return "EUser{" +
+                "id=" + id +
+                ", pUser=" + pUser +
+                ", cUsers=" + cUsers +
+                ", withdraws=" + withdraws +
+                ", sentMails=" + sentMails +
+                ", receivedMails=" + receivedMails +
+                ", createdMessages=" + createdMessages +
+                ", phone='" + phone + '\'' +
+                ", pwd='" + pwd + '\'' +
+                ", name='" + name + '\'' +
+                ", realName='" + realName + '\'' +
+                ", aliPayId='" + aliPayId + '\'' +
+                ", qqId='" + qqId + '\'' +
+                ", weChatId='" + weChatId + '\'' +
+                ", announcement='" + announcement + '\'' +
+                ", aliPid='" + aliPid + '\'' +
+                ", code='" + code + '\'' +
+                ", ext='" + ext + '\'' +
+                '}';
+    }
 }

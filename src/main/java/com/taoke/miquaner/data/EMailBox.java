@@ -100,4 +100,18 @@ public class EMailBox {
     public void setChecked(Boolean checked) {
         this.checked = checked;
     }
+
+    @Override
+    public String toString() {
+        return "EMailBox{" +
+                "id=" + id +
+                ", message=" + message +
+                ", senderUser=" + senderUser +
+                ", isSendFromAdmin=" + isSendFromAdmin +
+                ", receiverUser=" + receiverUser +
+                ", isAdminToReceive=" + isAdminToReceive +
+                ", createTime=" + createTime +
+                ", checked=" + checked +
+                '}';
+    }
 }

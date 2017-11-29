@@ -77,4 +77,16 @@ public class EMessage {
     public void setUser(EUser user) {
         this.user = user;
     }
+
+    @Override
+    public String toString() {
+        return "EMessage{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", admin=" + admin +
+                ", user=" + user +
+                ", mailBoxes=" + mailBoxes +
+                '}';
+    }
 }
