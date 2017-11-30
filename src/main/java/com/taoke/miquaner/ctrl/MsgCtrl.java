@@ -5,6 +5,7 @@ import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.serv.IMsgServ;
 import com.taoke.miquaner.util.Auth;
 import com.taoke.miquaner.view.MessageSubmit;
+import com.taoke.miquaner.view.ReportSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,8 +41,8 @@ public class MsgCtrl {
 
     @Auth
     @RequestMapping(value = "/msg/feedback", method = RequestMethod.POST)
-    public Object feedback(HttpServletRequest request, @RequestBody String content) {
-        return this.msgServ.sendFeedback((EUser) request.getAttribute("user"), content.replaceAll("\"", ""));
+    public Object feedback(HttpServletRequest request, @RequestBody ReportSubmit content) {
+        return this.msgServ.sendFeedback((EUser) request.getAttribute("user"), content.getReport().replaceAll("\"", ""));
     }
 
     @Auth(isAdmin = true)
