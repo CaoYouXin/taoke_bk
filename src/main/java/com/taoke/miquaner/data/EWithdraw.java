@@ -26,7 +26,7 @@ public class EWithdraw {
     @Column(name = "payed", nullable = false)
     private Boolean payed;
 
-    @Column(name = "pay_time", nullable = false)
+    @Column(name = "pay_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date payTime;
 

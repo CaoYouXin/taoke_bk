@@ -17,9 +17,9 @@ public interface TbkOrderRepo extends JpaRepository<ETbkOrder, Long> {
 
     List<ETbkOrder> findBySiteIdEqualsAndAdZoneIdIn(Long siteId, List<Long> adZoneId, Pageable pageable);
 
-    List<ETbkOrder> findAllBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContainsAndCreateTimeBefore(Long siteId, Long adZoneId, String orderStatus, Date lastDate);
+    List<ETbkOrder> findAllBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContainsAndSettleTimeBefore(Long siteId, Long adZoneId, String orderStatus, Date lastDate);
 
-    List<ETbkOrder> findAllBySiteIdEqualsAndAdZoneIdInAndOrderStatusContainsAndCreateTimeBetween(Long siteId, List<Long> adZoneId, String orderStatus, Date start, Date end);
+    List<ETbkOrder> findAllBySiteIdEqualsAndAdZoneIdInAndOrderStatusContainsAndSettleTimeBetween(Long siteId, List<Long> adZoneId, String orderStatus, Date start, Date end);
 
 }
 

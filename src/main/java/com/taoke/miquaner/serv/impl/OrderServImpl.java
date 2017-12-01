@@ -162,6 +162,12 @@ public class OrderServImpl implements IOrderServ {
                                 a.setPayedAmount(String.format(Locale.ENGLISH, "%.2f",
                                         Double.parseDouble(a.getPayedAmount())
                                                 + Double.parseDouble(b.getPayedAmount())));
+                                a.setSettleAmount(String.format(Locale.ENGLISH, "%.2f",
+                                                Double.parseDouble(a.getSettleAmount())
+                                                + Double.parseDouble(b.getSettleAmount())));
+                                a.setCommissionAmount(String.format(Locale.ENGLISH, "%.2f",
+                                        Double.parseDouble(a.getCommissionAmount())
+                                                + Double.parseDouble(b.getCommissionAmount())));
                                 return a;
                             }),
                             m -> new ArrayList<>(m.values())));
@@ -297,7 +303,7 @@ public class OrderServImpl implements IOrderServ {
 
         EWithdraw withdraw = new EWithdraw();
         withdraw.setCreateTime(new Date());
-        withdraw.setUser(user);
+        withdraw.setUser(this.userRepo.findOne(user.getId()));
         withdraw.setAmount(String.format(Locale.ENGLISH, "%.2f", amount));
         withdraw.setPayed(false);
         this.withdrawRepo.save(withdraw);
@@ -320,6 +326,7 @@ public class OrderServImpl implements IOrderServ {
         DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
         double userRate = isSuper ? (1 - tenth.platform) : tenth.second;
 
+        user = this.userRepo.findOne(user.getId());
         UserCommitView userCommitView = getUserCommitView(user, userRate);
         Double childCommit = user.getcUsers().stream().map(cUser -> {
             if (StringUtils.isNullOrEmpty(cUser.getAliPid())) {
@@ -367,7 +374,7 @@ public class OrderServImpl implements IOrderServ {
             start = now.getTime();
         }
 
-        Double settled = this.tbkOrderRepo.findAllBySiteIdEqualsAndAdZoneIdInAndOrderStatusContainsAndCreateTimeBetween(
+        Double settled = this.tbkOrderRepo.findAllBySiteIdEqualsAndAdZoneIdInAndOrderStatusContainsAndSettleTimeBetween(
                 siteId, adZoneIds, "结算", start, end
         ).stream().reduce(0.0, (pv, cO) -> {
             double rate = cO.getAdZoneId().equals(adZoneId) ? userRate : tenth.first;
@@ -399,7 +406,7 @@ public class OrderServImpl implements IOrderServ {
         Calendar now = Calendar.getInstance();
         now.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), 1, 0, 0, 0);
 
-        Double settled = this.tbkOrderRepo.findAllBySiteIdEqualsAndAdZoneIdInAndOrderStatusContainsAndCreateTimeBetween(
+        Double settled = this.tbkOrderRepo.findAllBySiteIdEqualsAndAdZoneIdInAndOrderStatusContainsAndSettleTimeBetween(
                 siteId, adZoneIds, "结算", now.getTime(), new Date()
         ).stream().reduce(0.0, (pv, cO) -> {
             double rate = cO.getAdZoneId().equals(adZoneId) ? userRate : tenth.first;
@@ -437,9 +444,10 @@ public class OrderServImpl implements IOrderServ {
     }
 
     private UserCommitView getUserCommitView(EUser user, final Double percent) {
-        Double settled = this.tbkOrderRepo.findAllBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContainsAndCreateTimeBefore(
+        Double settled = this.tbkOrderRepo.findAllBySiteIdEqualsAndAdZoneIdEqualsAndOrderStatusContainsAndSettleTimeBefore(
                 getSiteId(user.getAliPid()), getAdZoneId(user.getAliPid()), "结算", this.getNearestSettleEndTime()
         ).stream().reduce(0.0, (pv, cv) -> pv + Double.parseDouble(cv.getEstimateIncome()) * percent, (v1, v2) -> v1 + v2);
+        logger.debug(String.format("%s settled %.2f", user.getName(), settled));
         return new UserCommitView(user.getName(), String.format(Locale.ENGLISH, "%.2f", settled));
     }
 
