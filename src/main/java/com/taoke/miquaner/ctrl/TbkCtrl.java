@@ -75,4 +75,9 @@ public class TbkCtrl {
         return this.tbkServ.getJuItems((EUser) request.getAttribute("user"), keyword);
     }
 
+    @RequestMapping("/tbk/hints/top")
+    public Object hot() {
+        return this.tbkServ.getTopSearchWords();
+    }
+
 }

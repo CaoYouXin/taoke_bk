@@ -30,4 +30,8 @@ public interface ITbkServ {
 
     Object getJuItems(EUser user, String keyword);
 
+    void refreshKeyWord(String keyword);
+
+    Object getTopSearchWords();
+
 }

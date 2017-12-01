@@ -1,7 +1,6 @@
 package com.taoke.miquaner.serv.impl;
 
 import com.mysql.jdbc.StringUtils;
-import com.sun.org.apache.regexp.internal.RE;
 import com.taobao.api.ApiException;
 import com.taobao.api.DefaultTaobaoClient;
 import com.taobao.api.TaobaoClient;
@@ -26,6 +25,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -287,12 +288,7 @@ public class TbkServImpl implements ITbkServ {
         }
         logger.debug(rsp.getBody());
 
-        ESearchKeyWord one = this.searchKeyWordRepo.findByKeywordEquals(keyword);
-        if (null == one) {
-            one = new ESearchKeyWord();
-            one.setKeyword(keyword);
-            this.searchKeyWordRepo.save(one);
-        }
+        this.refreshKeyWord(keyword);
 
         if (null == rsp.getResults()) {
             return Result.success(Collections.emptyList());
@@ -301,6 +297,26 @@ public class TbkServImpl implements ITbkServ {
         return Result.success(rsp.getResults().stream().peek(tbkCoupon -> {
             tbkCoupon.setCommissionRate(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(tbkCoupon.getCommissionRate()) * 0.3));
         }).collect(Collectors.toList()));
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public void refreshKeyWord(String keyword) {
+        ESearchKeyWord one = this.searchKeyWordRepo.findByKeywordEquals(keyword);
+        if (null == one) {
+            one = new ESearchKeyWord();
+            one.setKeyword(keyword);
+            one.setCount(0L);
+        }
+        one.setCount(one.getCount() + 1);
+
+        this.searchKeyWordRepo.save(one);
+    }
+
+    @Override
+    public Object getTopSearchWords() {
+        return Result.success(this.searchKeyWordRepo.findTop5ByOrderByCountDesc()
+                .stream().map(ESearchKeyWord::getKeyword).collect(Collectors.toList()));
     }
 
     @Override
@@ -370,6 +386,8 @@ public class TbkServImpl implements ITbkServ {
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
         }
         logger.debug(rsp.getBody());
+
+        this.refreshKeyWord(keyword);
 
         List<JuItemsSearchResponse.Items> modelList;
         try {

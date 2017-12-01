@@ -14,6 +14,9 @@ public class ESearchKeyWord {
     @Column(name = "word", unique = true, nullable = false)
     private String keyword;
 
+    @Column(name = "count", nullable = false)
+    private Long count;
+
     public Long getId() {
         return id;
     }
@@ -28,5 +31,22 @@ public class ESearchKeyWord {
 
     public void setKeyword(String keyword) {
         this.keyword = keyword;
+    }
+
+    public Long getCount() {
+        return count;
+    }
+
+    public void setCount(Long count) {
+        this.count = count;
+    }
+
+    @Override
+    public String toString() {
+        return "ESearchKeyWord{" +
+                "id=" + id +
+                ", keyword='" + keyword + '\'' +
+                ", count=" + count +
+                '}';
     }
 }

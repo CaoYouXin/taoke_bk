@@ -11,4 +11,6 @@ public interface SearchKeyWordRepo extends JpaRepository<ESearchKeyWord, Long> {
 
     List<ESearchKeyWord> findAllByKeywordContains(String keyword);
 
+    List<ESearchKeyWord> findTop5ByOrderByCountDesc();
+
 }
