@@ -47,15 +47,15 @@ public class DivideByTenthUtil {
             return new Tenth(0.2, 0.3, 0.5);
         }
 
-        if (10 != first + second + platform) {
+        if (100 != first + second + platform) {
             logger.warn("数据库中配置总和不正确，使用默认5:2:3配置");
             return new Tenth(0.2, 0.3, 0.5);
         }
 
         return new Tenth(
-                (double) first / 10,
-                (double) second / 10,
-                (double) platform / 10
+                (double) first / 100,
+                (double) second / 100,
+                (double) platform / 100
         );
     }
 

@@ -11,6 +11,7 @@ public class AliMaMaSubmit {
     public static final String PID_K = "Pid";
     public static final String DIVIDE_BY_TENTHS = "DivideByTenths";
     public static final String PLATFORM_CODE = "PlatformCode";
+    public static final String PLATFORM_TOTAL = "PlatformTotal";
 
     private String account;
     private String mail;
@@ -21,6 +22,7 @@ public class AliMaMaSubmit {
     private String pid;
     private String divideByTenths;
     private String platformCode;
+    private String platformTotal;
 
     public String getAccount() {
         return account;
@@ -92,5 +94,13 @@ public class AliMaMaSubmit {
 
     public void setPlatformCode(String platformCode) {
         this.platformCode = platformCode;
+    }
+
+    public String getPlatformTotal() {
+        return platformTotal;
+    }
+
+    public void setPlatformTotal(String platformTotal) {
+        this.platformTotal = platformTotal;
     }
 }
