@@ -124,7 +124,7 @@ public class UserServImpl implements IUserServ {
         }
         Date now = new Date();
         token.setToken(StringUtil.toMD5HexString(MiquanerApplication.DEFAULT_DATE_FORMAT.format(now)));
-        token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 3));
+        token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 30));
         EToken eToken = this.tokenRepo.save(token);
 
         List<EAdmin> admins = this.adminRepo.findAllByGrantedAdminsIsNull();
@@ -180,7 +180,7 @@ public class UserServImpl implements IUserServ {
         }
         Date now = new Date();
         token.setToken(StringUtil.toMD5HexString(MiquanerApplication.DEFAULT_DATE_FORMAT.format(now)));
-        token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 3));
+        token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 30));
         EToken eToken = this.tokenRepo.save(token);
 
         List<EAdmin> admins = this.adminRepo.findAllByGrantedAdminsIsNull();
@@ -224,7 +224,7 @@ public class UserServImpl implements IUserServ {
         }
         Date now = new Date();
         token.setToken(StringUtil.toMD5HexString(MiquanerApplication.DEFAULT_DATE_FORMAT.format(now)));
-        token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 3));
+        token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 30));
         EToken eToken = this.tokenRepo.save(token);
 
         List<EAdmin> admins = this.adminRepo.findAllByGrantedAdminsIsNull();
