@@ -61,7 +61,7 @@ public class TbkCtrl {
     @Auth
     @RequestMapping("/tbk/search/{keyword}")
     public Object search(@PathVariable(name = "keyword") String keyword, HttpServletRequest request) {
-        return this.tbkServ.search((EUser) request.getAttribute("user"), keyword);
+        return this.tbkServ.search((EUser) request.getAttribute("user"), keyword, (Boolean) request.getAttribute("super"));
     }
 
     @RequestMapping("/tbk/hints/{keyword}")

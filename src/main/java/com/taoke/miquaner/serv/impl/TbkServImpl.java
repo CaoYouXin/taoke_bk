@@ -270,7 +270,10 @@ public class TbkServImpl implements ITbkServ {
     }
 
     @Override
-    public Object search(EUser user, String keyword) {
+    public Object search(EUser user, String keyword, Boolean isSuper) {
+        DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
+        final double userRate = isSuper ? (1.0 - tenth.platform) : tenth.second;
+
         this.initParams();
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
         TbkDgItemCouponGetRequest req = new TbkDgItemCouponGetRequest();
@@ -295,7 +298,8 @@ public class TbkServImpl implements ITbkServ {
         }
 
         return Result.success(rsp.getResults().stream().peek(tbkCoupon -> {
-            tbkCoupon.setCommissionRate(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(tbkCoupon.getCommissionRate()) * 0.3));
+            tbkCoupon.setCommissionRate(String.format(Locale.ENGLISH, "%.2f",
+                    userRate * Double.parseDouble(tbkCoupon.getCommissionRate())));
         }).collect(Collectors.toList()));
     }
 

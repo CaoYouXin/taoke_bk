@@ -22,7 +22,7 @@ public interface ITbkServ {
 
     Object getFavoriteItems(Long favoriteId, Long pageNo, EUser user, boolean isSuper);
 
-    Object search(EUser user, String keyword);
+    Object search(EUser user, String keyword, Boolean isSuper);
 
     Object hints(String keyword);
 
