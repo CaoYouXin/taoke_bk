@@ -17,7 +17,7 @@ public class HomeCtrl {
         this.homeServ = homeServ;
     }
 
-    @RequestMapping("/home/banner/list")
+    @RequestMapping(value = "/home/banner/list", method = RequestMethod.GET)
     public Object getBanners() {
         return this.homeServ.getBanners();
     }
@@ -28,7 +28,7 @@ public class HomeCtrl {
         return this.homeServ.postBanner(banner);
     }
 
-    @RequestMapping("/home/tool/list")
+    @RequestMapping(value = "/home/tool/list", method = RequestMethod.GET)
     public Object getTools() {
         return this.homeServ.getTools();
     }
@@ -39,7 +39,7 @@ public class HomeCtrl {
         return this.homeServ.postTool(tool);
     }
 
-    @RequestMapping("/home/group/list")
+    @RequestMapping(value = "/home/group/list", method = RequestMethod.GET)
     public Object getGroup() {
         return this.homeServ.getGroups();
     }
@@ -50,7 +50,7 @@ public class HomeCtrl {
         return this.homeServ.postGroup(group);
     }
 
-    @RequestMapping("/home/cate/list")
+    @RequestMapping(value = "/home/cate/list", method = RequestMethod.GET)
     public Object getCategories() {
         return this.homeServ.getCategories();
     }
@@ -68,7 +68,7 @@ public class HomeCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping("/home/btn/list")
+    @RequestMapping(value = "/home/btn/list", method = RequestMethod.GET)
     public Object getBtnList() {
         return this.homeServ.getBtnList();
     }

@@ -72,20 +72,27 @@ public class InitServImpl implements IInitServ {
                 return;
             }
 
-            if (!api.startsWith("/admin/")) {
+            String method = getMethod(requestMapping);
+            if (null == method) {
                 return;
             }
 
-            EPrivilege privilege = privilegeRepo.findByApiEquals(api);
+            EPrivilege privilege = privilegeRepo.findByApiEqualsAndMethodEquals(api, method);
             if (null == privilege) {
                 privilege = new EPrivilege();
                 privilege.setApi(api);
+                privilege.setAdmin(api.startsWith("/admin/"));
+                privilege.setMethod(method);
                 privileges.add(privilege);
             }
         });
         this.privilegeRepo.save(privileges);
 
         return null;
+    }
+
+    private String getMethod(RequestMapping requestMapping) {
+        return requestMapping.method().length > 0 ? requestMapping.method()[0].name() : null;
     }
 
     private String getApi(RequestMapping requestMapping) {

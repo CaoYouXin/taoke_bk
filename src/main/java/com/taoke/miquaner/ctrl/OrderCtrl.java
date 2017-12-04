@@ -37,7 +37,7 @@ public class OrderCtrl {
     }
 
     @Auth
-    @RequestMapping("/tbk/order/list/{type}/{pageNo}")
+    @RequestMapping(value = "/tbk/order/list/{type}/{pageNo}", method = RequestMethod.GET)
     public Object listOrders(@PathVariable(name = "type") Integer type, @PathVariable(name = "pageNo") Integer pageNo, HttpServletRequest request) {
         Boolean buyer = (Boolean) request.getAttribute("buyer");
         if (buyer) {
@@ -47,7 +47,7 @@ public class OrderCtrl {
     }
 
     @Auth
-    @RequestMapping("/tbk/team/list")
+    @RequestMapping(value = "/tbk/team/list", method = RequestMethod.GET)
     public Object getTeamList(HttpServletRequest request) {
         Boolean buyer = (Boolean) request.getAttribute("buyer");
         if (buyer) {
@@ -57,7 +57,7 @@ public class OrderCtrl {
     }
 
     @Auth
-    @RequestMapping("/tbk/candraw")
+    @RequestMapping(value = "/tbk/candraw", method = RequestMethod.GET)
     public Object getCandraw(HttpServletRequest request) {
         Boolean buyer = (Boolean) request.getAttribute("buyer");
         if (buyer) {
@@ -67,7 +67,7 @@ public class OrderCtrl {
     }
 
     @Auth
-    @RequestMapping("/tbk/estimate/this")
+    @RequestMapping(value = "/tbk/estimate/this", method = RequestMethod.GET)
     public Object getThisEstimate(HttpServletRequest request) {
         Boolean buyer = (Boolean) request.getAttribute("buyer");
         if (buyer) {
@@ -77,7 +77,7 @@ public class OrderCtrl {
     }
 
     @Auth
-    @RequestMapping("/tbk/estimate/that")
+    @RequestMapping(value = "/tbk/estimate/that", method = RequestMethod.GET)
     public Object getLastEstimate(HttpServletRequest request) {
         Boolean buyer = (Boolean) request.getAttribute("buyer");
         if (buyer) {
@@ -87,7 +87,7 @@ public class OrderCtrl {
     }
 
     @Auth
-    @RequestMapping("/tbk/withdraw/{amount}")
+    @RequestMapping(value = "/tbk/withdraw/{amount}", method = RequestMethod.GET)
     public Object withdraw(@PathVariable(name = "amount") Double amount, HttpServletRequest request) {
         Boolean buyer = (Boolean) request.getAttribute("buyer");
         if (buyer) {
@@ -97,13 +97,13 @@ public class OrderCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping("/tbk/withdraw/request/list")
+    @RequestMapping(value = "/tbk/withdraw/request/list", method = RequestMethod.GET)
     public Object withdrawList() {
         return this.orderServ.userWithdrawList();
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping("/tbk/withdraw/response/{id}")
+    @RequestMapping(value = "/tbk/withdraw/response/{id}", method = RequestMethod.GET)
     public Object payWithdraw(@PathVariable(name = "id") Long id) {
         return this.orderServ.payUserWithdraw(id);
     }

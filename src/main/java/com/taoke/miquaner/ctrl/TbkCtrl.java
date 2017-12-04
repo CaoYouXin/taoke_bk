@@ -33,7 +33,7 @@ public class TbkCtrl {
     }
 
     @Auth
-    @RequestMapping(value = "/tbk/coupon/{cid}/{pNo}")
+    @RequestMapping(value = "/tbk/coupon/{cid}/{pNo}", method = RequestMethod.GET)
     public Object getCoupons(@PathVariable(name = "cid") String cid, @PathVariable(name = "pNo") Long pageNo, HttpServletRequest request) {
         return this.tbkServ.getCouponByCid(cid, pageNo,
                 (EUser) request.getAttribute("user"), (Boolean) request.getAttribute("super"));
@@ -46,36 +46,36 @@ public class TbkCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping(value = "/tbk/fav/list/{pageNo}")
+    @RequestMapping(value = "/tbk/fav/list/{pageNo}", method = RequestMethod.GET)
     public Object getFavoriteList(@PathVariable(name = "pageNo") Long pageNo) {
         return this.tbkServ.getFavoriteList(pageNo);
     }
 
     @Auth
-    @RequestMapping("/tbk/fav/{favId}/list/{pageNo}")
+    @RequestMapping(value = "/tbk/fav/{favId}/list/{pageNo}", method = RequestMethod.GET)
     public Object getFavoriteItems(@PathVariable(name = "favId") Long favoriteId, @PathVariable(name = "pageNo") Long pageNo, HttpServletRequest request) {
         return this.tbkServ.getFavoriteItems(favoriteId, pageNo,
                 (EUser) request.getAttribute("user"), (Boolean) request.getAttribute("super"));
     }
 
     @Auth
-    @RequestMapping("/tbk/search/{keyword}")
+    @RequestMapping(value = "/tbk/search/{keyword}", method = RequestMethod.GET)
     public Object search(@PathVariable(name = "keyword") String keyword, HttpServletRequest request) {
         return this.tbkServ.search((EUser) request.getAttribute("user"), keyword, (Boolean) request.getAttribute("super"));
     }
 
-    @RequestMapping("/tbk/hints/{keyword}")
+    @RequestMapping(value = "/tbk/hints/{keyword}", method = RequestMethod.GET)
     public Object hint(@PathVariable(name = "keyword") String keyword) {
         return this.tbkServ.hints(keyword);
     }
 
     @Auth
-    @RequestMapping("/tbk/ju/{keyword}")
+    @RequestMapping(value = "/tbk/ju/{keyword}", method = RequestMethod.GET)
     public Object juSearch(@PathVariable(name = "keyword") String keyword, HttpServletRequest request) {
         return this.tbkServ.getJuItems((EUser) request.getAttribute("user"), keyword);
     }
 
-    @RequestMapping("/tbk/hints/top")
+    @RequestMapping(value = "/tbk/hints/top", method = RequestMethod.GET)
     public Object hot() {
         return this.tbkServ.getTopSearchWords();
     }

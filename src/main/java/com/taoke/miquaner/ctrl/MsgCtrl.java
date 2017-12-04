@@ -22,19 +22,19 @@ public class MsgCtrl {
     }
 
     @Auth
-    @RequestMapping("/msg/list/{pageNo}")
+    @RequestMapping(value = "/msg/list/{pageNo}", method = RequestMethod.GET)
     public Object getMsgList(@PathVariable(name = "pageNo") Integer pageNo, HttpServletRequest request) {
         return this.msgServ.listMessages((EUser) request.getAttribute("user"), pageNo);
     }
 
     @Auth
-    @RequestMapping("/msg/unread/count")
+    @RequestMapping(value = "/msg/unread/count", method = RequestMethod.GET)
     public Object getUnreadCount(HttpServletRequest request) {
         return this.msgServ.getUncheckedMessageCount((EUser) request.getAttribute("user"));
     }
 
     @Auth
-    @RequestMapping("/msg/read/{id}")
+    @RequestMapping(value = "/msg/read/{id}", method = RequestMethod.GET)
     public Object readMessage(HttpServletRequest request, @PathVariable(name = "id") Long id) {
         return this.msgServ.readMessage((EUser) request.getAttribute("user"), id);
     }

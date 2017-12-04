@@ -6,6 +6,7 @@ public class Result {
     private static final int UN_AUTH = 4010;
     private static final int UN_AUTH_ADMIN = 4011;
     private static final int GENERAL_FAIL = 5000;
+    private static final int VERSION_LOW = 5010;
 
     public static final String SUCCESS_MSG = "操作成功";
     public static final ErrorR FAIL_ON_SQL = new ErrorR(ErrorR.SQL_ERROR, "操作失败");
@@ -20,6 +21,10 @@ public class Result {
 
     public static Result unAuth() {
         return new Result(UN_AUTH, null);
+    }
+
+    public static Result versionLow() {
+        return new Result(VERSION_LOW, null);
     }
 
     public static Result unAuthAdmin() {

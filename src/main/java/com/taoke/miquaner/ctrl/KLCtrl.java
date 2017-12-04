@@ -8,6 +8,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,7 +17,7 @@ public class KLCtrl {
 
     private static final Logger logger = LogManager.getLogger(KLCtrl.class);
 
-    @RequestMapping("/kl/test")
+    @RequestMapping(value = "/kl/test", method = RequestMethod.GET)
     public Object test() {
         String url = KLUtil.activity("999684138096", "https://m.kaola.com/activity/h5/25702.shtml");
         logger.debug(url);

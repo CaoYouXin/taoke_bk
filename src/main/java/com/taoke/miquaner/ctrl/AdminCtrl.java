@@ -24,7 +24,7 @@ public class AdminCtrl {
         this.adminServ = adminServ;
     }
 
-    @RequestMapping("/admin/ping")
+    @RequestMapping(value = "/admin/ping", method = RequestMethod.GET)
     public Object adminPing() {
         return Result.success("admin ping success");
     }
@@ -35,7 +35,7 @@ public class AdminCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping("/admin/role/list")
+    @RequestMapping(value = "/admin/role/list", method = RequestMethod.GET)
     public Object getRoleList() {
         return this.adminServ.getRoles();
     }
@@ -53,7 +53,7 @@ public class AdminCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping("/admin/privilege/list")
+    @RequestMapping(value = "/admin/privilege/list", method = RequestMethod.GET)
     public Object getPrivileges() {
         return this.adminServ.getPrivileges();
     }
@@ -65,7 +65,7 @@ public class AdminCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping(value = "/admin/privilege/unbind")
+    @RequestMapping(value = "/admin/privilege/unbind", method = RequestMethod.GET)
     public Object unbindPrivilege(@RequestBody BindSubmit bindSubmit) {
         return this.adminServ.unbindPrivilege(bindSubmit);
     }
@@ -89,7 +89,7 @@ public class AdminCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping("/admin/menu/list")
+    @RequestMapping(value = "/admin/menu/list", method = RequestMethod.GET)
     public Object getMenuList() {
         return this.adminServ.getMenus();
     }
@@ -136,7 +136,7 @@ public class AdminCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping("/admin/user/list")
+    @RequestMapping(value = "/admin/user/list", method = RequestMethod.GET)
     public Object listAdmins(HttpServletRequest request) {
         return this.adminServ.listAdmins((EAdmin) request.getAttribute("admin"));
     }

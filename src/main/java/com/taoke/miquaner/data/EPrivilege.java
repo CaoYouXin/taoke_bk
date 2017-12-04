@@ -13,8 +13,23 @@ public class EPrivilege {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "api", unique = true, length = 2048, nullable = false)
+    @Column(name = "api", length = 2048, nullable = false)
     private String api;
+
+    @Column(name = "method", nullable = false)
+    private String method;
+
+    @Column(name = "android_v")
+    private String androidVersion;
+
+    @Column(name = "ios_v")
+    private String iOSVersion;
+
+    @Column(name = "web_v")
+    private String webVersion;
+
+    @Column(name = "is_admin", nullable = false)
+    private Boolean admin;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "role_privilege",
@@ -44,5 +59,58 @@ public class EPrivilege {
 
     public void setRoles(List<ERole> roles) {
         this.roles = roles;
+    }
+
+    public String getAndroidVersion() {
+        return androidVersion;
+    }
+
+    public void setAndroidVersion(String androidVersion) {
+        this.androidVersion = androidVersion;
+    }
+
+    public String getiOSVersion() {
+        return iOSVersion;
+    }
+
+    public void setiOSVersion(String iOSVersion) {
+        this.iOSVersion = iOSVersion;
+    }
+
+    public String getWebVersion() {
+        return webVersion;
+    }
+
+    public void setWebVersion(String webVersion) {
+        this.webVersion = webVersion;
+    }
+
+    public Boolean getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        this.admin = admin;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    @Override
+    public String toString() {
+        return "EPrivilege{" +
+                "id=" + id +
+                ", api='" + api + '\'' +
+                ", method='" + method + '\'' +
+                ", androidVersion='" + androidVersion + '\'' +
+                ", iOSVersion='" + iOSVersion + '\'' +
+                ", webVersion='" + webVersion + '\'' +
+                ", admin=" + admin +
+                '}';
     }
 }

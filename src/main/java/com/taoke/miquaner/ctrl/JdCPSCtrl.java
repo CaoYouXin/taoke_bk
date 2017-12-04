@@ -10,6 +10,7 @@ import com.taoke.miquaner.util.Result;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -17,7 +18,7 @@ public class JdCPSCtrl {
 
     private static final Logger logger = LogManager.getLogger(JdCPSCtrl.class);
 
-    @RequestMapping("/jd/test")
+    @RequestMapping(value = "/jd/test", method = RequestMethod.GET)
     public Object test() {
         JdClient client=new DefaultJdClient("https://api.jd.com/routerjson","f0fa32a8-73e4-4567-9d9f-ee1b1699ed24","F15DA8EC100B0182D24742EE9D13C586","a75813e767b94274aecba60828822d76");
 

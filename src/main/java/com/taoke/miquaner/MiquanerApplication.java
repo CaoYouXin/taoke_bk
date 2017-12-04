@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.taoke.miquaner.fltr.AdminInterceptor;
 import com.taoke.miquaner.fltr.IdentityInterceptor;
+import com.taoke.miquaner.fltr.VersionInterceptor;
 import com.taoke.miquaner.serv.IInitServ;
 import com.taoke.miquaner.util.DateUtils;
 import com.taoke.miquaner.view.JdTokenType;
@@ -66,10 +67,16 @@ public class MiquanerApplication {
 
             @Override
             public void addInterceptors(InterceptorRegistry registry) {
+                registry.addInterceptor(getVersionInterceptor());
                 registry.addInterceptor(getIdentityInterceptor());
                 registry.addInterceptor(getAdminInterceptor());
             }
         };
+    }
+
+    @Bean
+    VersionInterceptor getVersionInterceptor() {
+        return new VersionInterceptor();
     }
 
     @Bean

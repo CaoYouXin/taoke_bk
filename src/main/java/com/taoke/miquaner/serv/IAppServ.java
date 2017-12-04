@@ -28,4 +28,6 @@ public interface IAppServ {
 
     Object removeShareImgUrl(Long id);
 
+    Object getDownloadUrl(String key);
+
 }

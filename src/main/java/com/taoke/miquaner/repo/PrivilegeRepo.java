@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PrivilegeRepo extends JpaRepository<EPrivilege, Long> {
 
-    EPrivilege findByApiEquals(String api);
+    EPrivilege findByApiEqualsAndMethodEquals(String api, String method);
 }

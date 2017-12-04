@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +19,7 @@ public class CallbackCtrl {
 
     private static final Logger logger = LogManager.getLogger(CallbackCtrl.class);
 
-    @RequestMapping("/callback/vip?code={code}")
+    @RequestMapping(value = "/callback/vip?code={code}", method = RequestMethod.GET)
     public ResponseEntity<String> vipCallback(@PathVariable(name = "code") String code, HttpServletRequest request) {
         RestTemplate restTemplate = new RestTemplate();
         String url = String.format("https://auth.vip.com/oauth2/token?client_id=%s&client_secret=%s&grant_type=authorization_code&redirect_uri=%s&request_client_ip=%s&code=%s",
@@ -33,7 +34,7 @@ public class CallbackCtrl {
         return ResponseEntity.ok().body(body);
     }
 
-    @RequestMapping("/callback/jd")
+    @RequestMapping(value = "/callback/jd", method = RequestMethod.GET)
     public ResponseEntity<String> jdCallback(HttpServletRequest request) {
         RestTemplate restTemplate = new RestTemplate();
         String appKey = "F15DA8EC100B0182D24742EE9D13C586";

@@ -1,12 +1,15 @@
 package com.taoke.miquaner.serv.impl;
 
+import com.taoke.miquaner.data.EConfig;
 import com.taoke.miquaner.data.EGuide;
 import com.taoke.miquaner.data.EHelp;
 import com.taoke.miquaner.data.EShareImg;
+import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.GuideRepo;
 import com.taoke.miquaner.repo.HelpRepo;
 import com.taoke.miquaner.repo.ShareImgRepo;
 import com.taoke.miquaner.serv.IAppServ;
+import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +21,11 @@ public class AppServImpl implements IAppServ {
     private GuideRepo guideRepo;
     private HelpRepo helpRepo;
     private ShareImgRepo shareImgRepo;
+    private ConfigRepo configRepo;
 
     @Autowired
-    public AppServImpl(GuideRepo guideRepo, HelpRepo helpRepo, ShareImgRepo shareImgRepo) {
+    public AppServImpl(ConfigRepo configRepo, GuideRepo guideRepo, HelpRepo helpRepo, ShareImgRepo shareImgRepo) {
+        this.configRepo = configRepo;
         this.guideRepo = guideRepo;
         this.helpRepo = helpRepo;
         this.shareImgRepo = shareImgRepo;
@@ -126,4 +131,13 @@ public class AppServImpl implements IAppServ {
         return Result.success(null);
     }
 
+    @Override
+    public Object getDownloadUrl(String key) {
+        EConfig byKeyEquals = this.configRepo.findByKeyEquals(key);
+        if (null == byKeyEquals) {
+            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
+        }
+
+        return Result.success(byKeyEquals.getValue());
+    }
 }

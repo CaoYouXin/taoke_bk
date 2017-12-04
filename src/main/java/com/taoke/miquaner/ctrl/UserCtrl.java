@@ -67,7 +67,7 @@ public class UserCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping("/admin/manage/user/list/{pageNo}")
+    @RequestMapping(value = "/admin/manage/user/list/{pageNo}", method = RequestMethod.GET)
     public Object listAllUsers(@PathVariable(name = "pageNo") Integer pageNo) {
         return this.userServ.listAllUsers(pageNo);
     }
