@@ -259,6 +259,9 @@ public class OrderServImpl implements IOrderServ {
             if (!self) {
                 String teammateName = "";
                 for (EUser cUser : cUsers) {
+                    if (StringUtils.isNullOrEmpty(cUser.getAliPid())) {
+                        continue;
+                    }
                     if (getAdZoneId(cUser.getAliPid()).equals(eTbkOrder.getAdZoneId())) {
                         teammateName = cUser.getName();
                         break;
