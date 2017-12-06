@@ -1,11 +1,13 @@
 package com.taoke.miquaner.serv.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mysql.jdbc.StringUtils;
 import com.taoke.miquaner.MiquanerApplication;
 import com.taoke.miquaner.data.*;
 import com.taoke.miquaner.repo.*;
 import com.taoke.miquaner.serv.IMsgServ;
 import com.taoke.miquaner.serv.IOrderServ;
+import com.taoke.miquaner.serv.ISmsServ;
 import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.util.DivideByTenthUtil;
 import com.taoke.miquaner.util.ErrorR;
@@ -54,9 +56,11 @@ public class OrderServImpl implements IOrderServ {
     private AdminRepo adminRepo;
     private ITbkServ tbkServ;
     private IMsgServ msgServ;
+    private ISmsServ smsServ;
 
     @Autowired
-    public OrderServImpl(ITbkServ tbkServ, IMsgServ msgServ, AdminRepo adminRepo, TbkOrderRepo tbkOrderRepo, WithdrawRepo withdrawRepo, ConfigRepo configRepo, UserRepo userRepo) {
+    public OrderServImpl(ISmsServ smsServ, ITbkServ tbkServ, IMsgServ msgServ, AdminRepo adminRepo, TbkOrderRepo tbkOrderRepo, WithdrawRepo withdrawRepo, ConfigRepo configRepo, UserRepo userRepo) {
+        this.smsServ = smsServ;
         this.tbkServ = tbkServ;
         this.msgServ = msgServ;
         this.adminRepo = adminRepo;
@@ -443,6 +447,17 @@ public class OrderServImpl implements IOrderServ {
         EUser viewUser = new EUser();
         BeanUtils.copyProperties(user, viewUser, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
         one.setUser(viewUser);
+
+        Map<String, String> params = new HashMap<>();
+        params.put("name", user.getRealName());
+        params.put("time", MiquanerApplication.DEFAULT_DATE_FORMAT.format(one.getCreateTime()));
+        params.put("amount", one.getAmount());
+        try {
+            this.smsServ.send("SMS_115755120", user.getPhone(), params);
+        } catch (JsonProcessingException e) {
+            logger.error("sms param json error", e);
+        }
+
         return Result.success(one);
     }
 
