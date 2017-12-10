@@ -78,4 +78,9 @@ public class UserCtrl {
         return this.userServ.downGrade(id);
     }
 
+    @RequestMapping(value = "/tbk/user/anonymous/{hash}", method = RequestMethod.GET)
+    public Object anonymous(@PathVariable(name = "hash") String hash) {
+        return this.userServ.loginAnonymously(hash);
+    }
+
 }

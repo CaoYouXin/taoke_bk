@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileOutputStream;
@@ -452,4 +453,42 @@ public class UserServImpl implements IUserServ {
         return Result.success(null);
     }
 
+    @Override
+    public Object loginAnonymously(String hash) {
+        EUser anonymous = this.userRepo.findByPhoneEquals(hash);
+        if (null == anonymous) {
+            anonymous = new EUser();
+
+            anonymous.setExt("anonymous_user");
+            anonymous.setName("游客" + ("" + Math.random()).substring(2, 9));
+            anonymous.setPhone(hash);
+            anonymous.setRealName(hash);
+            anonymous.setPwd(hash);
+
+            EUser byNameEquals = this.userRepo.findByNameEquals(anonymous.getName());
+            while (null != byNameEquals) {
+                anonymous.setName("游客" + ("" + Math.random()).substring(2, 9));
+                byNameEquals = this.userRepo.findByNameEquals(anonymous.getName());
+            }
+
+            anonymous = this.userRepo.save(anonymous);
+
+            List<EAdmin> admins = this.adminRepo.findAllByGrantedAdminsIsNull();
+            if (!admins.isEmpty()) {
+                this.msgServ.send2One(admins.get(0), anonymous, "系统消息", "欢迎使用觅券儿APP！您现在是游客身份，还可以在'我的'中退出以用手机号注册正式账号。");
+            }
+        }
+
+        EToken token = this.tokenRepo.findByUser_Id(anonymous.getId());
+        if (null == token) {
+            token = new EToken();
+
+            token.setUser(anonymous);
+            token.setToken(StringUtil.toMD5HexString(MiquanerApplication.DEFAULT_DATE_FORMAT.format(new Date())));
+        }
+        token.setExpired(DateUtils.add(new Date(), Calendar.YEAR, 30));
+        EToken eToken = this.tokenRepo.save(token);
+
+        return tokenWithUser(eToken, anonymous);
+    }
 }

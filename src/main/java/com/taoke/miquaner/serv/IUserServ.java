@@ -29,4 +29,6 @@ public interface IUserServ {
 
     boolean exportAll(String filePath);
 
+    Object loginAnonymously(String hash);
+
 }
