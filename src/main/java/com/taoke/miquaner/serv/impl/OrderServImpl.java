@@ -133,9 +133,9 @@ public class OrderServImpl implements IOrderServ {
                         processCell(tbkOrderWrapper, cell, tow, method);
                     }
                 } catch (Exception e) {
-                    logger.error(String.format("第%d行第%d列 cellType=%d %s TOW: %s", row.getRowNum(),
+                    logger.error(String.format("第%d行第%d列 cellType=%s %s TOW: %s", row.getRowNum(),
                             cell != null ? cell.getColumnIndex() : -1,
-                            cell != null ? cell.getCellType() : -1,
+                            cell != null && cell.getCellTypeEnum() != null ? cell.getCellTypeEnum().toString() : "unknown type",
                             method != null ? method.getName() : "unknown",
                             tow != null ? String.format("%s type=%d, sd=%b, ds=%b, dl=%b sl=%b",
                                     tow.value(), tow.type(), tow.string2date(), tow.double2string(),
@@ -499,9 +499,9 @@ public class OrderServImpl implements IOrderServ {
     }
 
     private void processCell(TbkOrderWrapper tbkOrderWrapper, HSSFCell cell, TbkOrderWrapper.TOW tow, Method method) throws IllegalAccessException, InvocationTargetException, ParseException {
-        switch (cell.getCellType()) {
+        switch (cell.getCellTypeEnum()) {
 
-            case 0:
+            case NUMERIC:
                 Double numericCellValue = cell.getNumericCellValue();
 
                 if (tow.double2long()) {
@@ -516,7 +516,7 @@ public class OrderServImpl implements IOrderServ {
 
                 break;
 
-            case 1:
+            case STRING:
 
                 String stringCellValue = cell.getStringCellValue();
 
