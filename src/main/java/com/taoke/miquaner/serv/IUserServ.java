@@ -31,4 +31,16 @@ public interface IUserServ {
 
     Object loginAnonymously(String hash);
 
+    Object listAllNeedCheckUsers(Integer pageNo);
+
+    boolean exportAllNeedCheck(String filePath);
+
+    Object listTeamUsers(Long userId, Integer pageNo);
+
+    boolean exportTeam(String filePath, Long userId);
+
+    Object searchUsers(Integer pageNo, String search);
+
+    boolean exportSearch(String filePath, String search);
+
 }

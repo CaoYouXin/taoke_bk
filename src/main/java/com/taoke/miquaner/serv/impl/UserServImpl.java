@@ -390,6 +390,53 @@ public class UserServImpl implements IUserServ {
         return writeFile(filePath, data, this.getColWidth());
     }
 
+    @Override
+    public Object listAllNeedCheckUsers(Integer pageNo) {
+        return Result.success(this.userRepo.findAllByAliPayIdNotNullAndAliPidIsNull(new PageRequest(Math.max(0, pageNo - 1), 10, new Sort(Sort.Direction.ASC, "id"))).map(userConverter));
+    }
+
+    @Override
+    public boolean exportAllNeedCheck(String filePath) {
+        List<List<String>> data = this.userRepo.findAllByAliPayIdNotNullAndAliPidIsNull().stream().map(this.eUserRFunction).collect(Collectors.toList());
+        data.add(0, this.getHeaders());
+        return writeFile(filePath, data, this.getColWidth());
+    }
+
+    @Override
+    public Object listTeamUsers(Long userId, Integer pageNo) {
+        if (0 == userId) {
+            return Result.success(this.userRepo.findAllByExtContains("platform_user", new PageRequest(Math.max(0, pageNo - 1), 10, new Sort(Sort.Direction.ASC, "id"))).map(userConverter));
+        }
+        return Result.success(this.userRepo.findAllByPUser_idEquals(userId, new PageRequest(Math.max(0, pageNo - 1), 10, new Sort(Sort.Direction.ASC, "id"))).map(userConverter));
+    }
+
+    @Override
+    public boolean exportTeam(String filePath, Long userId) {
+        List<List<String>> data;
+
+        if (0 == userId) {
+            data = this.userRepo.findAllByExtContains("platform_user").stream().map(this.eUserRFunction).collect(Collectors.toList());
+        } else {
+            data = this.userRepo.findAllByPUser_idEquals(userId).stream().map(this.eUserRFunction).collect(Collectors.toList());
+        }
+
+        data.add(0, this.getHeaders());
+        return writeFile(filePath, data, this.getColWidth());
+    }
+
+    @Override
+    public Object searchUsers(Integer pageNo, String search) {
+        return Result.success(this.userRepo.findAllByNameContainsOrRealNameContainsOrAliPayIdContainsOrPhoneContains(search, search, search, search,
+                new PageRequest(Math.max(0, pageNo - 1), 10, new Sort(Sort.Direction.ASC, "id"))).map(userConverter));
+    }
+
+    @Override
+    public boolean exportSearch(String filePath, String search) {
+        List<List<String>> data = this.userRepo.findAllByNameContainsOrRealNameContainsOrAliPayIdContainsOrPhoneContains(search, search, search, search).stream().map(this.eUserRFunction).collect(Collectors.toList());
+        data.add(0, this.getHeaders());
+        return writeFile(filePath, data, this.getColWidth());
+    }
+
     private List<Integer> getColWidth() {
         return Arrays.asList(9, 12, 9, 18, 20, 15, 20, 42, 36, 11, 10);
     }

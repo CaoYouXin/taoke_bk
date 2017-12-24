@@ -19,4 +19,20 @@ public interface UserRepo extends JpaRepository<EUser, Long> {
 
     List<EUser> findAllByExtNotContainsOrExtIsNull(String ext);
 
+    Page<EUser> findAllByAliPayIdNotNullAndAliPidIsNull(Pageable pageable);
+
+    List<EUser> findAllByAliPayIdNotNullAndAliPidIsNull();
+
+    Page<EUser> findAllByExtContains(String ext, Pageable pageable);
+
+    Page<EUser> findAllByPUser_idEquals(Long userId, Pageable pageable);
+
+    List<EUser> findAllByExtContains(String ext);
+
+    List<EUser> findAllByPUser_idEquals(Long userId);
+
+    Page<EUser> findAllByNameContainsOrRealNameContainsOrAliPayIdContainsOrPhoneContains(String name, String realName, String aliPay, String phone, Pageable pageable);
+
+    List<EUser> findAllByNameContainsOrRealNameContainsOrAliPayIdContainsOrPhoneContains(String name, String realName, String aliPay, String phone);
+
 }

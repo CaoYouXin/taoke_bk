@@ -67,11 +67,43 @@ public class FileCtrl {
     @RequestMapping(value = "/export/all/{showAnonymousFlag}", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> exportAll(@PathVariable("showAnonymousFlag") Integer showAnonymousFlag)
             throws IOException {
-        String directory = env.getProperty("taoke.paths.uploadedFiles");
         String fileName = String.format("ALL-USERS_%s.xls", MiquanerApplication.DEFAULT_DATE_FORMAT.format(new Date()));
-        String filePath = Paths.get(directory, fileName).toString();
-
+        String filePath = getFilePath(fileName);
         boolean suc = this.userServ.exportAll(filePath, showAnonymousFlag == 1);
+        return getInputStreamResourceResponseEntity(filePath, fileName, suc);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/export/all/need/check", method = RequestMethod.GET)
+    public ResponseEntity<InputStreamResource> exportAllNeedCheck()
+            throws IOException {
+        String fileName = String.format("ALL-NEED-CHECK-USERS_%s.xls", MiquanerApplication.DEFAULT_DATE_FORMAT.format(new Date()));
+        String filePath = getFilePath(fileName);
+        boolean suc = this.userServ.exportAllNeedCheck(filePath);
+        return getInputStreamResourceResponseEntity(filePath, fileName, suc);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/export/team/{userId}", method = RequestMethod.GET)
+    public ResponseEntity<InputStreamResource> exportTeam(@PathVariable("userId") Long userId)
+            throws IOException {
+        String fileName = String.format("ALL-TEAM-USERS_%s.xls", MiquanerApplication.DEFAULT_DATE_FORMAT.format(new Date()));
+        String filePath = getFilePath(fileName);
+        boolean suc = this.userServ.exportTeam(filePath, userId);
+        return getInputStreamResourceResponseEntity(filePath, fileName, suc);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/export/search/{search}", method = RequestMethod.GET)
+    public ResponseEntity<InputStreamResource> exportTeam(@PathVariable("search") String search)
+            throws IOException {
+        String fileName = String.format("ALL-SEARCH-USERS_%s.xls", MiquanerApplication.DEFAULT_DATE_FORMAT.format(new Date()));
+        String filePath = getFilePath(fileName);
+        boolean suc = this.userServ.exportSearch(filePath, search);
+        return getInputStreamResourceResponseEntity(filePath, fileName, suc);
+    }
+
+    private ResponseEntity<InputStreamResource> getInputStreamResourceResponseEntity(String filePath, String fileName, boolean suc) throws IOException {
         if (!suc) {
             return ResponseEntity.status(500).body(null);
         }
@@ -90,6 +122,11 @@ public class FileCtrl {
                 .contentLength(file.contentLength())
                 .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
                 .body(new InputStreamResource(file.getInputStream()));
+    }
+
+    private String getFilePath(String fileName) {
+        String directory = env.getProperty("taoke.paths.uploadedFiles");
+        return Paths.get(directory, fileName).toString();
     }
 
 }

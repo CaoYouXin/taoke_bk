@@ -82,9 +82,21 @@ public class UserCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping(value = "/admin/manage/user/need/check/list/{pageNo}/{showAnonymousFlag}", method = RequestMethod.GET)
-    public Object listAllNeedCheckUsers(@PathVariable(name = "pageNo") Integer pageNo, @PathVariable("showAnonymousFlag") Integer showAnonymousFlag) {
-        return this.userServ.listAllUsers(pageNo, showAnonymousFlag == 1);
+    @RequestMapping(value = "/admin/manage/user/need/check/list/{pageNo}", method = RequestMethod.GET)
+    public Object listAllNeedCheckUsers(@PathVariable(name = "pageNo") Integer pageNo) {
+        return this.userServ.listAllNeedCheckUsers(pageNo);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/admin/manage/user/team/list/{pageNo}/of/{userId}", method = RequestMethod.GET)
+    public Object listTeamUsers(@PathVariable(name = "pageNo") Integer pageNo, @PathVariable("userId") Long userId) {
+        return this.userServ.listTeamUsers(userId, pageNo);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/admin/manage/user/search/{search}/{pageNo}", method = RequestMethod.GET)
+    public Object listTeamUsers(@PathVariable("search") String search, @PathVariable(name = "pageNo") Integer pageNo) {
+        return this.userServ.searchUsers(pageNo, search);
     }
 
 }
