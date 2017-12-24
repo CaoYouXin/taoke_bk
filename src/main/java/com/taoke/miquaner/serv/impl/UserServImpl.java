@@ -1,9 +1,5 @@
 package com.taoke.miquaner.serv.impl;
 
-import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
-import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
-import com.aliyuncs.exceptions.ClientException;
-import com.aliyuncs.http.MethodType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mysql.jdbc.StringUtils;
 import com.taobao.api.internal.toplink.embedded.websocket.util.StringUtil;
@@ -24,10 +20,10 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileOutputStream;
@@ -64,6 +60,12 @@ public class UserServImpl implements IUserServ {
             user.getCode(),
             user.getExt()
     );
+
+    private Converter<EUser, EUser> userConverter = user -> {
+        EUser viewUser = new EUser();
+        BeanUtils.copyProperties(user, viewUser, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
+        return viewUser;
+    };
 
     private UserRepo userRepo;
     private TokenRepo tokenRepo;
@@ -366,17 +368,24 @@ public class UserServImpl implements IUserServ {
     }
 
     @Override
-    public Object listAllUsers(Integer pageNo) {
-        return Result.success(this.userRepo.findAll(new PageRequest(Math.max(0, pageNo - 1), 10, new Sort(Sort.Direction.ASC, "id"))).map(user -> {
-            EUser viewUser = new EUser();
-            BeanUtils.copyProperties(user, viewUser, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
-            return viewUser;
-        }));
+    public Object listAllUsers(Integer pageNo, Boolean showAnonymousFlag) {
+        if (showAnonymousFlag) {
+            return Result.success(this.userRepo.findAll(new PageRequest(Math.max(0, pageNo - 1), 10, new Sort(Sort.Direction.ASC, "id"))).map(userConverter));
+        } else {
+            return Result.success(this.userRepo.findAllByExtNotContainsOrExtIsNull("anonymous_user", new PageRequest(Math.max(0, pageNo - 1), 10, new Sort(Sort.Direction.ASC, "id"))).map(userConverter));
+        }
     }
 
     @Override
-    public boolean exportAll(String filePath) {
-        List<List<String>> data = this.userRepo.findAll().stream().map(this.eUserRFunction).collect(Collectors.toList());
+    public boolean exportAll(String filePath, Boolean showAnonymousFlag) {
+        List<List<String>> data;
+
+        if (showAnonymousFlag) {
+            data = this.userRepo.findAll().stream().map(this.eUserRFunction).collect(Collectors.toList());
+        } else {
+            data = this.userRepo.findAllByExtNotContainsOrExtIsNull("anonymous_user").stream().map(this.eUserRFunction).collect(Collectors.toList());
+        }
+
         data.add(0, this.getHeaders());
         return writeFile(filePath, data, this.getColWidth());
     }

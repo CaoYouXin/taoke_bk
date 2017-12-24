@@ -25,9 +25,9 @@ public interface IUserServ {
 
     List<EUser> getChildUsers(EUser user);
 
-    Object listAllUsers(Integer pageNo);
+    Object listAllUsers(Integer pageNo, Boolean showAnonymousFlag);
 
-    boolean exportAll(String filePath);
+    boolean exportAll(String filePath, Boolean showAnonymousFlag);
 
     Object loginAnonymously(String hash);
 

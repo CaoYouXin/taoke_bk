@@ -20,12 +20,10 @@ import java.io.Reader;
 @RestController
 public class UserCtrl {
 
-    private Environment env;
     private IUserServ userServ;
 
     @Autowired
-    public UserCtrl(Environment env, IUserServ userServ) {
-        this.env = env;
+    public UserCtrl(IUserServ userServ) {
         this.userServ = userServ;
     }
 
@@ -67,12 +65,6 @@ public class UserCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping(value = "/admin/manage/user/list/{pageNo}", method = RequestMethod.GET)
-    public Object listAllUsers(@PathVariable(name = "pageNo") Integer pageNo) {
-        return this.userServ.listAllUsers(pageNo);
-    }
-
-    @Auth(isAdmin = true)
     @RequestMapping(value = "/tbk/user/down/grade/{id}", method = RequestMethod.GET)
     public Object downGrade(@PathVariable(name = "id") Long id) {
         return this.userServ.downGrade(id);
@@ -81,6 +73,18 @@ public class UserCtrl {
     @RequestMapping(value = "/tbk/user/anonymous/{hash}", method = RequestMethod.GET)
     public Object anonymous(@PathVariable(name = "hash") String hash) {
         return this.userServ.loginAnonymously(hash);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/admin/manage/user/list/{pageNo}/{showAnonymousFlag}", method = RequestMethod.GET)
+    public Object listAllUsers(@PathVariable(name = "pageNo") Integer pageNo, @PathVariable("showAnonymousFlag") Integer showAnonymousFlag) {
+        return this.userServ.listAllUsers(pageNo, showAnonymousFlag == 1);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/admin/manage/user/need/check/list/{pageNo}/{showAnonymousFlag}", method = RequestMethod.GET)
+    public Object listAllNeedCheckUsers(@PathVariable(name = "pageNo") Integer pageNo, @PathVariable("showAnonymousFlag") Integer showAnonymousFlag) {
+        return this.userServ.listAllUsers(pageNo, showAnonymousFlag == 1);
     }
 
 }

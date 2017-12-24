@@ -15,10 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -67,14 +64,14 @@ public class FileCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping(value = "/export/all/2", method = RequestMethod.GET)
-    public ResponseEntity<InputStreamResource> exportAll()
+    @RequestMapping(value = "/export/all/{showAnonymousFlag}", method = RequestMethod.GET)
+    public ResponseEntity<InputStreamResource> exportAll(@PathVariable("showAnonymousFlag") Integer showAnonymousFlag)
             throws IOException {
         String directory = env.getProperty("taoke.paths.uploadedFiles");
         String fileName = String.format("ALL-USERS_%s.xls", MiquanerApplication.DEFAULT_DATE_FORMAT.format(new Date()));
         String filePath = Paths.get(directory, fileName).toString();
 
-        boolean suc = this.userServ.exportAll(filePath);
+        boolean suc = this.userServ.exportAll(filePath, showAnonymousFlag == 1);
         if (!suc) {
             return ResponseEntity.status(500).body(null);
         }
