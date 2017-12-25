@@ -92,7 +92,7 @@ public class AppServImpl implements IAppServ {
             return Result.success(null);
         }
 
-        this.guideRepo.delete(id);
+        this.helpRepo.delete(id);
         return Result.success(null);
     }
 
