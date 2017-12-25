@@ -47,23 +47,32 @@ public class UserServImpl implements IUserServ {
     private static final String NO_INV_CODE_FOUND = "没有找到该邀请码";
     private static final String THIRD_CAN_NOT_ENROLL = "您没有申请成为合伙人的权限";
 
-    private Function<EUser, List<String>> eUserRFunction = user -> Arrays.asList(
-            "" + user.getId(),
-            user.getName(),
-            user.getRealName(),
-            user.getPhone(),
-            user.getAliPayId(),
-            user.getQqId(),
-            user.getWeChatId(),
-            user.getAnnouncement(),
-            user.getAliPid(),
-            user.getCode(),
-            user.getExt()
-    );
+    private Function<EUser, List<String>> eUserRFunction = user -> {
+        String ext = user.getExt();
+        if (null == ext && null != user.getpUser()) {
+            ext = user.getpUser().getId() + "_" + user.getpUser().getName() + "_" + user.getpUser().getRealName();
+        }
+        return Arrays.asList(
+                "" + user.getId(),
+                user.getName(),
+                user.getRealName(),
+                user.getPhone(),
+                user.getAliPayId(),
+                user.getQqId(),
+                user.getWeChatId(),
+                user.getAnnouncement(),
+                user.getAliPid(),
+                user.getCode(),
+                ext
+        );
+    };
 
     private Converter<EUser, EUser> userConverter = user -> {
         EUser viewUser = new EUser();
         BeanUtils.copyProperties(user, viewUser, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
+        if (null == viewUser.getExt() && null != user.getpUser()) {
+            viewUser.setExt(user.getpUser().getId() + "_" + user.getpUser().getName() + "_" + user.getpUser().getRealName());
+        }
         return viewUser;
     };
 
@@ -125,13 +134,13 @@ public class UserServImpl implements IUserServ {
             return Result.fail(new ErrorR(ErrorR.ALREADY_REGISTERED_USER, ALREADY_REGISTERED_USER));
         }
 
-        EUser byCodeEquals = null;
         if (!StringUtils.isNullOrEmpty(userRegisterSubmit.getInvitation()) && !this.setSuperDivider(userRegisterSubmit)) {
-            byCodeEquals = this.userRepo.findByCodeEquals(userRegisterSubmit.getInvitation());
+            EUser byCodeEquals = this.userRepo.findByCodeEquals(userRegisterSubmit.getInvitation());
             if (null == byCodeEquals) {
                 return Result.fail(new ErrorR(ErrorR.NO_INV_CODE_FOUND, NO_INV_CODE_FOUND));
             }
             userRegisterSubmit.getUser().setpUser(byCodeEquals);
+            userRegisterSubmit.getUser().setExt(byCodeEquals.getId() + "_" + byCodeEquals.getName() + "_" + byCodeEquals.getRealName());
         }
 
         boolean try2ok = false;
