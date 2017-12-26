@@ -83,11 +83,11 @@ public class AdminServImpl implements IAdminServ {
     @Override
     public Object getRoles() {
         List<ERole> all = this.roleRepo.findAll();
-        return Result.success(all.stream().filter(eRole -> !eRole.isSuperRole()).peek(eRole -> {
-            eRole.setAdmins(null);
-            eRole.setMenus(null);
-            eRole.setPrivileges(null);
-        }).collect(Collectors.toList()));
+        return Result.success(
+                all.stream().filter(eRole -> !eRole.isSuperRole())
+                        .peek(this::roleToView)
+                        .collect(Collectors.toList())
+        );
     }
 
     @Override
@@ -166,10 +166,22 @@ public class AdminServImpl implements IAdminServ {
     @Override
     public Object createRole(ERole role) {
         ERole saved = this.roleRepo.save(role);
-        saved.setPrivileges(null);
-        saved.setMenus(null);
-        saved.setAdmins(null);
+        roleToView(saved);
         return Result.success(saved);
+    }
+
+    private void roleToView(ERole saved) {
+        saved.setPrivileges(saved.getPrivileges().stream().map(privilege -> {
+            EPrivilege view = new EPrivilege();
+            view.setApi(privilege.getApi());
+            return view;
+        }).collect(Collectors.toList()));
+        saved.setMenus(saved.getMenus().stream().map(menu -> {
+            EMenu view = new EMenu();
+            view.setName(menu.getName());
+            return view;
+        }).collect(Collectors.toList()));
+        saved.setAdmins(null);
     }
 
     @Override
@@ -181,9 +193,7 @@ public class AdminServImpl implements IAdminServ {
         ERole one = this.roleRepo.findOne(role.getId());
         BeanUtils.copyProperties(role, one);
         ERole saved = this.roleRepo.save(role);
-        saved.setPrivileges(null);
-        saved.setMenus(null);
-        saved.setAdmins(null);
+        roleToView(saved);
         return Result.success(saved);
     }
 
