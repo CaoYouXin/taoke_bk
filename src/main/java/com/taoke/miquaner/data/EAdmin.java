@@ -88,4 +88,17 @@ public class EAdmin {
     public void setCreatedMessages(List<EMessage> createdMessages) {
         this.createdMessages = createdMessages;
     }
+
+    @Override
+    public String toString() {
+        return "EAdmin{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", pwd='" + pwd + '\'' +
+                ", parentAdmin=" + parentAdmin +
+                ", grantedAdmins=" + grantedAdmins +
+                ", role=" + role +
+                ", createdMessages=" + createdMessages +
+                '}';
+    }
 }

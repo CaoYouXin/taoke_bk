@@ -56,4 +56,14 @@ public class EMenu {
     public void setRoles(List<ERole> roles) {
         this.roles = roles;
     }
+
+    @Override
+    public String toString() {
+        return "EMenu{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", route='" + route + '\'' +
+                ", roles=" + roles +
+                '}';
+    }
 }

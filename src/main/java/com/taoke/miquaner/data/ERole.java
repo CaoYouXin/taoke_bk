@@ -70,4 +70,15 @@ public class ERole {
     public void setAdmins(List<EAdmin> admins) {
         this.admins = admins;
     }
+
+    @Override
+    public String toString() {
+        return "ERole{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", admins=" + admins +
+                ", privileges=" + privileges +
+                ", menus=" + menus +
+                '}';
+    }
 }

@@ -14,6 +14,7 @@ import com.taoke.miquaner.view.BindSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -92,6 +93,8 @@ public class AdminServImpl implements IAdminServ {
 
     @Override
     public Object createAdmin(AdminUserSubmit adminUserSubmit, EAdmin performer) {
+        performer = this.adminRepo.findOne(performer.getId());
+
         ERole role = this.roleRepo.findOne(adminUserSubmit.getRoleId());
         if (null == role) {
             return Result.fail(new ErrorR(ErrorR.SUBMIT_NEED_ROLE, SUBMIT_NEED_ROLE));
@@ -102,12 +105,7 @@ public class AdminServImpl implements IAdminServ {
         admin.setRole(role);
         admin.setParentAdmin(performer);
         EAdmin saved = this.adminRepo.save(admin);
-        saved.setGrantedAdmins(null);
-        saved.getParentAdmin().setGrantedAdmins(null);
-        saved.setCreatedMessages(null);
-        saved.getRole().setAdmins(null);
-        saved.getRole().setPrivileges(null);
-        return Result.success(saved);
+        return Result.success(adminToView(saved));
     }
 
     @Override
@@ -307,30 +305,55 @@ public class AdminServImpl implements IAdminServ {
         token.setToken(StringUtil.toMD5HexString(MiquanerApplication.DEFAULT_DATE_FORMAT.format(now)));
         token.setExpired(DateUtils.add(now, Calendar.DAY_OF_YEAR, 3));
         EToken saved = this.tokenRepo.save(token);
-        one.setPwd(null);
-        one.setGrantedAdmins(null);
-        one.setCreatedMessages(null);
-        one.getRole().setAdmins(null);
-        one.getRole().setPrivileges(null);
 
+        EAdmin view = new EAdmin();
+        BeanUtils.copyProperties(one, view, "parentAdmin", "grantedAdmins", "role", "createdMessages");
+
+        ERole viewRole = new ERole();
+        view.setRole(viewRole);
         if (one.getRole().isSuperRole()) {
-            one.getRole().setMenus(this.menuRepo.findAll());
+            viewRole.setMenus(this.menuRepo.findAll());
+        } else {
+            viewRole.setMenus(one.getRole().getMenus());
         }
 
-        return Result.success(new AdminLoginView(one, saved));
+        viewRole.setMenus(viewRole.getMenus().stream().map(menu -> {
+            EMenu viewMenu = new EMenu();
+            BeanUtils.copyProperties(menu, viewMenu, "roles");
+            return viewMenu;
+        }).collect(Collectors.toList()));
+
+        EToken viewToken = new EToken();
+        BeanUtils.copyProperties(saved, viewToken, "admin", "user");
+
+        return Result.success(new AdminLoginView(view, viewToken));
     }
 
     @Override
     public Object listAdmins(EAdmin performer) {
+        // regain session
+        performer = this.adminRepo.findOne(performer.getId());
+
         List<EAdmin> ret = new ArrayList<>();
         Queue<EAdmin> admins = new ArrayDeque<>(performer.getGrantedAdmins());
 
         while (!admins.isEmpty()) {
             EAdmin admin = admins.remove();
-            ret.add(admin);
+            EAdmin view = adminToView(admin);
+            ret.add(view);
             admins.addAll(admin.getGrantedAdmins());
         }
 
         return Result.success(ret);
+    }
+
+    private EAdmin adminToView(EAdmin admin) {
+        EAdmin view = new EAdmin();
+        BeanUtils.copyProperties(admin, view, "parentAdmin", "grantedAdmins", "createdMessages");
+        ERole role = view.getRole();
+        ERole viewRole = new ERole();
+        viewRole.setName(role.getName());
+        view.setRole(viewRole);
+        return view;
     }
 }
