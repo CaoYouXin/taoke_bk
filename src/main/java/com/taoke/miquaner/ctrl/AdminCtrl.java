@@ -65,7 +65,7 @@ public class AdminCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping(value = "/admin/privilege/unbind", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/privilege/unbind", method = RequestMethod.POST)
     public Object unbindPrivilege(@RequestBody BindSubmit bindSubmit) {
         return this.adminServ.unbindPrivilege(bindSubmit);
     }
