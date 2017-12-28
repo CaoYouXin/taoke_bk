@@ -19,6 +19,9 @@ public class EAdmin {
     @Column(name = "pwd", length = 32, nullable = false)
     private String pwd;
 
+    @Column(name = "isDel")
+    private Boolean isDeleted;
+
     @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     @JoinColumn(name = "grant_by_id")
     private EAdmin parentAdmin;
@@ -89,12 +92,21 @@ public class EAdmin {
         this.createdMessages = createdMessages;
     }
 
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
     @Override
     public String toString() {
         return "EAdmin{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", pwd='" + pwd + '\'' +
+                ", isDeleted=" + isDeleted +
                 ", parentAdmin=" + parentAdmin +
                 ", grantedAdmins=" + grantedAdmins +
                 ", role=" + role +

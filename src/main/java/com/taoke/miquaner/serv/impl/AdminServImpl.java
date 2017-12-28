@@ -1,5 +1,6 @@
 package com.taoke.miquaner.serv.impl;
 
+import com.mysql.jdbc.StringUtils;
 import com.taobao.api.internal.toplink.embedded.websocket.util.StringUtil;
 import com.taoke.miquaner.MiquanerApplication;
 import com.taoke.miquaner.data.*;
@@ -110,55 +111,65 @@ public class AdminServImpl implements IAdminServ {
 
     @Override
     public Object changeAdminRole(EAdmin admin, EAdmin performer) {
-        if (!this.checkPermission(admin, performer)) {
+        EAdmin toPersist = this.checkPermission(admin, performer);
+        if (null == toPersist) {
             return Result.fail(new ErrorR(ErrorR.ADMIN_NOT_PERMITTED, ADMIN_NOT_PERMITTED));
         }
-        return this.persistentNewAdmin(admin);
+        return this.persistentNewAdmin(toPersist, admin);
     }
 
     @Override
     public Object changeAdminPwd(EAdmin admin, EAdmin performer) {
-        if (!this.checkPermission(admin, performer)) {
+        EAdmin toPersist = this.checkPermission(admin, performer);
+        if (null == toPersist) {
             return Result.fail(new ErrorR(ErrorR.ADMIN_NOT_PERMITTED, ADMIN_NOT_PERMITTED));
         }
-        return this.persistentNewAdmin(admin);
+        return this.persistentNewAdmin(toPersist, admin);
     }
 
-    private boolean checkPermission(EAdmin admin, EAdmin performer) {
+    private EAdmin checkPermission(EAdmin admin, EAdmin performer) {
+        admin = this.adminRepo.findOne(admin.getId());
         EAdmin granter = admin.getParentAdmin();
         while (null != granter) {
             if (granter.getId().equals(performer.getId())) {
-                return true;
+                return admin;
             }
             granter = granter.getParentAdmin();
         }
-        return false;
+        return null;
     }
 
     @Override
     public Object deleteAdmin(Long id) {
         try {
-            this.adminRepo.delete(id);
+            EAdmin one = this.adminRepo.findOne(id);
+            one.setDeleted(true);
+            this.adminRepo.save(one);
         } catch (Exception ignored) {
             return Result.fail(Result.FAIL_ON_SQL);
         }
         return Result.success(Result.SUCCESS_MSG);
     }
 
-    private Object persistentNewAdmin(EAdmin admin) {
+    private Object persistentNewAdmin(EAdmin one, EAdmin admin) {
         if (null == admin.getId()) {
             return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
         }
 
-        EAdmin one = this.adminRepo.findOne(admin.getId());
-        BeanUtils.copyProperties(admin, one);
-        EAdmin saved = this.adminRepo.save(admin);
-        saved.setGrantedAdmins(null);
-        saved.getParentAdmin().setGrantedAdmins(null);
-        saved.setCreatedMessages(null);
-        saved.getRole().setPrivileges(null);
-        saved.getRole().setAdmins(null);
-        return Result.success(saved);
+        if (!StringUtils.isNullOrEmpty(admin.getPwd())) {
+            one.setPwd(admin.getPwd());
+        }
+
+        if (null != admin.getRole()) {
+            ERole role = this.roleRepo.findOne(admin.getRole().getId());
+            if (null == role) {
+                return Result.fail(new ErrorR(ErrorR.SUBMIT_NEED_ROLE, SUBMIT_NEED_ROLE));
+            }
+            one.setRole(role);
+        }
+
+        EAdmin saved = this.adminRepo.save(one);
+        return Result.success(adminToView(saved));
     }
 
     @Override
@@ -288,7 +299,7 @@ public class AdminServImpl implements IAdminServ {
         }
 
         EAdmin one = this.adminRepo.findByNameEquals(admin.getName());
-        if (null == one) {
+        if (null == one || one.getDeleted()) {
             return Result.fail(new ErrorR(ErrorR.ADMIN_NOT_FOUND, ADMIN_NOT_FOUND));
         }
 
