@@ -299,7 +299,7 @@ public class AdminServImpl implements IAdminServ {
         }
 
         EAdmin one = this.adminRepo.findByNameEquals(admin.getName());
-        if (null == one || one.getDeleted()) {
+        if (null == one || (null != one.getDeleted() && one.getDeleted())) {
             return Result.fail(new ErrorR(ErrorR.ADMIN_NOT_FOUND, ADMIN_NOT_FOUND));
         }
 
