@@ -21,6 +21,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
 
 @SpringBootApplication
 public class MiquanerApplication {
@@ -39,6 +40,12 @@ public class MiquanerApplication {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
+
+//        LinkedList<Integer> stack = new LinkedList<>();
+//        stack.push(1);
+//        stack.push(2);
+//        System.out.println(stack.pollFirst());
+//        System.out.println(stack.pollFirst());
 
         ConfigurableApplicationContext context = SpringApplication.run(MiquanerApplication.class, args);
 
