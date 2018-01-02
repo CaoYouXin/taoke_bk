@@ -6,8 +6,6 @@ import com.taoke.miquaner.fltr.AdminInterceptor;
 import com.taoke.miquaner.fltr.IdentityInterceptor;
 import com.taoke.miquaner.fltr.VersionInterceptor;
 import com.taoke.miquaner.serv.IInitServ;
-import com.taoke.miquaner.util.DateUtils;
-import com.taoke.miquaner.view.JdTokenType;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -16,12 +14,8 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.util.UrlPathHelper;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
 
 @SpringBootApplication
 public class MiquanerApplication {

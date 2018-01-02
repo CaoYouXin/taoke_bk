@@ -11,9 +11,6 @@ public class ErrorR {
     public static final String NO_ID_FOUND = "NO_ID_FOUND";
     public static final String NOT_FOR_BUYER = "NOT_FOR_BUYER";
     public static final String DOWNLOAD_ERROR = "DOWNLOAD_ERROR";
-
-    static final String SQL_ERROR = "SQL_ERROR";
-
     public static final String ST_NOT_MATCH = "ST_NOT_MATCH";
     public static final String NO_SUPER_ROLE = "NO_SUPER_ROLE";
     public static final String ALREADY_HAS_SUPER_USER = "ALREADY_HAS_SUPER_USER";
@@ -41,7 +38,7 @@ public class ErrorR {
     public static final String NO_INV_CODE_FOUND = "NO_INV_CODE_FOUND";
     public static final String THIRD_CAN_NOT_ENROLL = "THIRD_CAN_NOT_ENROLL";
     public static final String FAIL_ON_JD_API = "FAIL_ON_JD_API";
-
+    static final String SQL_ERROR = "SQL_ERROR";
     private String key;
     private String msg;
 

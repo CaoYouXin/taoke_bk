@@ -10,18 +10,6 @@ public class DivideByTenthUtil {
 
     private static final Logger logger = LogManager.getLogger(DivideByTenthUtil.class);
 
-    public static class Tenth {
-        public double first;
-        public double second;
-        public double platform;
-
-        public Tenth(double first, double second, double platform) {
-            this.first = first;
-            this.second = second;
-            this.platform = platform;
-        }
-    }
-
     public static Tenth get(ConfigRepo configRepo) {
         EConfig one = configRepo.findByKeyEquals(AliMaMaSubmit.DIVIDE_BY_TENTHS);
         if (null == one) {
@@ -57,6 +45,18 @@ public class DivideByTenthUtil {
                 (double) second / 100,
                 (double) platform / 100
         );
+    }
+
+    public static class Tenth {
+        public double first;
+        public double second;
+        public double platform;
+
+        public Tenth(double first, double second, double platform) {
+            this.first = first;
+            this.second = second;
+            this.platform = platform;
+        }
     }
 
 }

@@ -40,10 +40,10 @@ public class CallbackCtrl {
         String appKey = "F15DA8EC100B0182D24742EE9D13C586";
         String appSecret = "a75813e767b94274aecba60828822d76";
         String redirectUrl = "http://server.tkmqr.com:8080/api/callback/jd";
-        String url ="https://oauth.jd.com/oauth/token?grant_type=authorization_code&client_id="+appKey
-                +"&client_secret="+ appSecret
-                +"&scope=read&redirect_uri="+ redirectUrl
-                +"&code="+ request.getParameter("code");
+        String url = "https://oauth.jd.com/oauth/token?grant_type=authorization_code&client_id=" + appKey
+                + "&client_secret=" + appSecret
+                + "&scope=read&redirect_uri=" + redirectUrl
+                + "&code=" + request.getParameter("code");
 
         ResponseEntity<String> exchange = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(""), String.class);
 

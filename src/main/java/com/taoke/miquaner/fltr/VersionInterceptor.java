@@ -1,7 +1,6 @@
 package com.taoke.miquaner.fltr;
 
 import com.taoke.miquaner.data.EPrivilege;
-import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.PrivilegeRepo;
 import com.taoke.miquaner.util.HttpUtils;
 import com.taoke.miquaner.util.Result;

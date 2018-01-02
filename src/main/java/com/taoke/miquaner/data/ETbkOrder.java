@@ -10,101 +10,73 @@ import java.util.function.Function;
 })
 public class ETbkOrder {
 
+    public static Function<? super ETbkOrder, ?> staticHash =
+            (Function<ETbkOrder, Object>) eTbkOrder -> eTbkOrder.getOrderId() + "-" + eTbkOrder.getItemNumIid();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
     @Column(name = "order_id", nullable = false)
     private Long orderId;
-
     @Column(name = "create_time", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
-
     @Column(name = "click_time", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date clickTime;
-
     @Column(name = "item_title", nullable = false)
     private String itemTitle;
-
     @Column(name = "item_numIid", nullable = false)
     private Long itemNumIid;
-
     @Column(name = "wangwangName", nullable = false)
     private String wangwangName;
-
     @Column(name = "shopTitle", nullable = false)
     private String shopTitle;
-
     @Column(name = "item_count", nullable = false)
     private Long itemCount;
-
     @Column(name = "item_unit_price", nullable = false)
     private String itemUnitPrice;
-
     @Column(name = "order_status", nullable = false)
     private String orderStatus;
-
     @Column(name = "order_type", nullable = false)
     private String orderType;
-
     @Column(name = "income_rate", nullable = false)
     private String incomeRate;
-
     @Column(name = "divide_rate", nullable = false)
     private String divideRate;
-
     @Column(name = "payed_amount", nullable = false)
     private String payedAmount;
-
     @Column(name = "estimate_effect", nullable = false)
     private String estimateEffect;
-
     @Column(name = "settle_amount", nullable = false)
     private String settleAmount;
-
     @Column(name = "estimate_income", nullable = false)
     private String estimateIncome;
-
     @Column(name = "settle_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date settleTime;
-
     @Column(name = "commission_rate", nullable = false)
     private String commissionRate;
-
     @Column(name = "commission_amount", nullable = false)
     private String commissionAmount;
-
     @Column(name = "subsidy_rate", nullable = false)
     private String subsidyRate;
-
     @Column(name = "subsidy_amount", nullable = false)
     private String subsidyAmount;
-
     @Column(name = "subsidy_type", nullable = false)
     private String subsidyType;
-
     @Column(name = "platform", nullable = false)
     private String platform;
-
     @Column(name = "3rd_service", nullable = false)
     private String service3rd;
-
     @Column(name = "category", nullable = false)
     private String category;
-
     @Column(name = "site_id", nullable = false)
     private Long siteId;
-
     @Column(name = "site_name", nullable = false)
     private String siteName;
-
     @Column(name = "adzone_id", nullable = false)
     private Long adZoneId;
-
     @Column(name = "adzone_name", nullable = false)
     private String adZoneName;
 
@@ -355,8 +327,5 @@ public class ETbkOrder {
     public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
-
-    public static Function<? super ETbkOrder, ?> staticHash =
-            (Function<ETbkOrder, Object>) eTbkOrder -> eTbkOrder.getOrderId() + "-" + eTbkOrder.getItemNumIid();
 
 }

@@ -9,7 +9,6 @@ import com.taoke.miquaner.view.PhoneVerifySubmit;
 import com.taoke.miquaner.view.UserRegisterSubmit;
 import com.taoke.miquaner.view.UserResetPwdSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;

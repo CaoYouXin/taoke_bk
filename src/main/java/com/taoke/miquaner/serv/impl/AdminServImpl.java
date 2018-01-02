@@ -15,7 +15,6 @@ import com.taoke.miquaner.view.BindSubmit;
 import com.taoke.miquaner.view.SuperUserSubmit;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

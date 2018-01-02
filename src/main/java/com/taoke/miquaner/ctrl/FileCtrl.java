@@ -47,7 +47,7 @@ public class FileCtrl {
         String directory = env.getProperty("taoke.paths.uploadedFiles");
         try {
             Map<String, String> ret = new HashMap<>();
-            for(MultipartFile uploadedFile : uploadingFiles) {
+            for (MultipartFile uploadedFile : uploadingFiles) {
                 String filename = StringUtil.toMD5HexString(MiquanerApplication.DEFAULT_DATE_FORMAT.format(new Date()))
                         + uploadedFile.getOriginalFilename().substring(uploadedFile.getOriginalFilename().lastIndexOf('.'));
                 String filepath = Paths.get(directory, filename).toString();

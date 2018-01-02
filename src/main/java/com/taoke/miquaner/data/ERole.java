@@ -9,27 +9,22 @@ import java.util.List;
 public class ERole {
 
     public static final String SUPER_ROLE_NAME = "super role";
-
-    public boolean isSuperRole() {
-        return SUPER_ROLE_NAME.equals(this.name);
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
     @Column(name = "name", unique = true, nullable = false)
     private String name;
-
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     private List<EAdmin> admins = new ArrayList<>();
-
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private List<EPrivilege> privileges = new ArrayList<>();
-
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private List<EMenu> menus = new ArrayList<>();
+
+    public boolean isSuperRole() {
+        return SUPER_ROLE_NAME.equals(this.name);
+    }
 
     public Long getId() {
         return id;

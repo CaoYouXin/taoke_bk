@@ -29,7 +29,7 @@ public class EAdmin {
     @OneToMany(mappedBy = "parentAdmin", fetch = FetchType.LAZY)
     private List<EAdmin> grantedAdmins = new ArrayList<>();
 
-    @ManyToOne(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private ERole role;
 

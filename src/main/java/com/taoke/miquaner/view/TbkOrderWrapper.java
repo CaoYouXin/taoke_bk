@@ -10,29 +10,6 @@ import java.util.Date;
 
 public class TbkOrderWrapper extends ETbkOrder {
 
-    //    _NONE(-1),
-//    NUMERIC(0),
-//    STRING(1),
-//    FORMULA(2),
-//    BLANK(3),
-//    BOOLEAN(4),
-//    ERROR(5);
-    @Target({ElementType.METHOD, ElementType.TYPE})
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface TOW {
-        String value();
-
-        int type();
-
-        boolean double2long() default false;
-
-        boolean string2date() default false;
-
-        boolean double2string() default false;
-
-        boolean string2long() default false;
-    }
-
     public ETbkOrder getEntity() {
         return this;
     }
@@ -215,5 +192,28 @@ public class TbkOrderWrapper extends ETbkOrder {
     @TOW(value = "广告位名称", type = 1)
     public void setAdZoneName(String adZoneName) {
         super.setAdZoneName(adZoneName);
+    }
+
+    //    _NONE(-1),
+//    NUMERIC(0),
+//    STRING(1),
+//    FORMULA(2),
+//    BLANK(3),
+//    BOOLEAN(4),
+//    ERROR(5);
+    @Target({ElementType.METHOD, ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface TOW {
+        String value();
+
+        int type();
+
+        boolean double2long() default false;
+
+        boolean string2date() default false;
+
+        boolean double2string() default false;
+
+        boolean string2long() default false;
     }
 }

@@ -167,7 +167,7 @@ public class OrderServImpl implements IOrderServ {
                                         Double.parseDouble(a.getPayedAmount())
                                                 + Double.parseDouble(b.getPayedAmount())));
                                 a.setSettleAmount(String.format(Locale.ENGLISH, "%.2f",
-                                                Double.parseDouble(a.getSettleAmount())
+                                        Double.parseDouble(a.getSettleAmount())
                                                 + Double.parseDouble(b.getSettleAmount())));
                                 a.setCommissionAmount(String.format(Locale.ENGLISH, "%.2f",
                                         Double.parseDouble(a.getCommissionAmount())

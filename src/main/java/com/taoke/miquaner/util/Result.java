@@ -2,14 +2,20 @@ package com.taoke.miquaner.util;
 
 public class Result {
 
+    public static final String SUCCESS_MSG = "操作成功";
+    public static final ErrorR FAIL_ON_SQL = new ErrorR(ErrorR.SQL_ERROR, "操作失败");
     private static final int SUCCESS = 2000;
     private static final int UN_AUTH = 4010;
     private static final int UN_AUTH_ADMIN = 4011;
     private static final int GENERAL_FAIL = 5000;
     private static final int VERSION_LOW = 5010;
+    private int code;
+    private Object body;
 
-    public static final String SUCCESS_MSG = "操作成功";
-    public static final ErrorR FAIL_ON_SQL = new ErrorR(ErrorR.SQL_ERROR, "操作失败");
+    private Result(int code, Object body) {
+        this.code = code;
+        this.body = body;
+    }
 
     public static Result success(Object body) {
         return new Result(SUCCESS, body);
@@ -29,14 +35,6 @@ public class Result {
 
     public static Result unAuthAdmin() {
         return new Result(UN_AUTH_ADMIN, null);
-    }
-
-    private int code;
-    private Object body;
-
-    private Result(int code, Object body) {
-        this.code = code;
-        this.body = body;
     }
 
     public int getCode() {

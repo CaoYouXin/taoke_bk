@@ -35,8 +35,7 @@ public class BeanUtil {
                                 }
                                 writeMethod.invoke(target, value);
                             }
-                        }
-                        catch (Throwable ex) {
+                        } catch (Throwable ex) {
                             throw new FatalBeanException(
                                     "Could not copy property '" + targetPd.getName() + "' from source to target", ex);
                         }

@@ -40,26 +40,6 @@ public class MsgServImpl implements IMsgServ {
         this.adminRepo = adminRepo;
     }
 
-    @Override
-    public Object listMessages(EUser user, Integer pageNo) {
-        return Result.success(this.mailBoxRepo.findByReceiverUserEquals(user,
-                new PageRequest(pageNo - 1, 10, new Sort(Sort.Direction.DESC, "createTime")))
-                .stream().peek(new MailBoxConsumer()).collect(Collectors.toList()));
-    }
-
-    private static class MailBoxConsumer implements Consumer<EMailBox> {
-
-        @Override
-        public void accept(EMailBox eMailBox) {
-            eMailBox.setReceiverUser(mapUser(eMailBox.getReceiverUser()));
-            eMailBox.setSenderUser(mapUser(eMailBox.getSenderUser()));
-            eMailBox.getMessage().setMailBoxes(null);
-            eMailBox.getMessage().setUser(null);
-            eMailBox.getMessage().setAdmin(null);
-        }
-
-    }
-
     private static EUser mapUser(EUser user) {
         if (null == user) {
             return null;
@@ -73,6 +53,13 @@ public class MsgServImpl implements IMsgServ {
         EAdmin ret = new EAdmin();
         ret.setName(admin.getName());
         return ret;
+    }
+
+    @Override
+    public Object listMessages(EUser user, Integer pageNo) {
+        return Result.success(this.mailBoxRepo.findByReceiverUserEquals(user,
+                new PageRequest(pageNo - 1, 10, new Sort(Sort.Direction.DESC, "createTime")))
+                .stream().peek(new MailBoxConsumer()).collect(Collectors.toList()));
     }
 
     @Override
@@ -200,5 +187,18 @@ public class MsgServImpl implements IMsgServ {
             eMessage.setMailBoxes(null);
             eMessage.setAdmin(null);
         }).collect(Collectors.toList()));
+    }
+
+    private static class MailBoxConsumer implements Consumer<EMailBox> {
+
+        @Override
+        public void accept(EMailBox eMailBox) {
+            eMailBox.setReceiverUser(mapUser(eMailBox.getReceiverUser()));
+            eMailBox.setSenderUser(mapUser(eMailBox.getSenderUser()));
+            eMailBox.getMessage().setMailBoxes(null);
+            eMailBox.getMessage().setUser(null);
+            eMailBox.getMessage().setAdmin(null);
+        }
+
     }
 }

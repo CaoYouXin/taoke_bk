@@ -20,15 +20,15 @@ public class JdCPSCtrl {
 
     @RequestMapping(value = "/jd/test", method = RequestMethod.GET)
     public Object test() {
-        JdClient client=new DefaultJdClient("https://api.jd.com/routerjson","f0fa32a8-73e4-4567-9d9f-ee1b1699ed24","F15DA8EC100B0182D24742EE9D13C586","a75813e767b94274aecba60828822d76");
+        JdClient client = new DefaultJdClient("https://api.jd.com/routerjson", "f0fa32a8-73e4-4567-9d9f-ee1b1699ed24", "F15DA8EC100B0182D24742EE9D13C586", "a75813e767b94274aecba60828822d76");
 
-        UnionSearchQueryCouponGoodsRequest request=new UnionSearchQueryCouponGoodsRequest();
+        UnionSearchQueryCouponGoodsRequest request = new UnionSearchQueryCouponGoodsRequest();
 
-        request.setPageIndex( 1 );
-        request.setPageSize( 100 );
-        request.setCid3( 123 );
+        request.setPageIndex(1);
+        request.setPageSize(100);
+        request.setCid3(123);
 
-        UnionSearchQueryCouponGoodsResponse response= null;
+        UnionSearchQueryCouponGoodsResponse response = null;
         try {
             response = client.execute(request);
         } catch (JdException e) {
