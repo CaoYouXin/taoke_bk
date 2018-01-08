@@ -1,13 +1,17 @@
 package com.taoke.miquaner.serv.impl;
 
+import com.taoke.miquaner.data.EAdZoneItem;
 import com.taoke.miquaner.data.ECate;
 import com.taoke.miquaner.data.EHomeBtn;
+import com.taoke.miquaner.repo.AdZoneItemRepo;
 import com.taoke.miquaner.repo.CateRepo;
 import com.taoke.miquaner.repo.HomeBtnRepo;
 import com.taoke.miquaner.serv.IHomeServ;
+import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,11 +19,13 @@ public class HomeServImpl implements IHomeServ {
 
     private HomeBtnRepo homeBtnRepo;
     private CateRepo cateRepo;
+    private AdZoneItemRepo adZoneItemRepo;
 
     @Autowired
-    public HomeServImpl(HomeBtnRepo homeBtnRepo, CateRepo cateRepo) {
+    public HomeServImpl(HomeBtnRepo homeBtnRepo, CateRepo cateRepo, AdZoneItemRepo adZoneItemRepo) {
         this.homeBtnRepo = homeBtnRepo;
         this.cateRepo = cateRepo;
+        this.adZoneItemRepo = adZoneItemRepo;
     }
 
     @Override
@@ -93,6 +99,33 @@ public class HomeServImpl implements IHomeServ {
     @Override
     public Object getBtnList() {
         return Result.success(this.homeBtnRepo.findAll());
+    }
+
+    @Override
+    public Object getAdZone() {
+        return Result.success(this.adZoneItemRepo.findAllByOrderByOrderDesc());
+    }
+
+    @Override
+    public Object postAdZone(EAdZoneItem item) {
+        if (null != item.getId()) {
+            EAdZoneItem one = this.adZoneItemRepo.findOne(item.getId());
+            BeanUtils.copyProperties(item, one);
+            item = one;
+        }
+
+        EAdZoneItem saved = this.adZoneItemRepo.save(item);
+        return Result.success(saved);
+    }
+
+    @Override
+    public Object removeAdZone(Long id) {
+        try {
+            this.adZoneItemRepo.delete(id);
+            return Result.success(null);
+        } catch (Exception e) {
+            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
+        }
     }
 
     private Object postHomeBtn(EHomeBtn homeBtn, Integer locationType) {

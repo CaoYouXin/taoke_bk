@@ -1,5 +1,6 @@
 package com.taoke.miquaner.ctrl;
 
+import com.taoke.miquaner.data.EAdZoneItem;
 import com.taoke.miquaner.data.ECate;
 import com.taoke.miquaner.data.EHomeBtn;
 import com.taoke.miquaner.serv.IHomeServ;
@@ -77,6 +78,23 @@ public class HomeCtrl {
     @RequestMapping(value = "/home/btn/del/{id}", method = RequestMethod.GET)
     public Object removeHomeBtn(@PathVariable(name = "id") Long id) {
         return this.homeServ.deleteHomeBtn(id);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/home/adZone/set", method = RequestMethod.POST)
+    public Object setAdZone(@RequestBody EAdZoneItem item) {
+        return this.homeServ.postAdZone(item);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/home/adZone/del/{id}", method = RequestMethod.GET)
+    public Object removeAdZone(@PathVariable(name = "id") Long id) {
+        return this.homeServ.removeAdZone(id);
+    }
+
+    @RequestMapping(value = "/home/adZone/list", method = RequestMethod.GET)
+    public Object getAdZone() {
+        return this.homeServ.getAdZone();
     }
 
 }

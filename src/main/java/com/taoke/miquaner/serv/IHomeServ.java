@@ -1,5 +1,6 @@
 package com.taoke.miquaner.serv;
 
+import com.taoke.miquaner.data.EAdZoneItem;
 import com.taoke.miquaner.data.ECate;
 import com.taoke.miquaner.data.EHomeBtn;
 
@@ -26,5 +27,11 @@ public interface IHomeServ {
     Object deleteCategory(Long id);
 
     Object getBtnList();
+
+    Object getAdZone();
+
+    Object postAdZone(EAdZoneItem item);
+
+    Object removeAdZone(Long id);
 
 }
