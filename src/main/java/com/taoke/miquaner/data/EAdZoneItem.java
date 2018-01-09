@@ -29,6 +29,9 @@ public class EAdZoneItem {
     @Column(name = "idx", nullable = false)
     private Integer order;
 
+    @Column(name = "ios_idx", nullable = false)
+    private Integer iosOrder;
+
     @Column(name = "ext", nullable = false, length = 102400)
     private String ext;
 
@@ -96,4 +99,26 @@ public class EAdZoneItem {
         this.ext = ext;
     }
 
+    public Integer getIosOrder() {
+        return iosOrder;
+    }
+
+    public void setIosOrder(Integer iosOrder) {
+        this.iosOrder = iosOrder;
+    }
+
+    @Override
+    public String toString() {
+        return "EAdZoneItem{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", imgUrl='" + imgUrl + '\'' +
+                ", colSpan=" + colSpan +
+                ", rowSpan=" + rowSpan +
+                ", openType=" + openType +
+                ", order=" + order +
+                ", iosOrder=" + iosOrder +
+                ", ext='" + ext + '\'' +
+                '}';
+    }
 }

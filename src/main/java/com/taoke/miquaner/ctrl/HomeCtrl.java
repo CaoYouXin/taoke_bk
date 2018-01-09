@@ -5,8 +5,13 @@ import com.taoke.miquaner.data.ECate;
 import com.taoke.miquaner.data.EHomeBtn;
 import com.taoke.miquaner.serv.IHomeServ;
 import com.taoke.miquaner.util.Auth;
+import com.taoke.miquaner.util.ErrorR;
+import com.taoke.miquaner.util.Result;
+import com.taoke.miquaner.view.AliMaMaSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 public class HomeCtrl {
@@ -93,8 +98,21 @@ public class HomeCtrl {
     }
 
     @RequestMapping(value = "/home/adZone/list", method = RequestMethod.GET)
-    public Object getAdZone() {
-        return this.homeServ.getAdZone();
+    public Object getAdZone(HttpServletRequest request) {
+        String platform = request.getHeader("platform");
+        if (null == platform) {
+            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
+        }
+
+        switch (platform) {
+            case "android":
+            case "web":
+                return this.homeServ.getAdZone(false);
+            case "ios":
+                return this.homeServ.getAdZone(true);
+            default:
+                return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
+        }
     }
 
 }

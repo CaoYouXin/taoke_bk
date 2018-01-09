@@ -54,8 +54,8 @@ public class MiquanerApplication {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins("*")
-                        .allowedHeaders("auth", "content-type")
-                        .exposedHeaders("auth", "Content-Disposition");
+                        .allowedHeaders("auth", "platform", "content-type")
+                        .exposedHeaders("auth", "platform", "Content-Disposition");
             }
 
             @Override

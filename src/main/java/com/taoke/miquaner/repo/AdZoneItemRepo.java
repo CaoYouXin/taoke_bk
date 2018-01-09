@@ -9,6 +9,6 @@ public interface AdZoneItemRepo extends JpaRepository<EAdZoneItem, Long> {
 
     List<EAdZoneItem> findAllByOrderByOrderDesc();
 
-
+    List<EAdZoneItem> findAllByOrderByIosOrderDesc();
 
 }

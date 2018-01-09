@@ -11,7 +11,6 @@ import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -102,8 +101,9 @@ public class HomeServImpl implements IHomeServ {
     }
 
     @Override
-    public Object getAdZone() {
-        return Result.success(this.adZoneItemRepo.findAllByOrderByOrderDesc());
+    public Object getAdZone(boolean isIos) {
+        return isIos ? Result.success(this.adZoneItemRepo.findAllByOrderByIosOrderDesc())
+                : Result.success(this.adZoneItemRepo.findAllByOrderByOrderDesc());
     }
 
     @Override

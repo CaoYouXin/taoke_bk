@@ -28,7 +28,7 @@ public interface IHomeServ {
 
     Object getBtnList();
 
-    Object getAdZone();
+    Object getAdZone(boolean isIos);
 
     Object postAdZone(EAdZoneItem item);
 
