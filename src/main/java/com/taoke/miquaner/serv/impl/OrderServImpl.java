@@ -49,17 +49,19 @@ public class OrderServImpl implements IOrderServ {
     private static final String AT_LEAST_TEN = "不满足最小提现金额";
     private static final String NO_THAT_MUCH = "可提现金额不足";
 
-    private TbkOrderRepo tbkOrderRepo;
-    private WithdrawRepo withdrawRepo;
-    private ConfigRepo configRepo;
-    private UserRepo userRepo;
-    private AdminRepo adminRepo;
-    private ITbkServ tbkServ;
-    private IMsgServ msgServ;
-    private ISmsServ smsServ;
+    private final TbkOrderRepo tbkOrderRepo;
+    private final WithdrawRepo withdrawRepo;
+    private final ConfigRepo configRepo;
+    private final UserRepo userRepo;
+    private final AdminRepo adminRepo;
+    private final ITbkServ tbkServ;
+    private final IMsgServ msgServ;
+    private final ISmsServ smsServ;
 
     @Autowired
-    public OrderServImpl(ISmsServ smsServ, ITbkServ tbkServ, IMsgServ msgServ, AdminRepo adminRepo, TbkOrderRepo tbkOrderRepo, WithdrawRepo withdrawRepo, ConfigRepo configRepo, UserRepo userRepo) {
+    public OrderServImpl(ISmsServ smsServ, ITbkServ tbkServ, IMsgServ msgServ, AdminRepo adminRepo,
+                         TbkOrderRepo tbkOrderRepo, WithdrawRepo withdrawRepo, ConfigRepo configRepo,
+                         UserRepo userRepo) {
         this.smsServ = smsServ;
         this.tbkServ = tbkServ;
         this.msgServ = msgServ;

@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class TbkCtrl {
 
-    private ITbkServ tbkServ;
+    private final ITbkServ tbkServ;
 
     @Autowired
     public TbkCtrl(ITbkServ tbkServ) {

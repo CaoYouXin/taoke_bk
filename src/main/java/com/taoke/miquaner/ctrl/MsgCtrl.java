@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class MsgCtrl {
 
-    private IMsgServ msgServ;
+    private final IMsgServ msgServ;
 
     @Autowired
     public MsgCtrl(IMsgServ msgServ) {

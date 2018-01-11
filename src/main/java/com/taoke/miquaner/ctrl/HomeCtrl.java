@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class HomeCtrl {
 
-    private IHomeServ homeServ;
+    private final IHomeServ homeServ;
 
     @Autowired
     public HomeCtrl(IHomeServ homeServ) {

@@ -76,13 +76,13 @@ public class UserServImpl implements IUserServ {
         return viewUser;
     };
 
-    private UserRepo userRepo;
-    private TokenRepo tokenRepo;
-    private SmsCodeRepo smsCodeRepo;
-    private ConfigRepo configRepo;
-    private AdminRepo adminRepo;
-    private IMsgServ msgServ;
-    private ISmsServ smsServ;
+    private final UserRepo userRepo;
+    private final TokenRepo tokenRepo;
+    private final SmsCodeRepo smsCodeRepo;
+    private final ConfigRepo configRepo;
+    private final AdminRepo adminRepo;
+    private final IMsgServ msgServ;
+    private final ISmsServ smsServ;
 
     @Autowired
     public UserServImpl(ISmsServ smsServ, IMsgServ msgServ, AdminRepo adminRepo, UserRepo userRepo, TokenRepo tokenRepo, SmsCodeRepo smsCodeRepo, ConfigRepo configRepo) {

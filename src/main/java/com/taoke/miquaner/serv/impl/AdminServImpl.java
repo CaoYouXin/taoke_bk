@@ -36,12 +36,12 @@ public class AdminServImpl implements IAdminServ {
     private static final String ADMIN_WRONG_PWD = "管理员密码错误，请联系您的上级管理员";
     private static final String ADMIN_NOT_PERMITTED = "该管理员并非您的权限范围";
 
-    private ConfigRepo configRepo;
-    private AdminRepo adminRepo;
-    private RoleRepo roleRepo;
-    private PrivilegeRepo privilegeRepo;
-    private MenuRepo menuRepo;
-    private TokenRepo tokenRepo;
+    private final ConfigRepo configRepo;
+    private final AdminRepo adminRepo;
+    private final RoleRepo roleRepo;
+    private final PrivilegeRepo privilegeRepo;
+    private final MenuRepo menuRepo;
+    private final TokenRepo tokenRepo;
 
     @Autowired
     public AdminServImpl(ConfigRepo configRepo, AdminRepo adminRepo, RoleRepo roleRepo, PrivilegeRepo privilegeRepo, MenuRepo menuRepo, TokenRepo tokenRepo) {

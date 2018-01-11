@@ -30,8 +30,8 @@ public class FileCtrl {
 
     private static final Logger logger = LogManager.getLogger(FileCtrl.class);
 
-    private Environment env;
-    private IUserServ userServ;
+    private final Environment env;
+    private final IUserServ userServ;
 
     @Autowired
     public FileCtrl(Environment env, IUserServ userServ) {

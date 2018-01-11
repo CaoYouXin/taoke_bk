@@ -18,10 +18,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppServImpl implements IAppServ {
 
-    private GuideRepo guideRepo;
-    private HelpRepo helpRepo;
-    private ShareImgRepo shareImgRepo;
-    private ConfigRepo configRepo;
+    private final GuideRepo guideRepo;
+    private final HelpRepo helpRepo;
+    private final ShareImgRepo shareImgRepo;
+    private final ConfigRepo configRepo;
 
     @Autowired
     public AppServImpl(ConfigRepo configRepo, GuideRepo guideRepo, HelpRepo helpRepo, ShareImgRepo shareImgRepo) {

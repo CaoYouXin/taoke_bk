@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class AppCtrl {
 
-    private IAppServ appServ;
+    private final IAppServ appServ;
 
     @Autowired
     public AppCtrl(IAppServ appServ) {

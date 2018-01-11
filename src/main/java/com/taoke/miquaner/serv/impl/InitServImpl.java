@@ -25,9 +25,9 @@ import java.util.List;
 @Service
 public class InitServImpl implements IInitServ {
 
-    private ConfigRepo configRepo;
-    private RoleRepo roleRepo;
-    private PrivilegeRepo privilegeRepo;
+    private final ConfigRepo configRepo;
+    private final RoleRepo roleRepo;
+    private final PrivilegeRepo privilegeRepo;
 
     @Autowired
     public InitServImpl(ConfigRepo configRepo, RoleRepo roleRepo, PrivilegeRepo privilegeRepo) {

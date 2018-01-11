@@ -16,9 +16,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class HomeServImpl implements IHomeServ {
 
-    private HomeBtnRepo homeBtnRepo;
-    private CateRepo cateRepo;
-    private AdZoneItemRepo adZoneItemRepo;
+    private final HomeBtnRepo homeBtnRepo;
+    private final CateRepo cateRepo;
+    private final AdZoneItemRepo adZoneItemRepo;
 
     @Autowired
     public HomeServImpl(HomeBtnRepo homeBtnRepo, CateRepo cateRepo, AdZoneItemRepo adZoneItemRepo) {

@@ -27,10 +27,11 @@ import java.util.stream.Collectors;
 public class MsgServImpl implements IMsgServ {
 
     private static final String WRONG_MESSAGE_ID = "正在确认错误的消息";
-    private MessageRepo messageRepo;
-    private MailBoxRepo mailBoxRepo;
-    private UserRepo userRepo;
-    private AdminRepo adminRepo;
+
+    private final MessageRepo messageRepo;
+    private final MailBoxRepo mailBoxRepo;
+    private final UserRepo userRepo;
+    private final AdminRepo adminRepo;
 
     @Autowired
     public MsgServImpl(MessageRepo messageRepo, MailBoxRepo mailBoxRepo, UserRepo userRepo, AdminRepo adminRepo) {

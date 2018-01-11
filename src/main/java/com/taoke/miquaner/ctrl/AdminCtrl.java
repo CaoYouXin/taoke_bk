@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class AdminCtrl {
 
-    private IAdminServ adminServ;
+    private final IAdminServ adminServ;
 
     @Autowired
     public AdminCtrl(IAdminServ adminServ) {

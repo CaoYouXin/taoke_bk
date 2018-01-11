@@ -19,7 +19,7 @@ import java.io.Reader;
 @RestController
 public class UserCtrl {
 
-    private IUserServ userServ;
+    private final IUserServ userServ;
 
     @Autowired
     public UserCtrl(IUserServ userServ) {

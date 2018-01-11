@@ -18,9 +18,9 @@ import java.util.Collections;
 @RestController
 public class OrderCtrl {
 
-    private Environment env;
-    private IOrderServ orderServ;
-    private IUserServ userServ;
+    private final Environment env;
+    private final IOrderServ orderServ;
+    private final IUserServ userServ;
 
     @Autowired
     public OrderCtrl(Environment env, IOrderServ orderServ, IUserServ userServ) {

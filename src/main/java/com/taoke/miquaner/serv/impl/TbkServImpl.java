@@ -46,9 +46,9 @@ public class TbkServImpl implements ITbkServ {
     private String appKey;
     private String secret;
 
-    private ConfigRepo configRepo;
-    private SearchKeyWordRepo searchKeyWordRepo;
-    private TbkItemRepo tbkItemRepo;
+    private final ConfigRepo configRepo;
+    private final SearchKeyWordRepo searchKeyWordRepo;
+    private final TbkItemRepo tbkItemRepo;
 
     @Autowired
     public TbkServImpl(ConfigRepo configRepo, SearchKeyWordRepo searchKeyWordRepo, TbkItemRepo tbkItemRepo) {
