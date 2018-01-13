@@ -7,6 +7,8 @@ public class ErrorR {
     public static final String NOT_FOR_BUYER_MSG = "购买者不享有此功能";
     public static final String DOWNLOAD_ERROR_MSG = "下载文件错误";
 
+    static final String SQL_ERROR = "SQL_ERROR";
+
     public static final String CAN_NOT_SAVE_OBJECT = "CAN_NOT_SAVE_OBJECT";
     public static final String NO_ID_FOUND = "NO_ID_FOUND";
     public static final String NOT_FOR_BUYER = "NOT_FOR_BUYER";
@@ -38,7 +40,9 @@ public class ErrorR {
     public static final String NO_INV_CODE_FOUND = "NO_INV_CODE_FOUND";
     public static final String THIRD_CAN_NOT_ENROLL = "THIRD_CAN_NOT_ENROLL";
     public static final String FAIL_ON_JD_API = "FAIL_ON_JD_API";
-    static final String SQL_ERROR = "SQL_ERROR";
+    public static final String FAIL_ON_OBJECT_MAPPER_API = "FAIL_ON_OBJECT_MAPPER_API";
+    public static final String FAIL_ON_SERV_RET_NON_RESULT = "FAIL_ON_SERV_RET_NON_RESULT";
+
     private String key;
     private String msg;
 

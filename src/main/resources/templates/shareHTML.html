@@ -1,0 +1,130 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>觅券儿分享商品详情</title>
+    <style>
+        *, *:before, *:after {
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+
+        body {
+            text-align: center;
+        }
+
+        .wrapper,
+        .image-wrapper,
+        .image-wrapper>img,
+        .intro_wrapper,
+        .btn-wrapper {
+            width: 100%;
+        }
+
+        .btn-wrapper {
+            height: 200px;
+        }
+
+        .btn-wrapper, .btn-wrapper:after {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .btn-wrapper:after {
+            content: '';
+            width: 0;
+            height: 100%;
+        }
+
+        .btn-wrapper>button {
+            outline: none;
+            padding: 0.5em 1em;
+            border-radius: 0.12em;
+            background-color: orange;
+            color: whitesmoke;
+            font-size: 2rem;
+        }
+
+        .btn-wrapper>button:active {
+            background-color: red;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .intro_wrapper>p {
+            margin: 2em 0;
+            text-shadow: 1px 1px 3px #666;
+            font-size: 1.618rem;
+            text-decoration: overline;
+        }
+
+        .footer {
+            position: absolute;
+            z-index: -1;
+            bottom: 2rem;
+            width: 100%;
+        }
+
+        .footer>p {
+            font-size: 1rem;
+            color: gray;
+            text-shadow: 0 1px 3px #000;
+        }
+    </style>
+</head>
+<body>
+<div th:if="${found} != true">
+    对不起，您要找的分享内容已经过期！
+</div>
+
+<div class="wrapper" th:if="${found} == true">
+    <div class="image-wrapper">
+        <img th:if="${images.isEmpty()} == false" th:src="${images.get(0)}" alt="分享图片"/>
+    </div>
+    <div class="intro_wrapper">
+        <p>点击下方按钮，然后打开淘宝查看！</p>
+    </div>
+    <div class="btn-wrapper">
+        <button id="copyBtn">复制淘口令</button>
+    </div>
+    <div id="tPwd" class="hidden" th:text="${tPwd}"></div>
+</div>
+
+<div class="footer">
+    <p>觅券儿提供技术支持</p>
+</div>
+
+<script>
+
+function copyText(text){
+  function selectElementText(element) {
+    if (document.selection) {
+      var range = document.body.createTextRange();
+      range.moveToElementText(element);
+      range.select();
+    } else if (window.getSelection) {
+      var range = document.createRange();
+      range.selectNode(element);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+    }
+  }
+  var element = document.createElement('DIV');
+  element.textContent = text;
+  document.body.appendChild(element);
+  selectElementText(element);
+  document.execCommand('copy');
+  element.remove();
+}
+
+var tPwd = document.getElementById("tPwd");
+var copyBtn = document.getElementById("copyBtn");
+copyBtn.addEventListener('click', function(){
+  copyText(tPwd.innerText);
+  alert("已成功复制");
+});
+
+</script>
+</body>
+</html>

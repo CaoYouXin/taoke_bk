@@ -5,6 +5,7 @@ import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.util.Auth;
 import com.taoke.miquaner.view.AliMaMaSubmit;
 import com.taoke.miquaner.view.ShareSubmit;
+import com.taoke.miquaner.view.ShareSubmit2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +44,12 @@ public class TbkCtrl {
     @RequestMapping(value = "/tbk/url/trans", method = RequestMethod.POST)
     public Object getShareLink(@RequestBody ShareSubmit shareSubmit) {
         return this.tbkServ.getShareLink(shareSubmit);
+    }
+
+    @Auth
+    @RequestMapping(value = "/tbk/share/save", method = RequestMethod.POST)
+    public Object shareSave(@RequestBody ShareSubmit2 shareSubmit2) {
+        return this.tbkServ.getShareLink2(shareSubmit2);
     }
 
     @Auth(isAdmin = true)

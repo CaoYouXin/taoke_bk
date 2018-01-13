@@ -1,9 +1,12 @@
 package com.taoke.miquaner.ctrl;
 
+import com.mysql.jdbc.StringUtils;
 import com.taobao.api.internal.toplink.embedded.websocket.util.StringUtil;
 import com.taoke.miquaner.MiquanerApplication;
+import com.taoke.miquaner.serv.IShareServ;
 import com.taoke.miquaner.serv.IUserServ;
 import com.taoke.miquaner.util.Auth;
+import com.taoke.miquaner.util.Result;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +35,35 @@ public class FileCtrl {
 
     private final Environment env;
     private final IUserServ userServ;
+    private final IShareServ shareServ;
 
     @Autowired
-    public FileCtrl(Environment env, IUserServ userServ) {
+    public FileCtrl(Environment env, IUserServ userServ, IShareServ shareServ) {
         this.env = env;
         this.userServ = userServ;
+        this.shareServ = shareServ;
+    }
+
+    @RequestMapping(value = "/share/{key}", method = RequestMethod.GET)
+    public String share(@PathVariable(name = "key") String key, Map<String, Object> map) {
+        Object shareFetch = this.shareServ.shareFetch(key);
+        if (shareFetch instanceof Result) {
+            String params = ((Result) shareFetch).getBody().toString();
+            if (StringUtils.isNullOrEmpty(params)) {
+                map.put("found", false);
+            } else {
+                try {
+                    Map readValue = MiquanerApplication.DEFAULT_OBJECT_MAPPER.readValue(params, Map.class);
+                    map.put("found", true);
+                    map.putAll(readValue);
+                } catch (IOException e) {
+                    map.put("found", false);
+                }
+            }
+        } else {
+            map.put("found", false);
+        }
+        return "/shareHTML";
     }
 
     @Auth(isAdmin = true)

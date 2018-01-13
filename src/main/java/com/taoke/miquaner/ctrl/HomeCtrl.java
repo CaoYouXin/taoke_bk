@@ -101,17 +101,15 @@ public class HomeCtrl {
     public Object getAdZone(HttpServletRequest request) {
         String platform = request.getHeader("platform");
         if (null == platform) {
-            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
+            platform = "";
         }
-
         switch (platform) {
-            case "android":
-            case "web":
-                return this.homeServ.getAdZone(false);
             case "ios":
                 return this.homeServ.getAdZone(true);
+            case "android":
+            case "web":
             default:
-                return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
+                return this.homeServ.getAdZone(false);
         }
     }
 

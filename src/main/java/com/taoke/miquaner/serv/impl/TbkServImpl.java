@@ -1,5 +1,6 @@
 package com.taoke.miquaner.serv.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mysql.jdbc.StringUtils;
 import com.taobao.api.ApiException;
 import com.taobao.api.DefaultTaobaoClient;
@@ -7,6 +8,7 @@ import com.taobao.api.TaobaoClient;
 import com.taobao.api.domain.UatmTbkItem;
 import com.taobao.api.request.*;
 import com.taobao.api.response.*;
+import com.taoke.miquaner.MiquanerApplication;
 import com.taoke.miquaner.data.EConfig;
 import com.taoke.miquaner.data.ESearchKeyWord;
 import com.taoke.miquaner.data.ETbkItem;
@@ -14,13 +16,12 @@ import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.SearchKeyWordRepo;
 import com.taoke.miquaner.repo.TbkItemRepo;
+import com.taoke.miquaner.serv.IShareServ;
 import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.util.DivideByTenthUtil;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
-import com.taoke.miquaner.view.AliMaMaSubmit;
-import com.taoke.miquaner.view.ShareSubmit;
-import com.taoke.miquaner.view.ShareView;
+import com.taoke.miquaner.view.*;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,8 @@ public class TbkServImpl implements ITbkServ {
     private static final Logger logger = LogManager.getLogger(TbkServImpl.class);
     private static final String FAIL_ON_EXTRACT_OBJECT_CONFIG = "在展开配置类时发生错误，可能是访问限定符有误";
     private static final String FAIL_ON_ALI_API = "调用阿里API时出错，可能需要提升调用次数";
+    private static final String FAIL_ON_OBJECT_MAPPER_API = "对象序列化时出错";
+    private static final String FAIL_ON_SERV_RET_NON_RESULT = "服务器内部错误";
 
     private String serverUrl;
     private String appKey;
@@ -49,9 +52,11 @@ public class TbkServImpl implements ITbkServ {
     private final ConfigRepo configRepo;
     private final SearchKeyWordRepo searchKeyWordRepo;
     private final TbkItemRepo tbkItemRepo;
+    private final IShareServ shareServ;
 
     @Autowired
-    public TbkServImpl(ConfigRepo configRepo, SearchKeyWordRepo searchKeyWordRepo, TbkItemRepo tbkItemRepo) {
+    public TbkServImpl(IShareServ shareServ, ConfigRepo configRepo, SearchKeyWordRepo searchKeyWordRepo, TbkItemRepo tbkItemRepo) {
+        this.shareServ = shareServ;
         this.configRepo = configRepo;
         this.searchKeyWordRepo = searchKeyWordRepo;
         this.tbkItemRepo = tbkItemRepo;
@@ -187,12 +192,39 @@ public class TbkServImpl implements ITbkServ {
         try {
             return Result.success(new ShareView(
                     this.getShortUrl(shareSubmit.getUrl()),
-                    this.getTaobaoPwd(shareSubmit)
+                    this.getTaobaoPwd(shareSubmit.getTitle(), shareSubmit.getUrl())
             ));
         } catch (ApiException e) {
             logger.error("error when invoke ali api" + e.getMessage());
             return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
         }
+    }
+
+    @Override
+    public Object getShareLink2(ShareSubmit2 shareSubmit2) {
+        ShareView2 view = new ShareView2();
+        try {
+            view.settPwd(this.getTaobaoPwd(shareSubmit2.getTitle(), shareSubmit2.getUrl()));
+        } catch (ApiException e) {
+            logger.error("error when invoke ali api" + e.getMessage());
+            return Result.fail(new ErrorR(ErrorR.FAIL_ON_ALI_API, FAIL_ON_ALI_API));
+        }
+        view.setImages(shareSubmit2.getImages());
+        String json = null;
+        try {
+            json = MiquanerApplication.DEFAULT_OBJECT_MAPPER.writeValueAsString(view);
+        } catch (JsonProcessingException e) {
+            logger.error("error trans ShareView2 to json" + e.getMessage());
+            return Result.fail(new ErrorR(ErrorR.FAIL_ON_OBJECT_MAPPER_API, FAIL_ON_OBJECT_MAPPER_API));
+        }
+
+        Object shareSave = this.shareServ.shareSave(json);
+        if (!(shareSave instanceof Result)) {
+            logger.error("error when unexpected serv interface");
+            return Result.fail(new ErrorR(ErrorR.FAIL_ON_SERV_RET_NON_RESULT, FAIL_ON_SERV_RET_NON_RESULT));
+        }
+
+        return Result.success(new ShareView("share/" + ((Result) shareSave).getBody().toString(), view.gettPwd()));
     }
 
     @Override
@@ -404,13 +436,13 @@ public class TbkServImpl implements ITbkServ {
         return Result.success(modelList);
     }
 
-    private String getTaobaoPwd(ShareSubmit shareSubmit) throws ApiException {
+    private String getTaobaoPwd(String text, String url) throws ApiException {
         this.initParams();
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
         TbkTpwdCreateRequest req = new TbkTpwdCreateRequest();
         req.setUserId("3434155161");
-        req.setText(shareSubmit.getTitle());
-        req.setUrl(shareSubmit.getUrl());
+        req.setText(text);
+        req.setUrl(url);
         TbkTpwdCreateResponse rsp = client.execute(req);
         logger.debug(rsp.getBody());
         return rsp.getData().getModel();
