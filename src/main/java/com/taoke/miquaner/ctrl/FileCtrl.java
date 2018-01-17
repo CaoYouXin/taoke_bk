@@ -63,7 +63,7 @@ public class FileCtrl {
         } else {
             map.put("found", false);
         }
-        return "/shareHTML";
+        return "shareHTML";
     }
 
     @Auth(isAdmin = true)
