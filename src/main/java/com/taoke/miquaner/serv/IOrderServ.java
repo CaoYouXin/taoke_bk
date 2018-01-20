@@ -21,7 +21,7 @@ public interface IOrderServ {
 
     Object thisMonthSettled(EUser user, Boolean isSuper);
 
-    Object userWithdrawList();
+    Object userWithdrawList(Integer type, Integer pageNo);
 
     Object payUserWithdraw(Long withdrawId);
 

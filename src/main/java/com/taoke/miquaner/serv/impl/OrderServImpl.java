@@ -9,6 +9,7 @@ import com.taoke.miquaner.serv.IMsgServ;
 import com.taoke.miquaner.serv.IOrderServ;
 import com.taoke.miquaner.serv.ISmsServ;
 import com.taoke.miquaner.serv.ITbkServ;
+import com.taoke.miquaner.util.BeanUtil;
 import com.taoke.miquaner.util.DivideByTenthUtil;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
@@ -23,6 +24,9 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -204,41 +208,42 @@ public class OrderServImpl implements IOrderServ {
 
         List<ETbkOrder> orders = null;
         pageNo = Math.max(0, --pageNo);
+        PageRequest pageRequest = new PageRequest(pageNo, pageSize, new Sort(Sort.Direction.DESC, "createTime"));
         switch (type) {
             case 1:
                 orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdIn(
                         siteId, adZoneIds,
-                        new PageRequest(pageNo, pageSize, new Sort(Sort.Direction.DESC, "createTime"))
+                        pageRequest
                 );
                 break;
             case 2:
                 orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdInAndOrderStatusNotContains(
                         siteId, adZoneIds, "失效",
-                        new PageRequest(pageNo, pageSize, new Sort(Sort.Direction.DESC, "createTime"))
+                        pageRequest
                 );
                 break;
             case 3:
                 orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdInAndOrderStatusContains(
                         siteId, adZoneIds, "付款",
-                        new PageRequest(pageNo, pageSize, new Sort(Sort.Direction.DESC, "createTime"))
+                        pageRequest
                 );
                 break;
             case 4:
                 orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdInAndOrderStatusContains(
                         siteId, adZoneIds, "收货",
-                        new PageRequest(pageNo, pageSize, new Sort(Sort.Direction.DESC, "createTime"))
+                        pageRequest
                 );
                 break;
             case 5:
                 orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdInAndOrderStatusContains(
                         siteId, adZoneIds, "结算",
-                        new PageRequest(pageNo, pageSize, new Sort(Sort.Direction.DESC, "createTime"))
+                        pageRequest
                 );
                 break;
             case 6:
                 orders = this.tbkOrderRepo.findBySiteIdEqualsAndAdZoneIdInAndOrderStatusContains(
                         siteId, adZoneIds, "失效",
-                        new PageRequest(pageNo, pageSize, new Sort(Sort.Direction.DESC, "createTime"))
+                        pageRequest
                 );
                 break;
             default:
@@ -425,13 +430,42 @@ public class OrderServImpl implements IOrderServ {
     }
 
     @Override
-    public Object userWithdrawList() {
-        return Result.success(this.withdrawRepo.findAllByPayedEquals(false).stream().peek(eWithdraw -> {
+    public Object userWithdrawList(Integer type, Integer pageNo) {
+        pageNo = Math.max(0, --pageNo);
+        int pageSize = 15;
+        PageRequest pageRequest = new PageRequest(pageNo, pageSize, Sort.Direction.ASC, "id");
+        Page<EWithdraw> fetched = null;
+        switch (type) {
+            case 1:
+                fetched = this.withdrawRepo.findAll(pageRequest);
+                break;
+            case 2:
+                fetched = this.withdrawRepo.findAllByPayedEquals(true, pageRequest);
+                break;
+            case 3:
+                fetched = this.withdrawRepo.findAllByPayedEquals(false, pageRequest);
+                break;
+            default:
+                return Result.success(new ArrayList<>());
+        }
+
+        return Result.success(fetched.map(eWithdraw -> {
+//            EWithdraw view = new EWithdraw();
+//            BeanUtils.copyProperties(eWithdraw, view);
+//
+//            EUser user = eWithdraw.getUser();
+//            EUser viewUser = new EUser();
+//            BeanUtils.copyProperties(user, viewUser);
+//            view.setUser(user);
+//
+//            return view;
+
             EUser user = eWithdraw.getUser();
             EUser viewUser = new EUser();
             BeanUtils.copyProperties(user, viewUser, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
             eWithdraw.setUser(viewUser);
-        }).collect(Collectors.toList()));
+            return eWithdraw;
+        }));
     }
 
     @Override

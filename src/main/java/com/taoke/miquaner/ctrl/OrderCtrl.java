@@ -97,9 +97,9 @@ public class OrderCtrl {
     }
 
     @Auth(isAdmin = true)
-    @RequestMapping(value = "/tbk/withdraw/request/list", method = RequestMethod.GET)
-    public Object withdrawList() {
-        return this.orderServ.userWithdrawList();
+    @RequestMapping(value = "/tbk/withdraw/request/list/{type}/{pageNo}", method = RequestMethod.GET)
+    public Object withdrawList(@PathVariable(name = "type") Integer type, @PathVariable(name = "pageNo") Integer pageNo) {
+        return this.orderServ.userWithdrawList(type, pageNo);
     }
 
     @Auth(isAdmin = true)
