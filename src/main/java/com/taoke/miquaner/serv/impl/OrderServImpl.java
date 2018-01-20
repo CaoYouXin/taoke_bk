@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,13 @@ public class OrderServImpl implements IOrderServ {
     private final ITbkServ tbkServ;
     private final IMsgServ msgServ;
     private final ISmsServ smsServ;
+    private Converter<EWithdraw, EWithdraw> eWithdrawConverter = eWithdraw -> {
+        EUser user = eWithdraw.getUser();
+        EUser viewUser = new EUser();
+        BeanUtils.copyProperties(user, viewUser, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
+        eWithdraw.setUser(viewUser);
+        return eWithdraw;
+    };
 
     @Autowired
     public OrderServImpl(ISmsServ smsServ, ITbkServ tbkServ, IMsgServ msgServ, AdminRepo adminRepo,
@@ -446,26 +454,25 @@ public class OrderServImpl implements IOrderServ {
                 fetched = this.withdrawRepo.findAllByPayedEquals(false, pageRequest);
                 break;
             default:
-                return Result.success(new ArrayList<>());
+                return Result.success(new PageImpl<EWithdraw>(new ArrayList<>()));
         }
 
-        return Result.success(fetched.map(eWithdraw -> {
-//            EWithdraw view = new EWithdraw();
-//            BeanUtils.copyProperties(eWithdraw, view);
-//
-//            EUser user = eWithdraw.getUser();
-//            EUser viewUser = new EUser();
-//            BeanUtils.copyProperties(user, viewUser);
-//            view.setUser(user);
-//
-//            return view;
+        return Result.success(fetched.map(eWithdrawConverter));
+    }
 
-            EUser user = eWithdraw.getUser();
-            EUser viewUser = new EUser();
-            BeanUtils.copyProperties(user, viewUser, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
-            eWithdraw.setUser(viewUser);
-            return eWithdraw;
-        }));
+    @Override
+    public Object userWithdrawList(String key) {
+        List<EUser> matchedUsers = this.userRepo.findAllByNameContainsOrRealNameContainsOrAliPayIdContainsOrPhoneContains(key, key, key, key);
+        if (matchedUsers.isEmpty()) {
+            return Result.success(new PageImpl<EWithdraw>(new ArrayList<>()));
+        }
+
+        List<EWithdraw> results = new ArrayList<>();
+        matchedUsers.forEach(eUser -> results.addAll(eUser.getWithdraws()));
+
+        return Result.success(new PageImpl<>(
+                results.stream().map(eWithdraw -> eWithdrawConverter.convert(eWithdraw)).collect(Collectors.toList())
+        ));
     }
 
     @Override

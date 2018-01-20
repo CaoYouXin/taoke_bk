@@ -23,6 +23,8 @@ public interface IOrderServ {
 
     Object userWithdrawList(Integer type, Integer pageNo);
 
+    Object userWithdrawList(String key);
+
     Object payUserWithdraw(Long withdrawId);
 
 }

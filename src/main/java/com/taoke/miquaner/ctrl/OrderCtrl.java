@@ -103,6 +103,12 @@ public class OrderCtrl {
     }
 
     @Auth(isAdmin = true)
+    @RequestMapping(value = "/tbk/withdraw/request/search/{key}", method = RequestMethod.GET)
+    public Object withdrawList(@PathVariable(name = "key") String key) {
+        return this.orderServ.userWithdrawList(key);
+    }
+
+    @Auth(isAdmin = true)
     @RequestMapping(value = "/tbk/withdraw/response/{id}", method = RequestMethod.GET)
     public Object payWithdraw(@PathVariable(name = "id") Long id) {
         return this.orderServ.payUserWithdraw(id);
