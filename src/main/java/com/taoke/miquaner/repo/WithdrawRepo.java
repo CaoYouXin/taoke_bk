@@ -14,4 +14,6 @@ public interface WithdrawRepo extends JpaRepository<EWithdraw, Long> {
 
     Page<EWithdraw> findAllByPayedEquals(Boolean payed, Pageable pageable);
 
+    List<EWithdraw> findAllByPayedEquals(Boolean payed);
+
 }

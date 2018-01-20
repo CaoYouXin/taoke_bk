@@ -9,9 +9,9 @@ import com.taoke.miquaner.serv.IMsgServ;
 import com.taoke.miquaner.serv.IOrderServ;
 import com.taoke.miquaner.serv.ISmsServ;
 import com.taoke.miquaner.serv.ITbkServ;
-import com.taoke.miquaner.util.BeanUtil;
 import com.taoke.miquaner.util.DivideByTenthUtil;
 import com.taoke.miquaner.util.ErrorR;
+import com.taoke.miquaner.util.ExportUtils;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.TbkOrderView;
 import com.taoke.miquaner.view.TbkOrderWrapper;
@@ -24,7 +24,6 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -68,6 +67,16 @@ public class OrderServImpl implements IOrderServ {
         BeanUtils.copyProperties(user, viewUser, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
         eWithdraw.setUser(viewUser);
         return eWithdraw;
+    };
+    private Function<EWithdraw, List<String>> eWithdrawListFunction = eWithdraw -> {
+        List<String> row = new ArrayList<>();
+        row.add(eWithdraw.getId().toString());
+        row.add(String.format("%s(%s)", eWithdraw.getUser().getName(), eWithdraw.getUser().getRealName()));
+        row.add(eWithdraw.getAmount());
+        row.add(MiquanerApplication.DEFAULT_DATE_FORMAT.format(eWithdraw.getCreateTime()));
+        row.add(eWithdraw.getPayed() ? "已支付" : "未支付");
+        row.add(null == eWithdraw.getPayTime() ? "" : MiquanerApplication.DEFAULT_DATE_FORMAT.format(eWithdraw.getPayTime()));
+        return row;
     };
 
     @Autowired
@@ -502,6 +511,50 @@ public class OrderServImpl implements IOrderServ {
         }
 
         return Result.success(one);
+    }
+
+    @Override
+    public boolean exportWithdraw(String filePath, Integer type) {
+        List<EWithdraw> fetched;
+        switch (type) {
+            case 1:
+                fetched = this.withdrawRepo.findAll();
+                break;
+            case 2:
+                fetched = this.withdrawRepo.findAllByPayedEquals(true);
+                break;
+            case 3:
+                fetched = this.withdrawRepo.findAllByPayedEquals(false);
+                break;
+            default:
+                fetched = new ArrayList<>();
+        }
+
+        List<List<String>> data = new ArrayList<>();
+        data.add(getHeaders());
+        data.addAll(fetched.stream().map(eWithdrawListFunction).collect(Collectors.toList()));
+        return ExportUtils.writeFile(filePath, data, getColWidths());
+    }
+
+    @Override
+    public boolean exportWithdraw(String filePath, String key) {
+        List<EUser> matchedUsers = this.userRepo.findAllByNameContainsOrRealNameContainsOrAliPayIdContainsOrPhoneContains(key, key, key, key);
+        List<EWithdraw> fetched = new ArrayList<>();
+
+        matchedUsers.forEach(eUser -> fetched.addAll(eUser.getWithdraws()));
+
+        List<List<String>> data = new ArrayList<>();
+        data.add(getHeaders());
+        data.addAll(fetched.stream().map(eWithdrawListFunction).collect(Collectors.toList()));
+        return ExportUtils.writeFile(filePath, data, getColWidths());
+    }
+
+    private List<String> getHeaders() {
+        return Arrays.asList("ID", "用户名", "提现金额", "创建时间", "状态", "支付时间");
+    }
+
+    private List<Integer> getColWidths() {
+        return Arrays.asList(9, 12, 10, 15, 9, 15);
     }
 
     private UserCommitView getUserCommitView(EUser user, final Double percent) {

@@ -3,6 +3,7 @@ package com.taoke.miquaner.ctrl;
 import com.mysql.jdbc.StringUtils;
 import com.taobao.api.internal.toplink.embedded.websocket.util.StringUtil;
 import com.taoke.miquaner.MiquanerApplication;
+import com.taoke.miquaner.serv.IOrderServ;
 import com.taoke.miquaner.serv.IShareServ;
 import com.taoke.miquaner.serv.IUserServ;
 import com.taoke.miquaner.util.Auth;
@@ -36,12 +37,14 @@ public class FileCtrl {
     private final Environment env;
     private final IUserServ userServ;
     private final IShareServ shareServ;
+    private final IOrderServ orderServ;
 
     @Autowired
-    public FileCtrl(Environment env, IUserServ userServ, IShareServ shareServ) {
+    public FileCtrl(Environment env, IUserServ userServ, IShareServ shareServ, IOrderServ orderServ) {
         this.env = env;
         this.userServ = userServ;
         this.shareServ = shareServ;
+        this.orderServ = orderServ;
     }
 
     @RequestMapping(value = "/share/{key}", method = RequestMethod.GET)
@@ -127,6 +130,24 @@ public class FileCtrl {
         String fileName = String.format("ALL-SEARCH-USERS_%s.xls", MiquanerApplication.DEFAULT_DATE_FORMAT.format(new Date()));
         String filePath = getFilePath(fileName);
         boolean suc = this.userServ.exportSearch(filePath, search);
+        return getInputStreamResourceResponseEntity(filePath, fileName, suc);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/export/withdraw/list/{type}", method = RequestMethod.GET)
+    public ResponseEntity<InputStreamResource> exportWithdraw(@PathVariable(name = "type") Integer type) throws IOException {
+        String fileName = String.format("ALL-WITHDRAW_%s.xls", MiquanerApplication.DEFAULT_DATE_FORMAT.format(new Date()));
+        String filePath = getFilePath(fileName);
+        boolean suc = this.orderServ.exportWithdraw(filePath, type);
+        return getInputStreamResourceResponseEntity(filePath, fileName, suc);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/export/withdraw/search/{key}", method = RequestMethod.GET)
+    public ResponseEntity<InputStreamResource> exportWithdraw(@PathVariable(name = "key") String key) throws IOException {
+        String fileName = String.format("ALL-SEARCH-WITHDRAW_%s.xls", MiquanerApplication.DEFAULT_DATE_FORMAT.format(new Date()));
+        String filePath = getFilePath(fileName);
+        boolean suc = this.orderServ.exportWithdraw(filePath, key);
         return getInputStreamResourceResponseEntity(filePath, fileName, suc);
     }
 

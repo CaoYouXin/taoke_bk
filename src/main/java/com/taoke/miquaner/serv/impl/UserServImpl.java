@@ -9,10 +9,7 @@ import com.taoke.miquaner.repo.*;
 import com.taoke.miquaner.serv.IMsgServ;
 import com.taoke.miquaner.serv.ISmsServ;
 import com.taoke.miquaner.serv.IUserServ;
-import com.taoke.miquaner.util.BeanUtil;
-import com.taoke.miquaner.util.DateUtils;
-import com.taoke.miquaner.util.ErrorR;
-import com.taoke.miquaner.util.Result;
+import com.taoke.miquaner.util.*;
 import com.taoke.miquaner.view.*;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -396,7 +393,7 @@ public class UserServImpl implements IUserServ {
         }
 
         data.add(0, this.getHeaders());
-        return writeFile(filePath, data, this.getColWidth());
+        return ExportUtils.writeFile(filePath, data, this.getColWidth());
     }
 
     @Override
@@ -408,7 +405,7 @@ public class UserServImpl implements IUserServ {
     public boolean exportAllNeedCheck(String filePath) {
         List<List<String>> data = this.userRepo.findAllByAliPayIdNotNullAndAliPidIsNull().stream().map(this.eUserRFunction).collect(Collectors.toList());
         data.add(0, this.getHeaders());
-        return writeFile(filePath, data, this.getColWidth());
+        return ExportUtils.writeFile(filePath, data, this.getColWidth());
     }
 
     @Override
@@ -430,7 +427,7 @@ public class UserServImpl implements IUserServ {
         }
 
         data.add(0, this.getHeaders());
-        return writeFile(filePath, data, this.getColWidth());
+        return ExportUtils.writeFile(filePath, data, this.getColWidth());
     }
 
     @Override
@@ -443,7 +440,7 @@ public class UserServImpl implements IUserServ {
     public boolean exportSearch(String filePath, String search) {
         List<List<String>> data = this.userRepo.findAllByNameContainsOrRealNameContainsOrAliPayIdContainsOrPhoneContains(search, search, search, search).stream().map(this.eUserRFunction).collect(Collectors.toList());
         data.add(0, this.getHeaders());
-        return writeFile(filePath, data, this.getColWidth());
+        return ExportUtils.writeFile(filePath, data, this.getColWidth());
     }
 
     private List<Integer> getColWidth() {
@@ -452,60 +449,6 @@ public class UserServImpl implements IUserServ {
 
     private List<String> getHeaders() {
         return Arrays.asList("ID", "用户名", "姓名", "电话", "支付宝", "QQ", "微信", "申请理由", "PID", "邀请码", "其它");
-    }
-
-    private boolean writeFile(String filePath, List<List<String>> data, List<Integer> width) {
-        try (HSSFWorkbook wb = new HSSFWorkbook()) {
-            HSSFSheet s = wb.createSheet();
-            wb.setSheetName(0, "User");
-
-            HSSFCellStyle cs = wb.createCellStyle();
-            HSSFCellStyle cs2 = wb.createCellStyle();
-            HSSFFont f = wb.createFont();
-            HSSFFont f2 = wb.createFont();
-
-            f.setFontHeightInPoints((short) 12);
-            f.setColor(IndexedColors.BLACK.getIndex());
-            f.setBold(true);
-            f2.setFontHeightInPoints((short) 10);
-            f2.setColor(IndexedColors.GREY_80_PERCENT.getIndex());
-            f2.setBold(false);
-            cs.setFont(f);
-            cs2.setFont(f2);
-
-            int rowNum = 0, cellNum;
-            HSSFRow r = s.createRow(rowNum);
-            r.setHeight((short) 0x128);
-
-            HSSFCell c = null;
-            List<String> headers = data.get(0);
-            for (cellNum = 0; cellNum < headers.size(); cellNum++) {
-                c = r.createCell(cellNum);
-                c.setCellStyle(cs);
-                c.setCellValue(headers.get(cellNum));
-
-                s.setColumnWidth(cellNum, (int) (width.get(cellNum) * 16 / 0.05));
-            }
-
-            for (rowNum = 1; rowNum < data.size(); rowNum++) {
-                r = s.createRow(rowNum);
-                List<String> datum = data.get(rowNum);
-
-                for (cellNum = 0; cellNum < datum.size(); cellNum++) {
-                    c = r.createCell(cellNum);
-                    c.setCellStyle(cs2);
-                    c.setCellValue(datum.get(cellNum));
-                }
-            }
-
-            try (FileOutputStream out = new FileOutputStream(filePath)) {
-                wb.write(out);
-                return true;
-            }
-        } catch (IOException e) {
-            logger.error(e);
-            return false;
-        }
     }
 
     private Object clearToken(Long id) {

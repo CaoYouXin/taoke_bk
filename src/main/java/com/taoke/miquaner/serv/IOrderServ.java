@@ -27,4 +27,8 @@ public interface IOrderServ {
 
     Object payUserWithdraw(Long withdrawId);
 
+    boolean exportWithdraw(String filePath, Integer type);
+
+    boolean exportWithdraw(String filePath, String key);
+
 }
