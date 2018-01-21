@@ -45,4 +45,6 @@ public interface IUserServ {
 
     Object competeInfo(EUser user, UserRegisterSubmit userRegisterSubmit);
 
+    Object getCustomerService(EUser user);
+
 }

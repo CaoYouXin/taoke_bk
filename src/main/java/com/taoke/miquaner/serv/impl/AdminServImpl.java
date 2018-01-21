@@ -55,7 +55,7 @@ public class AdminServImpl implements IAdminServ {
 
     @Override
     public Object setSuperUser(SuperUserSubmit superUserSubmit) {
-        EConfig checkSt = this.configRepo.findByKeyEqualsAndAndValueEquals(EConfig.SERVER_TOKEN, superUserSubmit.getSt());
+        EConfig checkSt = this.configRepo.findByKeyEqualsAndValueEquals(EConfig.SERVER_TOKEN, superUserSubmit.getSt());
         if (null == checkSt) {
             return Result.fail(new ErrorR(ErrorR.ST_NOT_MATCH, ST_NOT_MATCH));
         }

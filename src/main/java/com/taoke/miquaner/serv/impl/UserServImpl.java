@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 public class UserServImpl implements IUserServ {
 
     private static final Logger logger = LogManager.getLogger(UserServImpl.class);
+
     private static final String USER_WRONG_PWD = "用户密码错误";
     private static final String ALREADY_REGISTERED_USER = "已经注册过，请直接登录，或者找回密码";
     private static final String NO_CORRECT_PHONE = "手机号格式不正确";
@@ -39,6 +40,7 @@ public class UserServImpl implements IUserServ {
     private static final String NO_INV_CODE_FOUND = "没有找到该邀请码";
     private static final String THIRD_CAN_NOT_ENROLL = "您没有申请成为合伙人的权限";
     private static final String NO_INFO_FOUND = "特定信息未找到，无法完成操作";
+
     private final UserRepo userRepo;
     private final TokenRepo tokenRepo;
     private final SmsCodeRepo smsCodeRepo;
@@ -455,6 +457,28 @@ public class UserServImpl implements IUserServ {
         this.userRepo.save(one);
 
         return Result.success(null);
+    }
+
+    @Override
+    public Object getCustomerService(EUser user) {
+        user = this.userRepo.findOne(user.getId());
+        if (null == user) {
+            return Result.fail(new ErrorR(ErrorR.NO_USER_FOUND, ErrorR.NO_USER_FOUND_MSG));
+        }
+
+        if (null == user.getpUser()) {
+            EConfig weChat = this.configRepo.findByKeyEquals(AliMaMaSubmit.WE_CHAT);
+            EConfig mqq = this.configRepo.findByKeyEquals(AliMaMaSubmit.M_QQ);
+            return Result.success(new CustomerServiceView(
+                    null == weChat || null == weChat.getValue() ? "" : weChat.getValue(),
+                    null == mqq || null == mqq.getValue() ? "" : mqq.getValue()
+            ));
+        }
+
+        return Result.success(new CustomerServiceView(
+                null == user.getpUser().getWeChatId() ? "" : user.getpUser().getWeChatId(),
+                null == user.getpUser().getQqId() ? "" : user.getpUser().getQqId()
+        ));
     }
 
     private List<Integer> getColWidth() {

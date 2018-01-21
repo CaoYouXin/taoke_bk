@@ -13,6 +13,8 @@ public class AliMaMaSubmit {
     public static final String PLATFORM_CODE = "PlatformCode";
     public static final String ANDROID_URL = "AndroidUrl";
     public static final String IOS_URL = "IosUrl";
+    public static final String WE_CHAT = "WeChat";
+    public static final String M_QQ = "Mqq";
 
     private String account;
     private String mail;
@@ -25,6 +27,8 @@ public class AliMaMaSubmit {
     private String platformCode;
     private String androidUrl;
     private String iosUrl;
+    private String weChat;
+    private String mqq;
 
     public String getAccount() {
         return account;
@@ -112,5 +116,21 @@ public class AliMaMaSubmit {
 
     public void setIosUrl(String iosUrl) {
         this.iosUrl = iosUrl;
+    }
+
+    public String getWeChat() {
+        return weChat;
+    }
+
+    public void setWeChat(String weChat) {
+        this.weChat = weChat;
+    }
+
+    public String getMqq() {
+        return mqq;
+    }
+
+    public void setMqq(String mqq) {
+        this.mqq = mqq;
     }
 }

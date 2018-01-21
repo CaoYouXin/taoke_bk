@@ -125,4 +125,16 @@ public class UserCtrl {
         return this.userServ.searchUsers(pageNo, search);
     }
 
+    @Auth
+    @RequestMapping(value = "/tbk/user/customerService", method = RequestMethod.GET)
+    public Object getCustomerService(HttpServletRequest request) {
+        EUser user = null;
+        try {
+            user = EUser.class.cast(request.getAttribute("user"));
+        } catch (Exception e) {
+            return Result.fail(new ErrorR(ErrorR.NO_USER_FOUND, ErrorR.NO_USER_FOUND_MSG));
+        }
+        return this.userServ.getCustomerService(user);
+    }
+
 }
