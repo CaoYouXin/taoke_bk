@@ -13,8 +13,6 @@ import com.taoke.miquaner.util.*;
 import com.taoke.miquaner.view.*;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
@@ -23,8 +21,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,7 +29,6 @@ import java.util.stream.Collectors;
 public class UserServImpl implements IUserServ {
 
     private static final Logger logger = LogManager.getLogger(UserServImpl.class);
-    private static final String NO_USER_FOUND = "没有该用户";
     private static final String USER_WRONG_PWD = "用户密码错误";
     private static final String ALREADY_REGISTERED_USER = "已经注册过，请直接登录，或者找回密码";
     private static final String NO_CORRECT_PHONE = "手机号格式不正确";
@@ -43,7 +38,14 @@ public class UserServImpl implements IUserServ {
     private static final String NEED_NAME_UNIQUE = "该名字已被注册";
     private static final String NO_INV_CODE_FOUND = "没有找到该邀请码";
     private static final String THIRD_CAN_NOT_ENROLL = "您没有申请成为合伙人的权限";
-
+    private static final String NO_INFO_FOUND = "特定信息未找到，无法完成操作";
+    private final UserRepo userRepo;
+    private final TokenRepo tokenRepo;
+    private final SmsCodeRepo smsCodeRepo;
+    private final ConfigRepo configRepo;
+    private final AdminRepo adminRepo;
+    private final IMsgServ msgServ;
+    private final ISmsServ smsServ;
     private Function<EUser, List<String>> eUserRFunction = user -> {
         String ext = user.getExt();
         if (null == ext && null != user.getpUser()) {
@@ -63,7 +65,6 @@ public class UserServImpl implements IUserServ {
                 ext
         );
     };
-
     private Converter<EUser, EUser> userConverter = user -> {
         EUser viewUser = new EUser();
         BeanUtils.copyProperties(user, viewUser, "pUser", "cUsers", "withdraws", "sentMails", "receivedMails", "createdMessages");
@@ -72,14 +73,6 @@ public class UserServImpl implements IUserServ {
         }
         return viewUser;
     };
-
-    private final UserRepo userRepo;
-    private final TokenRepo tokenRepo;
-    private final SmsCodeRepo smsCodeRepo;
-    private final ConfigRepo configRepo;
-    private final AdminRepo adminRepo;
-    private final IMsgServ msgServ;
-    private final ISmsServ smsServ;
 
     @Autowired
     public UserServImpl(ISmsServ smsServ, IMsgServ msgServ, AdminRepo adminRepo, UserRepo userRepo, TokenRepo tokenRepo, SmsCodeRepo smsCodeRepo, ConfigRepo configRepo) {
@@ -96,7 +89,7 @@ public class UserServImpl implements IUserServ {
     public Object login(EUser user) {
         EUser one = this.userRepo.findByPhoneEquals(user.getPhone());
         if (null == one) {
-            return Result.fail(new ErrorR(ErrorR.NO_USER_FOUND, NO_USER_FOUND));
+            return Result.fail(new ErrorR(ErrorR.NO_USER_FOUND, ErrorR.NO_USER_FOUND_MSG));
         }
 
         if (!one.getPwd().equals(user.getPwd())) {
@@ -231,6 +224,7 @@ public class UserServImpl implements IUserServ {
         EUser eUser = new EUser();
         eUser.setId(user.getId());
         eUser.setName(user.getName());
+        eUser.setRealName(user.getRealName());
         eUser.setPhone(user.getPhone());
         eUser.setAliPid(user.getAliPid());
         eUser.setCode(user.getCode());
@@ -441,6 +435,26 @@ public class UserServImpl implements IUserServ {
         List<List<String>> data = this.userRepo.findAllByNameContainsOrRealNameContainsOrAliPayIdContainsOrPhoneContains(search, search, search, search).stream().map(this.eUserRFunction).collect(Collectors.toList());
         data.add(0, this.getHeaders());
         return ExportUtils.writeFile(filePath, data, this.getColWidth());
+    }
+
+    @Override
+    public Object competeInfo(EUser user, UserRegisterSubmit userRegisterSubmit) {
+        Object x = checkSmsCode(userRegisterSubmit.getUser().getPhone(), userRegisterSubmit.getCode());
+        if (x != null) return x;
+
+        if (StringUtils.isNullOrEmpty(userRegisterSubmit.getUser().getAliPayId())) {
+            return Result.fail(new ErrorR(ErrorR.NO_INFO_FOUND, NO_INFO_FOUND));
+        }
+
+        EUser one = this.userRepo.findOne(user.getId());
+        if (null == one) {
+            return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
+        }
+
+        one.setAliPayId(userRegisterSubmit.getUser().getAliPayId());
+        this.userRepo.save(one);
+
+        return Result.success(null);
     }
 
     private List<Integer> getColWidth() {

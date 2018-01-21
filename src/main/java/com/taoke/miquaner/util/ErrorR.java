@@ -6,6 +6,7 @@ public class ErrorR {
     public static final String NO_ID_FOUND_MSG = "没有找到主键，错误可能发生在前端漏传主键字段";
     public static final String NOT_FOR_BUYER_MSG = "购买者不享有此功能";
     public static final String DOWNLOAD_ERROR_MSG = "下载文件错误";
+    public static final String NO_USER_FOUND_MSG = "没有该用户";
 
     static final String SQL_ERROR = "SQL_ERROR";
 
@@ -42,6 +43,7 @@ public class ErrorR {
     public static final String FAIL_ON_JD_API = "FAIL_ON_JD_API";
     public static final String FAIL_ON_OBJECT_MAPPER_API = "FAIL_ON_OBJECT_MAPPER_API";
     public static final String FAIL_ON_SERV_RET_NON_RESULT = "FAIL_ON_SERV_RET_NON_RESULT";
+    public static final String NO_INFO_FOUND = "NO_INFO_FOUND";
 
     private String key;
     private String msg;

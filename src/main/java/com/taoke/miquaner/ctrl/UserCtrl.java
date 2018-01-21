@@ -1,9 +1,12 @@
 package com.taoke.miquaner.ctrl;
 
+import com.mysql.jdbc.StringUtils;
 import com.taoke.miquaner.MiquanerApplication;
 import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.serv.IUserServ;
 import com.taoke.miquaner.util.Auth;
+import com.taoke.miquaner.util.ErrorR;
+import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.EnrollSubmit;
 import com.taoke.miquaner.view.PhoneVerifySubmit;
 import com.taoke.miquaner.view.UserRegisterSubmit;
@@ -55,6 +58,30 @@ public class UserCtrl {
     @RequestMapping(value = "/tbk/user/apply/4/agent", method = RequestMethod.POST)
     public Object apply4Agent(@RequestBody EnrollSubmit enrollSubmit, HttpServletRequest request) {
         return this.userServ.enroll((EUser) request.getAttribute("user"), enrollSubmit);
+    }
+
+    @Auth
+    @RequestMapping(value = "/tbk/user/canWithdraw", method = RequestMethod.GET)
+    public Object canWithdraw(HttpServletRequest request) {
+        EUser user = null;
+        try {
+            user = EUser.class.cast(request.getAttribute("user"));
+        } catch (Exception e) {
+            return Result.success(false);
+        }
+        return Result.success(!StringUtils.isNullOrEmpty(user.getAliPayId()));
+    }
+
+    @Auth
+    @RequestMapping(value = "/tbk/user/competeInfo", method = RequestMethod.POST)
+    public Object competeInfo(@RequestBody UserRegisterSubmit userRegisterSubmit, HttpServletRequest request) {
+        EUser user = null;
+        try {
+            user = EUser.class.cast(request.getAttribute("user"));
+        } catch (Exception e) {
+            return Result.fail(new ErrorR(ErrorR.NO_USER_FOUND, ErrorR.NO_USER_FOUND_MSG));
+        }
+        return this.userServ.competeInfo(user, userRegisterSubmit);
     }
 
     @Auth(isAdmin = true)

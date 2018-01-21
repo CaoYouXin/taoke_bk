@@ -43,4 +43,6 @@ public interface IUserServ {
 
     boolean exportSearch(String filePath, String search);
 
+    Object competeInfo(EUser user, UserRegisterSubmit userRegisterSubmit);
+
 }
