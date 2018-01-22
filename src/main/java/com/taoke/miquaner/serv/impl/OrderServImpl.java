@@ -72,6 +72,7 @@ public class OrderServImpl implements IOrderServ {
         List<String> row = new ArrayList<>();
         row.add(eWithdraw.getId().toString());
         row.add(String.format("%s(%s)", eWithdraw.getUser().getName(), eWithdraw.getUser().getRealName()));
+        row.add(eWithdraw.getUser().getAliPayId());
         row.add(eWithdraw.getAmount());
         row.add(MiquanerApplication.DEFAULT_DATE_FORMAT.format(eWithdraw.getCreateTime()));
         row.add(eWithdraw.getPayed() ? "已支付" : "未支付");
@@ -550,11 +551,11 @@ public class OrderServImpl implements IOrderServ {
     }
 
     private List<String> getHeaders() {
-        return Arrays.asList("ID", "用户名", "提现金额", "创建时间", "状态", "支付时间");
+        return Arrays.asList("ID", "用户名", "支付宝号", "提现金额", "创建时间", "状态", "支付时间");
     }
 
     private List<Integer> getColWidths() {
-        return Arrays.asList(9, 12, 10, 15, 9, 15);
+        return Arrays.asList(9, 12, 10, 10, 15, 9, 15);
     }
 
     private UserCommitView getUserCommitView(EUser user, final Double percent) {
