@@ -19,9 +19,9 @@ public interface UserRepo extends JpaRepository<EUser, Long> {
 
     List<EUser> findAllByExtNotContainsOrExtIsNull(String ext);
 
-    Page<EUser> findAllByAliPayIdNotNullAndAliPidIsNull(Pageable pageable);
+    Page<EUser> findAllByAnnouncementNotNullAndAliPidIsNull(Pageable pageable);
 
-    List<EUser> findAllByAliPayIdNotNullAndAliPidIsNull();
+    List<EUser> findAllByAnnouncementNotNullAndAliPidIsNull();
 
     Page<EUser> findAllByExtContains(String ext, Pageable pageable);
 

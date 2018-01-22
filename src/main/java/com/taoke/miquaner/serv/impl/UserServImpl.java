@@ -354,6 +354,7 @@ public class UserServImpl implements IUserServ {
 
         one.setAliPid(null);
         one.setCode(null);
+        one.setAnnouncement(null);
         this.userRepo.save(one);
         clearToken(id);
 
@@ -394,12 +395,12 @@ public class UserServImpl implements IUserServ {
 
     @Override
     public Object listAllNeedCheckUsers(Integer pageNo) {
-        return Result.success(this.userRepo.findAllByAliPayIdNotNullAndAliPidIsNull(new PageRequest(Math.max(0, pageNo - 1), 10, new Sort(Sort.Direction.ASC, "id"))).map(userConverter));
+        return Result.success(this.userRepo.findAllByAnnouncementNotNullAndAliPidIsNull(new PageRequest(Math.max(0, pageNo - 1), 10, new Sort(Sort.Direction.ASC, "id"))).map(userConverter));
     }
 
     @Override
     public boolean exportAllNeedCheck(String filePath) {
-        List<List<String>> data = this.userRepo.findAllByAliPayIdNotNullAndAliPidIsNull().stream().map(this.eUserRFunction).collect(Collectors.toList());
+        List<List<String>> data = this.userRepo.findAllByAnnouncementNotNullAndAliPidIsNull().stream().map(this.eUserRFunction).collect(Collectors.toList());
         data.add(0, this.getHeaders());
         return ExportUtils.writeFile(filePath, data, this.getColWidth());
     }
