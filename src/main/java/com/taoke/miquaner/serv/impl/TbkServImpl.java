@@ -264,6 +264,21 @@ public class TbkServImpl implements ITbkServ {
             uatmTbkItems.addAll(this.getUatmTbkItems(userRate, favoriteId, 2L, adZoneId));
         }
 
+        return Result.success(uatmTbkItems);
+    }
+
+    @Override
+    public Object getFavoriteItemsV2(Long favoriteId, Long pageNo, EUser user, boolean isSuper) {
+        DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
+        final double userRate = isSuper ? (1.0 - tenth.platform) : tenth.second;
+
+        final long adZoneId = Long.parseLong(user.getAliPid().substring(user.getAliPid().lastIndexOf('_') + 1));
+
+        List<UatmTbkItem> uatmTbkItems = this.getUatmTbkItems(userRate, favoriteId, 1L, adZoneId);
+        if (uatmTbkItems.size() == 100) {
+            uatmTbkItems.addAll(this.getUatmTbkItems(userRate, favoriteId, 2L, adZoneId));
+        }
+
         return Result.success(new FavItemsView(uatmTbkItems,
                 this.homeServ.getFavOrder(favoriteId).stream()
                         .map(EFavoriteOrder::getNumIid)

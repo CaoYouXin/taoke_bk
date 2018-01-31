@@ -73,6 +73,13 @@ public class TbkCtrl {
     }
 
     @Auth
+    @RequestMapping(value = "/tbk/fav/{favId}/list/{pageNo}/v2", method = RequestMethod.GET)
+    public Object getFavoriteItemsV2(@PathVariable(name = "favId") Long favoriteId, @PathVariable(name = "pageNo") Long pageNo, HttpServletRequest request) {
+        return this.tbkServ.getFavoriteItemsV2(favoriteId, pageNo,
+                (EUser) request.getAttribute("user"), (Boolean) request.getAttribute("super"));
+    }
+
+    @Auth
     @RequestMapping(value = "/tbk/search/{keyword}", method = RequestMethod.GET)
     public Object search(@PathVariable(name = "keyword") String keyword, HttpServletRequest request) {
         return this.tbkServ.search((EUser) request.getAttribute("user"), keyword, (Boolean) request.getAttribute("super"));
