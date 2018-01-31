@@ -2,6 +2,7 @@ package com.taoke.miquaner.ctrl;
 
 import com.taoke.miquaner.data.EAdZoneItem;
 import com.taoke.miquaner.data.ECate;
+import com.taoke.miquaner.data.EFavoriteOrder;
 import com.taoke.miquaner.data.EHomeBtn;
 import com.taoke.miquaner.serv.IHomeServ;
 import com.taoke.miquaner.util.Auth;
@@ -111,6 +112,18 @@ public class HomeCtrl {
             default:
                 return this.homeServ.getAdZone(false);
         }
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/home/fav/order/set", method = RequestMethod.POST)
+    public Object setFavOrder(@RequestBody EFavoriteOrder favoriteOrder) {
+        return this.homeServ.postFavOrder(favoriteOrder);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/home/fav/order/del/{favId}/{numIid}", method = RequestMethod.GET)
+    public Object removeFavOrder(@PathVariable(name = "favId") Long favId, @PathVariable(name = "numIid") Long numIid) {
+        return this.homeServ.removeFavOrder(favId, numIid);
     }
 
 }

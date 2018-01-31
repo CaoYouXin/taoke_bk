@@ -2,9 +2,11 @@ package com.taoke.miquaner.serv.impl;
 
 import com.taoke.miquaner.data.EAdZoneItem;
 import com.taoke.miquaner.data.ECate;
+import com.taoke.miquaner.data.EFavoriteOrder;
 import com.taoke.miquaner.data.EHomeBtn;
 import com.taoke.miquaner.repo.AdZoneItemRepo;
 import com.taoke.miquaner.repo.CateRepo;
+import com.taoke.miquaner.repo.FavoriteOrderRepo;
 import com.taoke.miquaner.repo.HomeBtnRepo;
 import com.taoke.miquaner.serv.IHomeServ;
 import com.taoke.miquaner.util.ErrorR;
@@ -13,18 +15,22 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class HomeServImpl implements IHomeServ {
 
     private final HomeBtnRepo homeBtnRepo;
     private final CateRepo cateRepo;
     private final AdZoneItemRepo adZoneItemRepo;
+    private final FavoriteOrderRepo favoriteOrderRepo;
 
     @Autowired
-    public HomeServImpl(HomeBtnRepo homeBtnRepo, CateRepo cateRepo, AdZoneItemRepo adZoneItemRepo) {
+    public HomeServImpl(HomeBtnRepo homeBtnRepo, CateRepo cateRepo, AdZoneItemRepo adZoneItemRepo, FavoriteOrderRepo favoriteOrderRepo) {
         this.homeBtnRepo = homeBtnRepo;
         this.cateRepo = cateRepo;
         this.adZoneItemRepo = adZoneItemRepo;
+        this.favoriteOrderRepo = favoriteOrderRepo;
     }
 
     @Override
@@ -126,6 +132,34 @@ public class HomeServImpl implements IHomeServ {
         } catch (Exception e) {
             return Result.fail(new ErrorR(ErrorR.NO_ID_FOUND, ErrorR.NO_ID_FOUND_MSG));
         }
+    }
+
+    @Override
+    public Object postFavOrder(EFavoriteOrder favoriteOrder) {
+        EFavoriteOrder one = this.favoriteOrderRepo.findByFavoriteIdEqualsAndNumIidEquals(favoriteOrder.getFavoriteId(), favoriteOrder.getNumIid());
+        if (null != one) {
+            one.setOrder(favoriteOrder.getOrder());
+            favoriteOrder = one;
+        }
+
+        EFavoriteOrder saved = this.favoriteOrderRepo.save(favoriteOrder);
+        return Result.success(saved);
+    }
+
+    @Override
+    public Object removeFavOrder(Long favId, Long numIid) {
+        EFavoriteOrder one = this.favoriteOrderRepo.findByFavoriteIdEqualsAndNumIidEquals(favId, numIid);
+        if (null == one) {
+            return Result.success(null);
+        }
+
+        this.favoriteOrderRepo.delete(one);
+        return Result.success(null);
+    }
+
+    @Override
+    public List<EFavoriteOrder> getFavOrder(Long favoriteId) {
+        return this.favoriteOrderRepo.findAllByFavoriteIdOrderByOrderDesc(favoriteId);
     }
 
     private Object postHomeBtn(EHomeBtn homeBtn, Integer locationType) {

@@ -25,6 +25,8 @@ public interface ITbkServ {
 
     Object getFavoriteItems(Long favoriteId, Long pageNo, EUser user, boolean isSuper);
 
+    Object getFavoriteItems(Long favoriteId);
+
     Object search(EUser user, String keyword, Boolean isSuper);
 
     Object hints(String keyword);

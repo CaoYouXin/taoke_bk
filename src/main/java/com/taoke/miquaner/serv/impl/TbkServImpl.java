@@ -9,13 +9,11 @@ import com.taobao.api.domain.UatmTbkItem;
 import com.taobao.api.request.*;
 import com.taobao.api.response.*;
 import com.taoke.miquaner.MiquanerApplication;
-import com.taoke.miquaner.data.EConfig;
-import com.taoke.miquaner.data.ESearchKeyWord;
-import com.taoke.miquaner.data.ETbkItem;
-import com.taoke.miquaner.data.EUser;
+import com.taoke.miquaner.data.*;
 import com.taoke.miquaner.repo.ConfigRepo;
 import com.taoke.miquaner.repo.SearchKeyWordRepo;
 import com.taoke.miquaner.repo.TbkItemRepo;
+import com.taoke.miquaner.serv.IHomeServ;
 import com.taoke.miquaner.serv.IShareServ;
 import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.util.DivideByTenthUtil;
@@ -53,13 +51,15 @@ public class TbkServImpl implements ITbkServ {
     private final SearchKeyWordRepo searchKeyWordRepo;
     private final TbkItemRepo tbkItemRepo;
     private final IShareServ shareServ;
+    private final IHomeServ homeServ;
 
     @Autowired
-    public TbkServImpl(IShareServ shareServ, ConfigRepo configRepo, SearchKeyWordRepo searchKeyWordRepo, TbkItemRepo tbkItemRepo) {
+    public TbkServImpl(IShareServ shareServ, ConfigRepo configRepo, SearchKeyWordRepo searchKeyWordRepo, TbkItemRepo tbkItemRepo, IHomeServ homeServ) {
         this.shareServ = shareServ;
         this.configRepo = configRepo;
         this.searchKeyWordRepo = searchKeyWordRepo;
         this.tbkItemRepo = tbkItemRepo;
+        this.homeServ = homeServ;
 
         this.initParams();
     }
@@ -233,7 +233,7 @@ public class TbkServImpl implements ITbkServ {
         TaobaoClient client = new DefaultTaobaoClient(this.serverUrl, this.appKey, this.secret);
         TbkUatmFavoritesGetRequest req = new TbkUatmFavoritesGetRequest();
         req.setPageNo(pageNo);
-        req.setPageSize(20L);
+        req.setPageSize(100L);
         req.setFields("favorites_title,favorites_id,type");
         req.setType(-1L);
         TbkUatmFavoritesGetResponse rsp = null;
@@ -264,7 +264,32 @@ public class TbkServImpl implements ITbkServ {
             uatmTbkItems.addAll(this.getUatmTbkItems(userRate, favoriteId, 2L, adZoneId));
         }
 
-        return Result.success(uatmTbkItems);
+        return Result.success(new FavItemsView(uatmTbkItems,
+                this.homeServ.getFavOrder(favoriteId).stream()
+                        .map(EFavoriteOrder::getNumIid)
+                        .collect(Collectors.toList())
+        ));
+    }
+
+    @Override
+    public Object getFavoriteItems(Long favoriteId) {
+        final EConfig config = this.configRepo.findByKeyEquals(AliMaMaSubmit.PID_K);
+        if (null == config) {
+            return Result.fail(new ErrorR(ErrorR.FAIL_ON_EXTRACT_OBJECT_CONFIG, FAIL_ON_EXTRACT_OBJECT_CONFIG));
+        }
+        final long adZoneId = Long.parseLong(config.getValue().substring(config.getValue().lastIndexOf('_') + 1));
+        final DivideByTenthUtil.Tenth tenth = DivideByTenthUtil.get(this.configRepo);
+
+        List<UatmTbkItem> uatmTbkItems = this.getUatmTbkItems(tenth.platform, favoriteId, 1L, adZoneId);
+        if (uatmTbkItems.size() == 100) {
+            uatmTbkItems.addAll(this.getUatmTbkItems(tenth.platform, favoriteId, 2L, adZoneId));
+        }
+
+        return Result.success(new FavItemsView(uatmTbkItems,
+                this.homeServ.getFavOrder(favoriteId).stream()
+                        .map(EFavoriteOrder::getNumIid)
+                        .collect(Collectors.toList())
+        ));
     }
 
     private List<UatmTbkItem> getUatmTbkItems(final double userRate, final Long favoriteId, final Long pageNo, final long adZoneId) {

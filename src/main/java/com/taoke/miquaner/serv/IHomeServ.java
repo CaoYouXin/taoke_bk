@@ -2,7 +2,10 @@ package com.taoke.miquaner.serv;
 
 import com.taoke.miquaner.data.EAdZoneItem;
 import com.taoke.miquaner.data.ECate;
+import com.taoke.miquaner.data.EFavoriteOrder;
 import com.taoke.miquaner.data.EHomeBtn;
+
+import java.util.List;
 
 public interface IHomeServ {
 
@@ -33,5 +36,11 @@ public interface IHomeServ {
     Object postAdZone(EAdZoneItem item);
 
     Object removeAdZone(Long id);
+
+    Object postFavOrder(EFavoriteOrder favoriteOrder);
+
+    Object removeFavOrder(Long favId, Long numIid);
+
+    List<EFavoriteOrder> getFavOrder(Long favoriteId);
 
 }

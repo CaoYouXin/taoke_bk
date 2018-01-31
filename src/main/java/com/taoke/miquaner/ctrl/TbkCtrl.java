@@ -1,6 +1,7 @@
 package com.taoke.miquaner.ctrl;
 
 import com.taoke.miquaner.data.EUser;
+import com.taoke.miquaner.serv.IHomeServ;
 import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.util.Auth;
 import com.taoke.miquaner.view.AliMaMaSubmit;
@@ -56,6 +57,12 @@ public class TbkCtrl {
     @RequestMapping(value = "/tbk/fav/list/{pageNo}", method = RequestMethod.GET)
     public Object getFavoriteList(@PathVariable(name = "pageNo") Long pageNo) {
         return this.tbkServ.getFavoriteList(pageNo);
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/tbk/fav/{favId}/list/all", method = RequestMethod.GET)
+    public Object getFavoriteItems(@PathVariable(name = "favId") Long favoriteId) {
+        return this.tbkServ.getFavoriteItems(favoriteId);
     }
 
     @Auth
