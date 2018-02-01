@@ -56,4 +56,7 @@ public class StringUtils {
         return str;
     }
 
+    public static String randomMd5() {
+        return getMD5(Double.toString(Math.random()));
+    }
 }
