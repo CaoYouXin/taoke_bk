@@ -3,6 +3,7 @@ package com.taoke.miquaner.ctrl;
 import com.mysql.jdbc.StringUtils;
 import com.taobao.api.internal.toplink.embedded.websocket.util.StringUtil;
 import com.taoke.miquaner.MiquanerApplication;
+import com.taoke.miquaner.serv.IBlogServ;
 import com.taoke.miquaner.serv.IOrderServ;
 import com.taoke.miquaner.serv.IShareServ;
 import com.taoke.miquaner.serv.IUserServ;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,13 +40,15 @@ public class FileCtrl {
     private final IUserServ userServ;
     private final IShareServ shareServ;
     private final IOrderServ orderServ;
+    private final IBlogServ blogServ;
 
     @Autowired
-    public FileCtrl(Environment env, IUserServ userServ, IShareServ shareServ, IOrderServ orderServ) {
+    public FileCtrl(Environment env, IUserServ userServ, IShareServ shareServ, IOrderServ orderServ, IBlogServ blogServ) {
         this.env = env;
         this.userServ = userServ;
         this.shareServ = shareServ;
         this.orderServ = orderServ;
+        this.blogServ = blogServ;
     }
 
     @RequestMapping(value = "/share/{key}", method = RequestMethod.GET)
@@ -67,6 +71,25 @@ public class FileCtrl {
             map.put("found", false);
         }
         return "shareHTML";
+    }
+
+    @RequestMapping(value = "/blog/{path}/{domain:.*}", method = RequestMethod.GET)
+    public ModelAndView blog(@PathVariable(name = "path") String path, @PathVariable(name = "domain") String domain) {
+        ModelAndView modelAndView = new ModelAndView();
+
+        try {
+            String content = this.blogServ.fetchBlog(
+                    path.replaceAll("&@&", "/"),
+                    domain.replaceAll("&@&", "/")
+            );
+            modelAndView.addObject("content", content);
+            modelAndView.addObject("found", true);
+        } catch (IOException e) {
+            modelAndView.addObject("found", false);
+        }
+
+        modelAndView.setViewName("blogHTML");
+        return modelAndView;
     }
 
     @Auth(isAdmin = true)

@@ -25,6 +25,10 @@ public class Result {
         return new Result(GENERAL_FAIL, body);
     }
 
+    public static Result failWithExp(Exception e) {
+        return fail(new ErrorR(ErrorR.CAN_NOT_SAVE_OBJECT, e.getMessage()));
+    }
+
     public static Result unAuth() {
         return new Result(UN_AUTH, null);
     }

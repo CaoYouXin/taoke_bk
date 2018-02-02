@@ -6,15 +6,20 @@ import com.taoke.miquaner.repo.FeedbackRepo;
 import com.taoke.miquaner.repo.HelpDocRepo;
 import com.taoke.miquaner.serv.IBlogServ;
 import com.taoke.miquaner.serv.exp.MdParseException;
+import com.taoke.miquaner.serv.exp.SearchTypeException;
 import com.taoke.miquaner.util.BeanUtil;
 import com.taoke.miquaner.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,8 +45,8 @@ public class BlogServImpl implements IBlogServ {
     }
 
     @Override
-    public String storeBlog(String userId, String fileName, String content) throws IOException {
-        String filePath = userId + BlogPosts + fileName;
+    public String storeBlog(String userId, String content) throws IOException {
+        String filePath = userId + BlogPosts + StringUtils.randomMd5() + ".md";
         FileCopyUtils.copy(content, new FileWriter(BlogRoot + filePath));
         return filePath;
     }
@@ -129,5 +134,26 @@ public class BlogServImpl implements IBlogServ {
     @Override
     public void removeHelpDoc(Long id) {
         this.helpDocRepo.delete(id);
+    }
+
+    @Override
+    public List<EHelpDoc> listAllHelpDoc() {
+        return this.helpDocRepo.findAllByOrderByOrderDesc();
+    }
+
+    @Override
+    public Page<EFeedback> listPagedFeedback(Integer type, Integer pageNo) throws SearchTypeException {
+        pageNo = Math.max(0, --pageNo);
+        PageRequest pageRequest = new PageRequest(pageNo, 10, Sort.Direction.DESC, "createTime");
+        switch (type) {
+            case 1:
+                return this.feedbackRepo.findAll(pageRequest);
+            case 2:
+                return this.feedbackRepo.findAllByCheckedEquals(true, pageRequest);
+            case 3:
+                return this.feedbackRepo.findAllByCheckedEquals(false, pageRequest);
+        }
+
+        throw new SearchTypeException("type [" + type + "] is not recognized");
     }
 }

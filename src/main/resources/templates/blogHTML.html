@@ -1,0 +1,54 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>觅券儿帮助博客</title>
+    <link href="../static/github-markdown.css" th:href="@{/api/github-markdown.css}" rel="stylesheet"/>
+    <style>
+        *, *:before, *:after {
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+
+        body {
+            padding-bottom: 3rem;
+        }
+
+        .footer {
+            line-height: 3rem;
+            font-size: 1rem;
+            position: fixed;
+            z-index: 1;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .footer>p {
+            text-align: center;
+            font-size: 1rem;
+            color: gray;
+            text-shadow: 0 1px 3px #000;
+        }
+    </style>
+</head>
+<body>
+<div th:if="${found} != true">
+    对不起，您要找的内容并没有找到！
+</div>
+
+<div th:if="${found} == true">
+    <div id="markdown" class="markdown-body"></div>
+    <script src="../static/showdown.1.7.2.min.js" th:src="@{/api/showdown.1.7.2.min.js}"></script>
+    <script th:inline="javascript">
+        var converter = new showdown.Converter({ tables: true }),
+            html = converter.makeHtml([[${content}]]);
+        document.getElementById('markdown').innerHTML = html;
+    </script>
+</div>
+
+<div class="footer">
+    <p>觅券儿提供技术支持</p>
+</div>
+
+</body>
+</html>

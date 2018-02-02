@@ -51,4 +51,14 @@ public class EHelpDoc {
     public void setOrder(Integer order) {
         this.order = order;
     }
+
+    @Override
+    public String toString() {
+        return "EHelpDoc{" +
+                "id=" + id +
+                ", path='" + path + '\'' +
+                ", title='" + title + '\'' +
+                ", order=" + order +
+                '}';
+    }
 }
