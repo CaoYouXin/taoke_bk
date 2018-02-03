@@ -4,6 +4,7 @@ import com.taoke.miquaner.data.EHelpDoc;
 
 public class HelpDocSubmit extends EHelpDoc {
 
+    private String fileName;
     private String content;
 
     public String getContent() {
@@ -14,10 +15,19 @@ public class HelpDocSubmit extends EHelpDoc {
         this.content = content;
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
     @Override
     public String toString() {
         return "HelpDocSubmit{" +
-                "content='" + content + '\'' +
+                "fileName='" + fileName + '\'' +
+                ", content='" + content + '\'' +
                 "} " + super.toString();
     }
 }

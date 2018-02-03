@@ -12,13 +12,15 @@ import java.util.List;
 
 public interface IBlogServ {
 
-    String storeBlog(String userId, String content) throws IOException;
+    String storeBlog(String userId, String fileName, String content) throws IOException;
 
     String fetchBlog(String filePath, String domain) throws IOException;
 
     String uploadImage(String userId, MultipartFile image) throws IOException;
 
     String parseTitle(String content) throws IOException;
+
+    String dryMarkdown(String content) throws IOException;
 
     EHelpDoc saveHelpDoc(EHelpDoc helpDoc);
 

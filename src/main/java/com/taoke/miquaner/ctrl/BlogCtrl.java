@@ -29,7 +29,7 @@ public class BlogCtrl {
     @RequestMapping(value = "/blog/helpdoc/post", method = RequestMethod.POST)
     public Object postHelpdoc(@RequestBody HelpDocSubmit helpDocSubmit) {
         try {
-            String filePath = this.blogServ.storeBlog(BlogAdmin, helpDocSubmit.getContent());
+            String filePath = this.blogServ.storeBlog(BlogAdmin, helpDocSubmit.getFileName(), helpDocSubmit.getContent());
             helpDocSubmit.setPath(filePath);
             EHelpDoc eHelpDoc = this.blogServ.saveHelpDoc(helpDocSubmit);
             return Result.success(eHelpDoc);

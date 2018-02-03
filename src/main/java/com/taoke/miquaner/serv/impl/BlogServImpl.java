@@ -45,8 +45,8 @@ public class BlogServImpl implements IBlogServ {
     }
 
     @Override
-    public String storeBlog(String userId, String content) throws IOException {
-        String filePath = userId + BlogPosts + StringUtils.randomMd5() + ".md";
+    public String storeBlog(String userId, String fileName, String content) throws IOException {
+        String filePath = userId + BlogPosts + fileName + ".md";
         FileCopyUtils.copy(content, new FileWriter(BlogRoot + filePath));
         return filePath;
     }
@@ -107,6 +107,34 @@ public class BlogServImpl implements IBlogServ {
         } while (!"---".equals(line));
 
         throw new MdParseException("no title config found");
+    }
+
+    @Override
+    public String dryMarkdown(String content) throws IOException {
+        StringReader sr = new StringReader(content);
+        BufferedReader br = new BufferedReader(sr);
+        String firstLine = br.readLine();
+        if (!"---".equals(firstLine)) {
+            return content;
+        }
+
+        String line = null;
+        do {
+            line = br.readLine();
+            if (null == line) {
+                throw new MdParseException("config not properly end");
+            }
+        } while (!"---".equals(line));
+
+        StringBuilder sb = new StringBuilder();
+        while (true) {
+            line = br.readLine();
+            if (null == line) {
+                return sb.toString();
+            }
+
+            sb.append(line).append('\n');
+        }
     }
 
     @Override

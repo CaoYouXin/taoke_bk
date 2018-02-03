@@ -82,7 +82,8 @@ public class FileCtrl {
                     path.replaceAll("&@&", "/"),
                     domain.replaceAll("&@&", "/")
             );
-            modelAndView.addObject("content", content);
+            modelAndView.addObject("title", this.blogServ.parseTitle(content));
+            modelAndView.addObject("content", this.blogServ.dryMarkdown(content));
             modelAndView.addObject("found", true);
         } catch (IOException e) {
             modelAndView.addObject("found", false);
