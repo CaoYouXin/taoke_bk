@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 @Service
 public class BlogServImpl implements IBlogServ {
 
-    private final static Pattern PATTERN = Pattern.compile("!\\[.*?]\\((?<imageUrl>.*?)\\)");
+    private final static Pattern PATTERN = Pattern.compile("!\\[(?<alt>.*?)]\\((?<imageUrl>.*?)\\)");
 
     private final HelpDocRepo helpDocRepo;
     private final FeedbackRepo feedbackRepo;
@@ -62,12 +62,13 @@ public class BlogServImpl implements IBlogServ {
         StringBuffer sb0 = new StringBuffer();
 
         while (m0.find()) {
+            String alt = m0.group("alt");
             String imageUrl = m0.group("imageUrl");
 
             if (!imageUrl.startsWith("http")) {
                 imageUrl = domain + imageUrl;
             }
-            m0.appendReplacement(sb0, imageUrl);
+            m0.appendReplacement(sb0, String.format("![%s](%s)", alt, imageUrl));
         }
         m0.appendTail(sb0);
 
