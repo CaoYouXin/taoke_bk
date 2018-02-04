@@ -7,6 +7,7 @@ public class ErrorR {
     public static final String NOT_FOR_BUYER_MSG = "购买者不享有此功能";
     public static final String DOWNLOAD_ERROR_MSG = "下载文件错误";
     public static final String NO_USER_FOUND_MSG = "没有该用户";
+    public static final String EXCEPTION_FOUND_MSG = "发生异常：";
 
     static final String SQL_ERROR = "SQL_ERROR";
 

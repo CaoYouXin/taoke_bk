@@ -47,13 +47,16 @@ public class BlogServImpl implements IBlogServ {
     @Override
     public String storeBlog(String userId, String fileName, String content) throws IOException {
         String filePath = userId + BlogPosts + fileName + ".md";
-        FileCopyUtils.copy(content, new FileWriter(BlogRoot + filePath));
+        File file = new File(BlogRoot + filePath);
+        this.makeFileExist(file);
+        FileCopyUtils.copy(content, new FileWriter(file));
         return filePath;
     }
 
     @Override
     public String fetchBlog(String filePath, String domain) throws IOException {
-        String content = FileCopyUtils.copyToString(new FileReader(BlogRoot + filePath));
+        String content = FileCopyUtils.copyToString(new FileReader(BlogRoot +
+                (filePath.endsWith(".md") ? filePath : filePath + ".md")));
 
         Matcher m0 = PATTERN.matcher(content);
         StringBuffer sb0 = new StringBuffer();
@@ -75,7 +78,9 @@ public class BlogServImpl implements IBlogServ {
     public String uploadImage(String userId, MultipartFile image) throws IOException {
         String filePath = userId + BlogImages + StringUtils.randomMd5()
                 + image.getOriginalFilename().substring(image.getOriginalFilename().lastIndexOf('.'));
-        image.transferTo(new File(BlogRoot + filePath));
+        File file = new File(BlogRoot + filePath);
+        this.makeFileExist(file);
+        image.transferTo(file);
         return filePath;
     }
 
@@ -183,5 +188,19 @@ public class BlogServImpl implements IBlogServ {
         }
 
         throw new SearchTypeException("type [" + type + "] is not recognized");
+    }
+
+    private void makeFileExist(File file) throws IOException {
+        if (!file.exists()) {
+            if (!file.getParentFile().exists()) {
+                if (!file.getParentFile().mkdirs()) {
+                    throw new IOException("can not make dirs");
+                }
+            }
+
+            if (!file.createNewFile()) {
+                throw new IOException("can not make new file");
+            }
+        }
     }
 }

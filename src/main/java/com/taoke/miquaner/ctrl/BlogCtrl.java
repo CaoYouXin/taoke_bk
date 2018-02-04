@@ -6,6 +6,9 @@ import com.taoke.miquaner.util.Auth;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
 import com.taoke.miquaner.view.HelpDocSubmit;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +17,8 @@ import java.io.IOException;
 
 @RestController
 public class BlogCtrl {
+
+    private final static Logger logger = LogManager.getLogger(BlogCtrl.class);
 
     private final String BlogAdmin;
     private final IBlogServ blogServ;
@@ -31,9 +36,12 @@ public class BlogCtrl {
         try {
             String filePath = this.blogServ.storeBlog(BlogAdmin, helpDocSubmit.getFileName(), helpDocSubmit.getContent());
             helpDocSubmit.setPath(filePath);
-            EHelpDoc eHelpDoc = this.blogServ.saveHelpDoc(helpDocSubmit);
-            return Result.success(eHelpDoc);
+            EHelpDoc eHelpDoc = new EHelpDoc();
+            BeanUtils.copyProperties(helpDocSubmit, eHelpDoc);
+            EHelpDoc saved = this.blogServ.saveHelpDoc(eHelpDoc);
+            return Result.success(saved);
         } catch (Exception e) {
+            logger.error("", e);
             return Result.failWithExp(e);
         }
     }
@@ -45,6 +53,29 @@ public class BlogCtrl {
             this.blogServ.removeHelpDoc(id);
             return Result.success(null);
         } catch (Exception e) {
+            logger.error("", e);
+            return Result.failWithExp(e);
+        }
+    }
+
+    @RequestMapping(value = "/blog/helpdoc/list", method = RequestMethod.GET)
+    public Object listHelpdoc() {
+        try {
+            return Result.success(this.blogServ.listAllHelpDoc());
+        } catch (Exception e) {
+            logger.error("", e);
+            return Result.failWithExp(e);
+        }
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/blog/raw/{path}", method = RequestMethod.GET)
+    public Object rowBlogContent(@PathVariable(name = "path") String path) {
+        try {
+            String content = this.blogServ.fetchBlog(path.replaceAll("&@&", "/"), "");
+            return Result.success(this.blogServ.dryMarkdown(content));
+        } catch (IOException e) {
+            logger.error("", e);
             return Result.failWithExp(e);
         }
     }

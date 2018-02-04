@@ -26,7 +26,7 @@ public class Result {
     }
 
     public static Result failWithExp(Exception e) {
-        return fail(new ErrorR(ErrorR.CAN_NOT_SAVE_OBJECT, e.getMessage()));
+        return fail(new ErrorR(ErrorR.CAN_NOT_SAVE_OBJECT, ErrorR.EXCEPTION_FOUND_MSG + e.getClass().getName()));
     }
 
     public static Result unAuth() {
