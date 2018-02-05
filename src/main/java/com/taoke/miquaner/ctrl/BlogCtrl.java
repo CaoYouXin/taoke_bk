@@ -1,10 +1,14 @@
 package com.taoke.miquaner.ctrl;
 
+import com.taoke.miquaner.data.EFeedback;
 import com.taoke.miquaner.data.EHelpDoc;
+import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.serv.IBlogServ;
 import com.taoke.miquaner.util.Auth;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
+import com.taoke.miquaner.util.StringUtils;
+import com.taoke.miquaner.view.FeedbackSubmit;
 import com.taoke.miquaner.view.HelpDocSubmit;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -13,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @RestController
@@ -75,6 +80,27 @@ public class BlogCtrl {
             String content = this.blogServ.fetchBlog(path.replaceAll("&@&", "/"), "");
             return Result.success(this.blogServ.dryMarkdown(content));
         } catch (IOException e) {
+            logger.error("", e);
+            return Result.failWithExp(e);
+        }
+    }
+
+    @Auth
+    @RequestMapping(value = "/blog/feedback/post", method = RequestMethod.POST)
+    public Object postHelpdoc(@RequestBody FeedbackSubmit feedbackSubmit, HttpServletRequest request) {
+        EUser user = (EUser) request.getAttribute("user");
+        if (null == user) {
+            return Result.unAuth();
+        }
+
+        try {
+            String filePath = this.blogServ.storeBlog(user.getPhone(), StringUtils.randomMd5(), feedbackSubmit.getContent());
+            feedbackSubmit.setPath(filePath);
+            EFeedback eFeedback = new EFeedback();
+            BeanUtils.copyProperties(feedbackSubmit, eFeedback);
+            EFeedback saved = this.blogServ.saveFeedback(eFeedback, user.getId());
+            return Result.success(saved);
+        } catch (Exception e) {
             logger.error("", e);
             return Result.failWithExp(e);
         }

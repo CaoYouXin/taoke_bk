@@ -24,7 +24,7 @@ public interface IBlogServ {
 
     EHelpDoc saveHelpDoc(EHelpDoc helpDoc);
 
-    EFeedback saveFeedback(EFeedback feedback);
+    EFeedback saveFeedback(EFeedback feedback, Long userId);
 
     void removeHelpDoc(Long id);
 

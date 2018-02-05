@@ -1,8 +1,10 @@
 package com.taoke.miquaner.ctrl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mysql.jdbc.StringUtils;
 import com.taobao.api.internal.toplink.embedded.websocket.util.StringUtil;
 import com.taoke.miquaner.MiquanerApplication;
+import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.serv.IBlogServ;
 import com.taoke.miquaner.serv.IOrderServ;
 import com.taoke.miquaner.serv.IShareServ;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -110,6 +113,35 @@ public class FileCtrl {
                 ret.put(uploadedFile.getOriginalFilename(), filename);
             }
             return new ResponseEntity<>(MiquanerApplication.DEFAULT_OBJECT_MAPPER.writeValueAsString(ret), HttpStatus.OK);
+        } catch (IOException e) {
+            logger.error("上传文件发生I/O错误");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+    @Auth
+    @RequestMapping(value = "/upload/client/images", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<?> uploadClientImages(@RequestParam("uploadFiles") MultipartFile[] uploadingFiles, HttpServletRequest request) {
+
+        EUser user = (EUser) request.getAttribute("user");
+        if (null == user) {
+            try {
+                return new ResponseEntity<>(MiquanerApplication.DEFAULT_OBJECT_MAPPER.writeValueAsString(Result.unAuth()), HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                logger.error("上传文件发生I/O错误");
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        try {
+            Map<String, String> ret = new HashMap<>();
+            for (MultipartFile uploadedFile : uploadingFiles) {
+                String filePath = this.blogServ.uploadImage(user.getPhone(), uploadedFile);
+                ret.put(uploadedFile.getOriginalFilename(), filePath);
+            }
+            return new ResponseEntity<>(MiquanerApplication.DEFAULT_OBJECT_MAPPER.writeValueAsString(Result.success(ret)), HttpStatus.OK);
         } catch (IOException e) {
             logger.error("上传文件发生I/O错误");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

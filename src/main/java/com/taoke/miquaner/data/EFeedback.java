@@ -16,15 +16,19 @@ public class EFeedback {
     private String path;
 
     @Column(name = "checked")
-    private Boolean checked;
+    private Boolean checked = false;
 
     @Column(name = "create_time", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
 
-    @Column(name = "check_time", nullable = false)
+    @Column(name = "check_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date checkTime;
+
+    @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private EUser user;
 
     public Long getId() {
         return id;
@@ -64,5 +68,25 @@ public class EFeedback {
 
     public void setCheckTime(Date checkTime) {
         this.checkTime = checkTime;
+    }
+
+    public EUser getUser() {
+        return user;
+    }
+
+    public void setUser(EUser user) {
+        this.user = user;
+    }
+
+    @Override
+    public String toString() {
+        return "EFeedback{" +
+                "id=" + id +
+                ", path='" + path + '\'' +
+                ", checked=" + checked +
+                ", createTime=" + createTime +
+                ", checkTime=" + checkTime +
+                ", user=" + user +
+                '}';
     }
 }

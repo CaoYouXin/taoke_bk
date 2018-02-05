@@ -2,14 +2,17 @@ package com.taoke.miquaner.serv.impl;
 
 import com.taoke.miquaner.data.EFeedback;
 import com.taoke.miquaner.data.EHelpDoc;
+import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.repo.FeedbackRepo;
 import com.taoke.miquaner.repo.HelpDocRepo;
+import com.taoke.miquaner.repo.UserRepo;
 import com.taoke.miquaner.serv.IBlogServ;
 import com.taoke.miquaner.serv.exp.MdParseException;
 import com.taoke.miquaner.serv.exp.SearchTypeException;
 import com.taoke.miquaner.util.BeanUtil;
 import com.taoke.miquaner.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +22,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,14 +32,23 @@ public class BlogServImpl implements IBlogServ {
 
     private final static Pattern PATTERN = Pattern.compile("!\\[(?<alt>.*?)]\\((?<imageUrl>.*?)\\)");
 
+    private final UserRepo userRepo;
     private final HelpDocRepo helpDocRepo;
     private final FeedbackRepo feedbackRepo;
     private final String BlogRoot;
     private final String BlogPosts;
     private final String BlogImages;
+    private Converter<EFeedback, EFeedback> feedbackConverter = feedback -> {
+        EUser user = feedback.getUser();
+        EUser view = new EUser();
+        view.setName(user.getName() + "-" + user.getPhone());
+        feedback.setUser(view);
+        return feedback;
+    };;
 
     @Autowired
-    public BlogServImpl(Environment env, HelpDocRepo helpDocRepo, FeedbackRepo feedbackRepo) {
+    public BlogServImpl(UserRepo userRepo, Environment env, HelpDocRepo helpDocRepo, FeedbackRepo feedbackRepo) {
+        this.userRepo = userRepo;
         this.helpDocRepo = helpDocRepo;
         this.feedbackRepo = feedbackRepo;
 
@@ -68,7 +81,7 @@ public class BlogServImpl implements IBlogServ {
             if (!imageUrl.startsWith("http")) {
                 imageUrl = domain + imageUrl;
             }
-            m0.appendReplacement(sb0, String.format("![%s](%s)", alt, imageUrl));
+            m0.appendReplacement(sb0, String.format("![%s](%s)", alt, imageUrl.replaceAll(" ", "%20")));
         }
         m0.appendTail(sb0);
 
@@ -155,14 +168,27 @@ public class BlogServImpl implements IBlogServ {
     }
 
     @Override
-    public EFeedback saveFeedback(EFeedback feedback) {
+    public EFeedback saveFeedback(EFeedback feedback, Long userId) {
         if (null != feedback.getId()) {
             EFeedback one = this.feedbackRepo.findOne(feedback.getId());
             BeanUtil.copyNotNullProps(feedback, one);
             feedback = one;
         }
 
-        return this.feedbackRepo.save(feedback);
+        if (null == feedback.getCreateTime()) {
+            feedback.setCreateTime(new Date());
+        }
+
+        if (feedback.getChecked() && null == feedback.getCheckTime()) {
+            feedback.setCheckTime(new Date());
+        }
+
+        feedback.setUser(this.userRepo.findOne(userId));
+
+        EFeedback saved = this.feedbackRepo.save(feedback);
+        saved.setUser(null);
+
+        return saved;
     }
 
     @Override
@@ -181,11 +207,11 @@ public class BlogServImpl implements IBlogServ {
         PageRequest pageRequest = new PageRequest(pageNo, 10, Sort.Direction.DESC, "createTime");
         switch (type) {
             case 1:
-                return this.feedbackRepo.findAll(pageRequest);
+                return this.feedbackRepo.findAll(pageRequest).map(feedbackConverter);
             case 2:
-                return this.feedbackRepo.findAllByCheckedEquals(true, pageRequest);
+                return this.feedbackRepo.findAllByCheckedEquals(true, pageRequest).map(feedbackConverter);
             case 3:
-                return this.feedbackRepo.findAllByCheckedEquals(false, pageRequest);
+                return this.feedbackRepo.findAllByCheckedEquals(false, pageRequest).map(feedbackConverter);
         }
 
         throw new SearchTypeException("type [" + type + "] is not recognized");
