@@ -1,7 +1,6 @@
 package com.taoke.miquaner.ctrl;
 
 import com.taoke.miquaner.data.EUser;
-import com.taoke.miquaner.serv.IHomeServ;
 import com.taoke.miquaner.serv.ITbkServ;
 import com.taoke.miquaner.util.Auth;
 import com.taoke.miquaner.view.AliMaMaSubmit;
@@ -14,6 +13,17 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 public class TbkCtrl {
+
+//    private final static Logger logger = LogManager.getLogger(TbkCtrl.class);
+//
+//    private final static Map<String, String> Domain2Selector;
+//
+//    static {
+//        Map<String, String> map = new HashMap<>();
+//        map.put("detail.m.tmall.com", "#modules-desc > div.module-container.item_picture > div > div > div");
+//        map.put("h5.m.taobao.com", "#J_newDetail > div > div.d-InfoMain > div.d-tabBox > div.itemPhotoDetail > div > div");
+//        Domain2Selector = Collections.unmodifiableMap(map);
+//    }
 
     private final ITbkServ tbkServ;
 
@@ -100,5 +110,26 @@ public class TbkCtrl {
     public Object hot() {
         return this.tbkServ.getTopSearchWords();
     }
+
+//    @RequestMapping(value = "/tbk/spider/{url:.+}", method = RequestMethod.GET)
+//    public Object spider(@PathVariable(name = "url") String url) {
+//        Document doc = null;
+//        try {
+//            doc = Jsoup.connect(url).get();
+//        } catch (IOException e) {
+//            logger.error("", e);
+//            return Result.failWithExp(e);
+//        }
+//
+//        int beginIndex = url.indexOf("//") + 2;
+//        int endIndex = url.indexOf('/', beginIndex);
+//        Elements wrappers = doc.select(Domain2Selector.get(url.substring(beginIndex, endIndex)));
+//        List<String> result = new ArrayList<>();
+//        for (Element wrapper : wrappers) {
+//            result.add(wrapper.child(0).attr("data-ks-lazyload"));
+//        }
+//
+//        return Result.success(result);
+//    }
 
 }
