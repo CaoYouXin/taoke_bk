@@ -41,6 +41,31 @@ public class MiquanerApplication {
 //        System.out.println(stack.pollFirst());
 //        System.out.println(stack.pollFirst());
 
+//        Document doc = null;
+//        try {
+////            doc = Jsoup.connect("https://detail.m.tmall.com/item.htm?id=555810799097").get();
+////            doc = Jsoup.connect("http://h5.m.taobao.com/awp/core/detail.htm?spm=a230r.1.14.77.27c64882B6lw1N&id=540279170272&ns=1&abbucket=6#detail").get();
+//            doc = Jsoup.connect("http://h5.m.taobao.com/awp/core/detail.htm?id=551079618929").get();
+//        } catch (IOException e) {
+//            System.err.println(e);
+//        }
+//        System.out.println(doc.toString());
+//        Elements wrappers = doc.select("#J_newDetail > div > div.d-InfoMain > div.d-tabBox > div.itemPhotoDetail > div > div");
+//        System.out.println(wrappers);
+//        for (Element wrapper : wrappers) {
+//            System.out.println(wrapper.child(0).attr("src"));
+//        }
+
+//        Document doc = null;
+//        try {
+//            Connection.Response response = Jsoup.connect("http://h5.m.taobao.com/awp/core/detail.htm?id=555810799097").execute();
+//            System.out.println(response.body());
+//            //            doc = response.body()
+//        } catch (IOException e) {
+//            System.err.println(e);
+//        }
+//        System.out.println(doc.toString());
+
         ConfigurableApplicationContext context = SpringApplication.run(MiquanerApplication.class, args);
 
         IInitServ initServ = context.getBean(IInitServ.class);
