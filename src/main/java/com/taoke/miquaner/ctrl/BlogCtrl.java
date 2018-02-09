@@ -4,6 +4,7 @@ import com.taoke.miquaner.data.EFeedback;
 import com.taoke.miquaner.data.EHelpDoc;
 import com.taoke.miquaner.data.EUser;
 import com.taoke.miquaner.serv.IBlogServ;
+import com.taoke.miquaner.serv.exp.SearchTypeException;
 import com.taoke.miquaner.util.Auth;
 import com.taoke.miquaner.util.ErrorR;
 import com.taoke.miquaner.util.Result;
@@ -15,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -87,7 +89,7 @@ public class BlogCtrl {
 
     @Auth
     @RequestMapping(value = "/blog/feedback/post", method = RequestMethod.POST)
-    public Object postHelpdoc(@RequestBody FeedbackSubmit feedbackSubmit, HttpServletRequest request) {
+    public Object postFeedback(@RequestBody FeedbackSubmit feedbackSubmit, HttpServletRequest request) {
         EUser user = (EUser) request.getAttribute("user");
         if (null == user) {
             return Result.unAuth();
@@ -100,6 +102,17 @@ public class BlogCtrl {
             BeanUtils.copyProperties(feedbackSubmit, eFeedback);
             EFeedback saved = this.blogServ.saveFeedback(eFeedback, user.getId());
             return Result.success(saved);
+        } catch (Exception e) {
+            logger.error("", e);
+            return Result.failWithExp(e);
+        }
+    }
+
+    @Auth(isAdmin = true)
+    @RequestMapping(value = "/blog/feedback/list/{type}/{pageNo}", method = RequestMethod.GET)
+    public Object listFeedback(@PathVariable(name = "type") Integer type, @PathVariable(name = "pageNo") Integer pageNo) {
+        try {
+            return Result.success(this.blogServ.listPagedFeedback(type, pageNo));
         } catch (Exception e) {
             logger.error("", e);
             return Result.failWithExp(e);
