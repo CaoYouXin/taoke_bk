@@ -22,6 +22,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -62,7 +63,7 @@ public class BlogServImpl implements IBlogServ {
         String filePath = userId + BlogPosts + fileName + ".md";
         File file = new File(BlogRoot + filePath);
         this.makeFileExist(file);
-        FileCopyUtils.copy(content, new FileWriter(file));
+        FileCopyUtils.copy(new String(content.getBytes(), Charset.forName("UTF-8")), new FileWriter(file));
         return filePath;
     }
 
