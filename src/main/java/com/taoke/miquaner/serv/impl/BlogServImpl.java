@@ -64,17 +64,22 @@ public class BlogServImpl implements IBlogServ {
         String filePath = userId + BlogPosts + fileName + ".md";
         File file = new File(BlogRoot + filePath);
         this.makeFileExist(file);
-        OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-        FileCopyUtils.copy(new String(content.getBytes(), StandardCharsets.UTF_8), out);
+        try (DataOutputStream out = new DataOutputStream(new FileOutputStream(file))) {
+            out.writeUTF(content);
+            out.flush();
+            out.close();
+        }
         return filePath;
     }
 
     @Override
     public String fetchBlog(String filePath, String domain) throws IOException {
-        String content = FileCopyUtils.copyToString(new InputStreamReader(
-                new FileInputStream(BlogRoot + (filePath.endsWith(".md") ? filePath : filePath + ".md")),
-                StandardCharsets.UTF_8
-        ));
+        String content = "";
+        try (DataInputStream in = new DataInputStream(new FileInputStream(
+                BlogRoot + (filePath.endsWith(".md") ? filePath : filePath + ".md")
+        ))) {
+            content = in.readUTF();
+        }
 
         Matcher m0 = PATTERN.matcher(content);
         StringBuffer sb0 = new StringBuffer();
