@@ -203,6 +203,11 @@ public class BlogServImpl implements IBlogServ {
     }
 
     @Override
+    public List<EHelpDoc> listHelpDocByType(Integer type) {
+        return this.helpDocRepo.findAllByTypeEqualsOrderByOrderDesc(type);
+    }
+
+    @Override
     public Page<EFeedback> listPagedFeedback(Integer type, Integer pageNo) throws SearchTypeException {
         pageNo = Math.max(0, --pageNo);
         PageRequest pageRequest = new PageRequest(pageNo, 10, Sort.Direction.DESC, "createTime");

@@ -30,6 +30,8 @@ public interface IBlogServ {
 
     List<EHelpDoc> listAllHelpDoc();
 
+    List<EHelpDoc> listHelpDocByType(Integer type);
+
     Page<EFeedback> listPagedFeedback(Integer type, Integer pageNo) throws SearchTypeException;
 
 }

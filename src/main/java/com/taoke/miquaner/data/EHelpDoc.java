@@ -20,6 +20,22 @@ public class EHelpDoc {
     @Column(name = "idx", nullable = false)
     private Integer order = Integer.MAX_VALUE;
 
+    // if share code == null
+    //     if candidate == true
+    //         if direct user == true
+    //             type = 1
+    //          else
+    //             type = 2
+    //     else
+    //         type = 3
+    // else
+    //     if direct user == true
+    //         type = 4
+    //     else
+    //         type = 5
+    @Column(name = "type", nullable = false)
+    private Integer type = 0;
+
     public Long getId() {
         return id;
     }
@@ -52,6 +68,14 @@ public class EHelpDoc {
         this.order = order;
     }
 
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         return "EHelpDoc{" +
@@ -59,6 +83,7 @@ public class EHelpDoc {
                 ", path='" + path + '\'' +
                 ", title='" + title + '\'' +
                 ", order=" + order +
+                ", type=" + type +
                 '}';
     }
 }
