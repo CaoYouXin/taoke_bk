@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -63,14 +64,17 @@ public class BlogServImpl implements IBlogServ {
         String filePath = userId + BlogPosts + fileName + ".md";
         File file = new File(BlogRoot + filePath);
         this.makeFileExist(file);
-        FileCopyUtils.copy(new String(content.getBytes(), Charset.forName("UTF-8")), new FileWriter(file));
+        OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
+        FileCopyUtils.copy(new String(content.getBytes(), Charset.forName("UTF-8")), out);
         return filePath;
     }
 
     @Override
     public String fetchBlog(String filePath, String domain) throws IOException {
-        String content = FileCopyUtils.copyToString(new FileReader(BlogRoot +
-                (filePath.endsWith(".md") ? filePath : filePath + ".md")));
+        String content = FileCopyUtils.copyToString(new InputStreamReader(
+                new FileInputStream(BlogRoot + (filePath.endsWith(".md") ? filePath : filePath + ".md")),
+                StandardCharsets.UTF_8
+        ));
 
         Matcher m0 = PATTERN.matcher(content);
         StringBuffer sb0 = new StringBuffer();
