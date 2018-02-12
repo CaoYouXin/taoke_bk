@@ -9,4 +9,6 @@ public interface HelpDocRepo extends JpaRepository<EHelpDoc, Long> {
 
     List<EHelpDoc> findAllByOrderByOrderDesc();
 
+    List<EHelpDoc> findAllByTypeEqualsOrderByOrderDesc(Integer type);
+
 }

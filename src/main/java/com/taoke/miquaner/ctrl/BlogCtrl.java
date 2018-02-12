@@ -75,6 +75,16 @@ public class BlogCtrl {
         }
     }
 
+    @RequestMapping(value = "/blog/helpdoc/{type}/list", method = RequestMethod.GET)
+    public Object listHelpdocByType(@PathVariable(name = "type") Integer type) {
+        try {
+            return Result.success(this.blogServ.listHelpDocByType(type));
+        } catch (Exception e) {
+            logger.error("", e);
+            return Result.failWithExp(e);
+        }
+    }
+
     @Auth(isAdmin = true)
     @RequestMapping(value = "/blog/raw/{path}", method = RequestMethod.GET)
     public Object rowBlogContent(@PathVariable(name = "path") String path) {
