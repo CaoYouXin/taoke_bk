@@ -65,7 +65,7 @@ public class BlogServImpl implements IBlogServ {
         File file = new File(BlogRoot + filePath);
         this.makeFileExist(file);
         OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-        FileCopyUtils.copy(new String(content.getBytes(), Charset.forName("UTF-8")), out);
+        FileCopyUtils.copy(new String(content.getBytes(), StandardCharsets.UTF_8), out);
         return filePath;
     }
 
