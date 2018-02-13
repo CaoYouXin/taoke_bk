@@ -64,8 +64,7 @@ public class BlogServImpl implements IBlogServ {
         String filePath = userId + BlogPosts + fileName + ".md";
         File file = new File(BlogRoot + filePath);
         this.makeFileExist(file);
-        OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-        FileCopyUtils.copy(new String(content.getBytes(), StandardCharsets.UTF_8), out);
+        FileCopyUtils.copy(content.getBytes(StandardCharsets.UTF_8), file);
         return filePath;
     }
 
