@@ -22,7 +22,6 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
@@ -202,7 +201,7 @@ public class BlogServImpl implements IBlogServ {
 
     @Override
     public List<EHelpDoc> listAllHelpDoc() {
-        return this.helpDocRepo.findAllByOrderByOrderDesc();
+        return this.helpDocRepo.findAllByOrderByIdDesc();
     }
 
     @Override
