@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface HelpDocRepo extends JpaRepository<EHelpDoc, Long> {
 
-    List<EHelpDoc> findAllByOrderByOrderDesc();
+    List<EHelpDoc> findAllByOrderByIdDesc();
 
     List<EHelpDoc> findAllByTypeEqualsOrderByOrderDesc(Integer type);
 
